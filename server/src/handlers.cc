@@ -10,6 +10,7 @@
 #include "db_utils.h"
 #include "auth.h"
 #include "config.h"
+#include <algorithm>
 
 void handleGetModel(const httplib::Request &req, httplib::Response &res)
 {
@@ -31,14 +32,59 @@ void handleGetModel(const httplib::Request &req, httplib::Response &res)
     }
 
     std::string prompt = root.get("Prompt", "").asString();
-    std::string version = root.get("Version", "").asString();
+    std::string version = root.get("Action", "").asString();
     std::string imageBase64 = root.get("ImageBase64", "").asString();
     std::string resultFormat = root.get("ResultFormat", "").asString();
     //增加UserId
-    std::string userId = root.get("userId", "").asString();
+    std::string userId = root.get("UserId", "").asString();
+
+    //转化
+    if(version =="SubmitHunyuanTo3DJob")version ="comm";
+    else if(version == "SubmitHunyuanTo3DProJob") version = "pro";
+    else version = "rapid";
 
     try
     {
+        // 鉴权：从 Session-Token 读取当前用户信息，并尝试消费一次 token
+        std::string sessionToken;
+        if (req.has_header("Session-Token"))
+        {
+            sessionToken = req.get_header_value("Session-Token");
+        }
+        Json::Value userInfo;
+        if (!sessionToken.empty())
+        {
+            userInfo = getUserInfoBySessionToken(sessionToken);
+        }
+        std::string currentUserId = root.get("UserId", "").asString();
+        if (currentUserId.empty())
+        {
+            currentUserId = userInfo.get("userId", "").asString();
+        }
+        if (currentUserId.empty())
+        {
+            Json::Value errorResponse;
+            errorResponse["status"] = "error";
+            errorResponse["code"] = 401;
+            errorResponse["message"] = "未登录或缺少用户信息";
+            Json::StreamWriterBuilder writer;
+            res.status = 401;
+            res.set_content(Json::writeString(writer, errorResponse), "application/json");
+            return;
+        }
+
+        // token_count 扣减（小于等于0则禁止调用）
+        if (!tryConsumeUserTokenOnce(currentUserId))
+        {
+            Json::Value errorResponse;
+            errorResponse["status"] = "error";
+            errorResponse["code"] = 402;
+            errorResponse["message"] = "余额不足，无法调用";
+            Json::StreamWriterBuilder writer;
+            res.status = 402;
+            res.set_content(Json::writeString(writer, errorResponse), "application/json");
+            return;
+        }
         //version分流
         Json::Value submitResp;
         if(version == "comm")
@@ -51,7 +97,6 @@ void handleGetModel(const httplib::Request &req, httplib::Response &res)
         // 将任务写入数据库
         std::string jobId = submitResp.get("jobId", "").asString();
         std::string requestId = submitResp.get("requestId", "").asString();
-        std::string currentUserId = userId; // TODO: 替换为登录态解析
         bool ok = insertAi3dTask(currentUserId, jobId, requestId, prompt, resultFormat, "QUEUING", version);
         if (!ok)
         {
@@ -65,25 +110,33 @@ void handleGetModel(const httplib::Request &req, httplib::Response &res)
             return;
         }
         //启用定时器，在任务完成前，每隔一段时间更新数据库中的任务状态。
-        std::thread([jobId]() {
+        std::thread([jobId,version]() {
             using namespace std::chrono;
             auto start = steady_clock::now();
             while (duration_cast<seconds>(steady_clock::now() - start).count() < AI3D_POLL_TIMEOUT_SECONDS)
             {
-                Json::Value taskInfo = queryTaskStatusFromTx(jobId);
+                
+                Json::Value taskInfo;
+                if(version == "comm")
+                taskInfo = queryTaskStatusFromTx(jobId);
+                else if(version == "pro")
+                taskInfo = queryTaskStatusFromTxPro(jobId);
+                else if(version == "rapid")
+                taskInfo = queryTaskStatusFromTxRapid(jobId);
+                std::cout << "定时器任务执行中jobId: " << jobId <<" status:" <<taskInfo.get("status","")<< std::endl;  
                 std::string status = taskInfo.get("status", "").asString();
-                if (status == "SUCCEED")
+                if (status == "DONE")
                 {
                     updateAi3dTaskStatus(jobId, "SUCCEED");
                     break;
                 }
-                else if (status == "FAILED" || status == "QUERY_FAILED" || status == "QUERY_EXCEPTION")
+                else if (status == "FAIL" || status == "QUERY_FAILED" || status == "QUERY_EXCEPTION")
                 {
                     std::string err = taskInfo.get("errorMsg", "").asString();
                     updateAi3dTaskError(jobId, err);
                     break;
                 }
-                else if (status == "RUNNING" || status == "QUEUING")
+                else if (status == "RUN" || status == "WAIT")
                 {
                     updateAi3dTaskStatus(jobId, status);
                 }
@@ -121,14 +174,14 @@ void handleQueryJobsByPage(const httplib::Request &req, httplib::Response &res)
         std::string errors;
         bool isParamValid = true;
         std::string userId = "";
-        if(req.has_param("userId"))
-        userId = req.get_param_value("userId");
-        std::string version = req.has_param("version") ? req.get_param_value("version") : "comm";
-        if (req.has_param("pageNum"))
+        if(req.has_param("UserId"))
+        userId = req.get_param_value("UserId");
+        std::string version = req.has_param("Version") ? req.get_param_value("version") : "comm";
+        if (req.has_param("PageNum"))
         {
             try
             {
-                pageNum = std::stoi(req.get_param_value("pageNum"));
+                pageNum = std::stoi(req.get_param_value("PageNum"));
                 if (pageNum < 1)
                 {
                     errors += "pageNum≥1；";
@@ -142,11 +195,11 @@ void handleQueryJobsByPage(const httplib::Request &req, httplib::Response &res)
             }
         }
 
-        if (req.has_param("pageSize"))
+        if (req.has_param("PageSize"))
         {
             try
             {
-                pageSize = std::stoi(req.get_param_value("pageSize"));
+                pageSize = std::stoi(req.get_param_value("PageSize"));
                 if (pageSize < 1 || pageSize > 50)
                 {
                     errors += "1≤pageSize≤50；";
@@ -192,14 +245,16 @@ void handleQueryJobsByPage(const httplib::Request &req, httplib::Response &res)
         {
             //查询分流
             Json::Value taskInfo;
-            if(job.second == "comm")
-            taskInfo = queryTaskStatusFromTx(job.first);
+            std::cout <<"UserId: "<< userId<<" jobId: "<<job.first<<" job version:" <<job.second <<std::endl;
+            if(job.second == "rapid")
+            taskInfo = queryTaskStatusFromTxRapid(job.first);
             else if(job.second == "pro")
             taskInfo = queryTaskStatusFromTxPro(job.first);
             else
-            taskInfo = queryTaskStatusFromTxRapid(job.first);
+            taskInfo = queryTaskStatusFromTx(job.first);
 
             currentPageData.append(taskInfo);
+            
         }
 
         Json::Value successResp;
@@ -327,3 +382,221 @@ void handleLogin(const httplib::Request &req, httplib::Response &res)
     }
     res.set_content(Json::writeString(writer, result), "application/json");
 } 
+
+void handleMe(const httplib::Request &req, httplib::Response &res)
+{
+    std::string sessionToken;
+    if (req.has_header("Session-Token"))
+    {
+        sessionToken = req.get_header_value("Session-Token");
+    }
+    if (sessionToken.empty())
+    {
+        Json::Value errorResp;
+        errorResp["status"] = "error";
+        errorResp["code"] = 401;
+        errorResp["message"] = "缺少 Session-Token";
+        Json::StreamWriterBuilder writer;
+        res.status = 401;
+        res.set_content(Json::writeString(writer, errorResp), "application/json");
+        return;
+    }
+
+    Json::Value info = getUserInfoBySessionToken(sessionToken);
+    if (info.isNull() || info.get("userId", "").asString().empty())
+    {
+        Json::Value errorResp;
+        errorResp["status"] = "error";
+        errorResp["code"] = 401;
+        errorResp["message"] = "无效或过期的会话";
+        Json::StreamWriterBuilder writer;
+        res.status = 401;
+        res.set_content(Json::writeString(writer, errorResp), "application/json");
+        return;
+    }
+
+    Json::Value resp;
+    resp["status"] = "success";
+    resp["code"] = 200;
+    resp["message"] = "OK";
+    resp["data"]["userId"] = info.get("userId", "").asString();
+    resp["data"]["username"] = info.get("username", "").asString();
+    resp["data"]["role"] = info.get("role", "").asString();
+    resp["data"]["token_count"] = info.get("token_count", 0).asInt();
+    Json::StreamWriterBuilder writer;
+    res.status = 200;
+    res.set_content(Json::writeString(writer, resp), "application/json");
+}
+
+void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
+{
+    Json::Value root;
+    Json::CharReaderBuilder reader;
+    std::string errors;
+    std::istringstream reqBodyStream(req.body);
+    if (!Json::parseFromStream(reader, reqBodyStream, &root, &errors))
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 400;
+        errorResponse["message"] = std::string("无效的JSON格式: ") + errors;
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    std::string jobId = root.get("jobId", "").asString();
+    if (jobId.empty())
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 400;
+        errorResponse["message"] = "jobId 必填";
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    if (!incrementModelDownloadCount(jobId))
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 500;
+        errorResponse["message"] = "下载计数更新失败";
+        Json::StreamWriterBuilder writer;
+        res.status = 500;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    Json::Value ok;
+    ok["status"] = "success";
+    ok["code"] = 200;
+    ok["message"] = "下载计数+1";
+    Json::StreamWriterBuilder writer;
+    res.status = 200;
+    res.set_content(Json::writeString(writer, ok), "application/json");
+}
+
+void handleLikeModel(const httplib::Request &req, httplib::Response &res)
+{
+    Json::Value root;
+    Json::CharReaderBuilder reader;
+    std::string errors;
+    std::istringstream reqBodyStream(req.body);
+    if (!Json::parseFromStream(reader, reqBodyStream, &root, &errors))
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 400;
+        errorResponse["message"] = std::string("无效的JSON格式: ") + errors;
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    std::string jobId = root.get("jobId", "").asString();
+    if (jobId.empty())
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 400;
+        errorResponse["message"] = "jobId 必填";
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    if (!incrementModelLikeCount(jobId))
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 500;
+        errorResponse["message"] = "收藏计数更新失败";
+        Json::StreamWriterBuilder writer;
+        res.status = 500;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    Json::Value ok;
+    ok["status"] = "success";
+    ok["code"] = 200;
+    ok["message"] = "收藏计数+1";
+    Json::StreamWriterBuilder writer;
+    res.status = 200;
+    res.set_content(Json::writeString(writer, ok), "application/json");
+}
+
+void handleShowModel(const httplib::Request &req, httplib::Response &res)
+{
+    try
+    {
+        int pageNum = 1;
+        int pageSize = 10;
+        bool isPrivate = false;
+        std::string errors;
+        bool isParamValid = true;
+
+        if (req.has_param("PageNum"))
+        {
+            try { pageNum = std::stoi(req.get_param_value("PageNum")); if (pageNum < 1) { errors += "pageNum≥1；"; isParamValid = false; } }
+            catch (...) { errors += "pageNum需为整数；"; isParamValid = false; }
+        }
+        if (req.has_param("PageSize"))
+        {
+            try { pageSize = std::stoi(req.get_param_value("PageSize")); if (pageSize < 1 || pageSize > 50) { errors += "1≤pageSize≤50；"; isParamValid = false; } }
+            catch (...) { errors += "pageSize需为整数；"; isParamValid = false; }
+        }
+        if (req.has_param("Isprivate"))
+        {
+            std::string v = req.get_param_value("Isprivate");
+            std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+            isPrivate = (v == "1" || v == "true");
+        }
+
+        if (!isParamValid)
+        {
+            Json::Value errorResp;
+            errorResp["status"] = "error";
+            errorResp["code"] = 400;
+            errorResp["message"] = std::string("参数错误：") + errors;
+            Json::StreamWriterBuilder writer;
+            res.status = 400;
+            res.set_content(Json::writeString(writer, errorResp), "application/json");
+            return;
+        }
+
+        auto pair = queryModelsByPrivacy(isPrivate, pageNum, pageSize);
+        int totalCount = pair.first;
+        const Json::Value &items = pair.second;
+        int totalPage = (totalCount + pageSize - 1) / pageSize;
+        if (totalPage <= 0) totalPage = 0;
+        if (pageNum > totalPage && totalPage > 0) pageNum = totalPage;
+
+        Json::Value successResp;
+        successResp["status"] = "success";
+        successResp["code"] = 200;
+        successResp["message"] = "查询成功";
+        Json::Value pageInfo;
+        pageInfo["pageNum"] = pageNum;
+        pageInfo["pageSize"] = pageSize;
+        pageInfo["totalCount"] = totalCount;
+        pageInfo["totalPage"] = totalPage;
+        successResp["data"]["pageInfo"] = pageInfo;
+        successResp["data"]["list"] = items;
+
+        Json::StreamWriterBuilder writer;
+        res.status = 200;
+        res.set_content(Json::writeString(writer, successResp), "application/json");
+    }
+    catch (const std::exception &e)
+    {
+        Json::Value errorResp;
+        errorResp["status"] = "error";
+        errorResp["code"] = 500;
+        errorResp["message"] = "服务器内部错误";
+        errorResp["data"]["errorDetail"] = e.what();
+        Json::StreamWriterBuilder writer;
+        res.status = 500;
+        res.set_content(Json::writeString(writer, errorResp), "application/json");
+    }
+}

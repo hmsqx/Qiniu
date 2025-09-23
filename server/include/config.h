@@ -2,11 +2,11 @@
 
 // ---------------- Tencent Cloud Credentials ----------------
 #ifndef TENCENTCLOUD_SECRET_ID
-#define TENCENTCLOUD_SECRET_ID "YOUR_SECRET_ID"
+#define TENCENTCLOUD_SECRET_ID "AKIDzqUxDF3e2C8qLcfXRCuXzELSOJzXs1xf"
 #endif
 
 #ifndef TENCENTCLOUD_SECRET_KEY
-#define TENCENTCLOUD_SECRET_KEY "YOUR_SECRET_KEY"
+#define TENCENTCLOUD_SECRET_KEY "XqwotlQr43pPs8OWTDi07jAORHuJVVJv"
 #endif
 
 #ifndef TENCENTCLOUD_REGION

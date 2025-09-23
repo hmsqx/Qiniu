@@ -209,20 +209,39 @@ Json::Value loginUser(const std::string &usernameOrEmail,
         return resp;
     }
 
-    // 生成 session token
-    unsigned char tokenBytes[32];
-    if (RAND_bytes(tokenBytes, sizeof(tokenBytes)) != 1)
+    // 优先复用未过期且未撤销的会话
+    std::string tokenHex;
     {
-        mysql_close(conn);
-        resp["status"] = "error";
-        resp["code"] = 500;
-        resp["message"] = "生成会话失败";
-        return resp;
+        std::ostringstream q;
+        q << "SELECT session_token FROM user_sessions WHERE user_id='" << userId
+          << "' AND revoked=0 AND expire_time > NOW() ORDER BY create_time DESC LIMIT 1";
+        std::string query = q.str();
+        if (mysql_query(conn, query.c_str()) == 0)
+        {
+            MYSQL_RES *sres = mysql_store_result(conn);
+            MYSQL_ROW srow = sres ? mysql_fetch_row(sres) : nullptr;
+            if (srow && srow[0])
+            {
+                tokenHex = srow[0];
+            }
+            if (sres) mysql_free_result(sres);
+        }
     }
-    std::string tokenHex = bytesToHex(tokenBytes, sizeof(tokenBytes));
 
-    // 写入 session 表
+    // 若没有可复用会话，生成新的 session token 并写入
+    if (tokenHex.empty())
     {
+        unsigned char tokenBytes[32];
+        if (RAND_bytes(tokenBytes, sizeof(tokenBytes)) != 1)
+        {
+            mysql_close(conn);
+            resp["status"] = "error";
+            resp["code"] = 500;
+            resp["message"] = "生成会话失败";
+            return resp;
+        }
+        tokenHex = bytesToHex(tokenBytes, sizeof(tokenBytes));
+
         std::string escToken;
         escToken.resize(tokenHex.size() * 2 + 1);
         unsigned long tlen = mysql_real_escape_string(conn, &escToken[0], tokenHex.c_str(), tokenHex.size());

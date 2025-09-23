@@ -9,7 +9,7 @@
 #include <tencentcloud/core/Credential.h>
 #include <tencentcloud/core/profile/ClientProfile.h>
 #include <tencentcloud/core/profile/HttpProfile.h>
-
+#include <iostream>
 #include <stdexcept>
 
 using namespace TencentCloud;
@@ -149,9 +149,11 @@ Json::Value queryTaskStatusFromTx(const std::string &jobId)
             return taskInfo;
         }
         QueryHunyuanTo3DJobResponse resp = outcome.GetResult();
+
         taskInfo["requestId"] = resp.GetRequestId();
         taskInfo["status"] = resp.GetStatus();
-        if (resp.GetStatus() == "SUCCEED")
+        std::cout <<"CommJob: "<< resp.GetStatus()<<std::endl;
+        if (resp.GetStatus() == "DONE")
         {
             auto fileList = resp.GetResultFile3Ds();
             Json::Value modelList;
@@ -167,9 +169,17 @@ Json::Value queryTaskStatusFromTx(const std::string &jobId)
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
         }
-        else if (resp.GetStatus() == "FAILED")
+        else if (resp.GetStatus() == "FAIL")
         {
             taskInfo["errorMsg"] = resp.GetErrorMessage();
+        }
+        else if(resp.GetStatus() == "WAIT")
+        {
+            taskInfo["Msg"] = "任务等待中";
+        }
+        else if(resp.GetStatus() == "RUN")
+        {
+            taskInfo["Msg"] = "任务进行中";
         }
     }
     catch (const std::exception &e)
@@ -200,8 +210,8 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
         QueryHunyuanTo3DProJobResponse resp = outcome.GetResult();
         taskInfo["requestId"] = resp.GetRequestId();
         taskInfo["status"] = resp.GetStatus();
-        
-        if (resp.GetStatus() == "SUCCEED")
+        std::cout << "ProJob: " << resp.GetStatus() <<std::endl; 
+        if (resp.GetStatus() == "DONE")
         {
             auto fileList = resp.GetResultFile3Ds();
             Json::Value modelList;
@@ -220,9 +230,16 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
         }
-        else if (resp.GetStatus() == "FAILED")
+        else if (resp.GetStatus() == "FAIL")
         {
             taskInfo["errorMsg"] = resp.GetErrorMessage();
+        }else if(resp.GetStatus() == "WAIT")
+        {
+            taskInfo["Msg"] = "任务等待中";
+        }
+        else if(resp.GetStatus() == "RUN")
+        {
+            taskInfo["Msg"] = "任务进行中";
         }
     }
     catch (const std::exception &e)
@@ -253,7 +270,8 @@ Json::Value queryTaskStatusFromTxRapid(const std::string &jobId)
         QueryHunyuanTo3DRapidJobResponse resp = outcome.GetResult();
         taskInfo["requestId"] = resp.GetRequestId();
         taskInfo["status"] = resp.GetStatus();
-        if (resp.GetStatus() == "SUCCEED")
+        std::cout << "rapidJob: " << resp.GetStatus() <<std::endl; 
+        if (resp.GetStatus() == "DONE")
         {
             auto fileList = resp.GetResultFile3Ds();
             Json::Value modelList;
@@ -270,9 +288,16 @@ Json::Value queryTaskStatusFromTxRapid(const std::string &jobId)
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
         }
-        else if (resp.GetStatus() == "FAILED")
+        else if (resp.GetStatus() == "FAIL")
         {
             taskInfo["errorMsg"] = resp.GetErrorMessage();
+        }else if(resp.GetStatus() == "WAIT")
+        {
+            taskInfo["Msg"] = "任务等待中";
+        }
+        else if(resp.GetStatus() == "RUN")
+        {
+            taskInfo["Msg"] = "任务进行中";
         }
     }
     catch (const std::exception &e)

@@ -10,6 +10,10 @@ int main()
     server.Get("/api/query", handleQueryJobsByPage);
     server.Post("/api/register", handleRegister);
     server.Post("/api/login", handleLogin);
+    server.Get("/api/auth/me", handleMe);
+    server.Post("/api/downloadModel", handleDownloadModel);
+    server.Post("/api/like", handleLikeModel);
+    server.Get("/api/showModel", handleShowModel);
     server.Get("/health", [](const httplib::Request &, httplib::Response &res)
               { res.set_content("服务正常运行", "text/plain"); });
 
