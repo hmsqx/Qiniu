@@ -1,26 +1,30 @@
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    proxy: {
-      "/proxy": {
-        // 目标服务器地址
-        target:
-          "https://hunyuan-prod-1258344699.cos.ap-guangzhou.tencentcos.cn",
+export default ({ mode }: { mode: string }) => {
+  const env = loadEnv(mode, process.cwd());
 
-        changeOrigin: true,
-        // 重写请求路径，去掉我们自定义的代理前缀 '/proxy'
-        rewrite: (path) => path.replace(/^\/proxy/, ""),
+  const proxyTarget = env.VITE_PROXY_TARGET || "http://localhost:3000";
+
+  return defineConfig({
+    plugins: [react(), tailwindcss()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
       },
     },
-  },
-});
+    server: {
+      proxy: {
+        "/api": {
+          target: proxyTarget,
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/api/, ""),
+        },
+      },
+    },
+
+    define: {},
+  });
+};

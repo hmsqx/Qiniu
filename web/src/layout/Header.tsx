@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/context/AuthContext";
 
 import { MenuBar, type MenuItem } from "./glowMenu";
 
@@ -46,48 +47,34 @@ const menuItems: MenuItem[] = [
 ];
 
 export const Header = () => {
-  // --- 改动开始 ---
-
-  // 1. 获取 navigate 函数和 location 对象
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 2. 使用 useState 来管理 activeItem 的状态
   const [activeItem, setActiveItem] = useState("");
 
-  // 3. 使用 useEffect 监听路由变化，并更新 activeItem
   useEffect(() => {
-    // 查找当前路径匹配的菜单项
     const currentItem = menuItems.find((item) =>
       location.pathname.startsWith(item.href)
     );
     if (currentItem) {
       setActiveItem(currentItem.label);
     } else {
-      // 如果没有匹配的，可以设置一个默认值或清空
       setActiveItem("");
     }
-  }, [location.pathname]); // 依赖项是 location.pathname
+  }, [location.pathname]);
 
-  // 4. 修改点击事件处理函数，实现路由跳转
   const handleMenuItemClick = (label: string) => {
-    // 找到被点击菜单项的路由信息
     const item = menuItems.find((i) => i.label === label);
     if (item) {
-      // 更新 active 状态（为了立即反馈，虽然 useEffect 也会做）
       setActiveItem(item.label);
-      // 执行路由跳转
       navigate(item.href);
     }
   };
 
-  // --- 改动结束 ---
-
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50",
-        "flex items-center justify-between", // 整体依然是左右布局
+        "flex items-center justify-between",
         "px-4 sm:px-6 py-3",
         "bg-background/80 backdrop-blur-lg",
         "border-b border-border/60 shadow-sm"
@@ -136,13 +123,9 @@ export const Header = () => {
           <span className="font-semibold text-foreground">16</span>
         </Badge>
 
-        <Avatar className="h-9 w-9">
-          <AvatarImage
-            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-            alt="@username"
-          />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
+        <div>
+          <AuthArea />
+        </div>
 
         <div className="md:hidden">
           <Button variant="ghost" size="icon">
@@ -151,5 +134,37 @@ export const Header = () => {
         </div>
       </div>
     </header>
+  );
+};
+
+const AuthArea: React.FC = () => {
+  const { isAuthenticated, user, openLoginModal, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <Button onClick={openLoginModal} variant="ghost">
+        登录
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Avatar className="h-9 w-9">
+        {user?.avatar ? (
+          <AvatarImage src={user.avatar} alt={user.username} />
+        ) : (
+          <AvatarFallback>
+            {user?.username?.[0]?.toUpperCase() || "U"}
+          </AvatarFallback>
+        )}
+      </Avatar>
+      <div className="hidden sm:block">
+        <div className="text-sm font-medium">{user?.username}</div>
+        <button className="text-xs text-muted-foreground" onClick={logout}>
+          登出
+        </button>
+      </div>
+    </div>
   );
 };

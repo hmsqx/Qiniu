@@ -1,8 +1,28 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import Layout from "@/layout";
 import Home from "@/views/home";
 import Workspace from "@/views/workspace";
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { Navigate } from "react-router-dom";
+
+// small Protected wrapper component used in routes
+const Protected: React.FC<{ children: React.ReactElement }> = ({
+  children,
+}) => {
+  const { isAuthenticated, openLoginModal } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      openLoginModal();
+    }
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) return <Navigate to="/home" replace />;
+
+  return children;
+};
 
 const router = createBrowserRouter([
   {
@@ -21,8 +41,11 @@ const router = createBrowserRouter([
       },
       {
         path: "workspace",
-        // 直接提供 JSX 元素
-        element: <Workspace />,
+        element: (
+          <Protected>
+            <Workspace />
+          </Protected>
+        ),
       },
     ],
   },

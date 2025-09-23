@@ -88,7 +88,7 @@ export const MenuBar = React.forwardRef<HTMLDivElement, MenuBarProps>(
               <motion.li key={item.label} className="relative">
                 <button
                   onClick={() => onItemClick?.(item.label)}
-                  className="block w-full"
+                  className="block w-full bg-transparent"
                 >
                   <motion.div
                     className="block rounded-xl overflow-visible group relative"
@@ -97,12 +97,15 @@ export const MenuBar = React.forwardRef<HTMLDivElement, MenuBarProps>(
                     initial="initial"
                   >
                     <motion.div
-                      className="absolute inset-0 z-0 pointer-events-none"
+                      className={cn(
+                        "absolute inset-0 z-0 pointer-events-none",
+                        "blur-2xl opacity-40" // ✨ 添加这两个类
+                      )}
                       variants={glowVariants}
                       animate={isActive ? "hover" : "initial"}
                       style={{
                         background: item.gradient,
-                        opacity: isActive ? 1 : 0,
+
                         borderRadius: "16px",
                       }}
                     />

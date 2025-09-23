@@ -1,5 +1,7 @@
+import WorkspaceGallery from "./_modules/WorkspaceGallery";
+
 const Workspace = () => {
-  return <div>Workspace</div>;
+  return <WorkspaceGallery />;
 };
 
 export default Workspace;
