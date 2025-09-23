@@ -53,15 +53,16 @@ export const GeneratorTabs = () => {
 
     setLoading(true);
     try {
+      let resp: any;
       if (activeTab === "text-to-3d" && hasPrompt) {
-        await textTo3D({
+        resp = await textTo3D({
           action,
           prompt: prompt.trim(),
           resultFormat: format,
           userId: user.id,
         });
       } else if (activeTab === "image-to-3d" && hasImage && imageBase64) {
-        await imageTo3D({
+        resp = await imageTo3D({
           action,
           imageBase64,
           resultFormat: format,
@@ -69,7 +70,14 @@ export const GeneratorTabs = () => {
         });
       }
 
-      show({ type: "success", content: "提交成功" });
+      // 仅当后端返回成功时才提示成功并可前往控制台
+      if (resp && (resp.status === "success" || resp.code === 0)) {
+        show({ type: "success", content: "提交成功", duration: 5000 });
+      } else {
+        const msg =
+          (resp && (resp.message || resp.msg)) || "提交失败，请稍后重试";
+        throw new Error(msg);
+      }
     } catch (e: any) {
       const msg = e?.message || "生成失败，请稍后重试";
       setError(msg);

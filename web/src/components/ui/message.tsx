@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 type MessageType = "info" | "success" | "warning" | "error";
 
 export type MessageOptions = {
-  content: React.ReactNode; // 文案或自定义节点（由调用方传递）
+  content: React.ReactNode;
   type?: MessageType;
-  duration?: number; // 毫秒，默认 2000；传 0 则不自动关闭
+  duration?: number;
 };
 
 type InternalMsg = MessageOptions & { id: number; createdAt: number };
@@ -60,11 +60,11 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <MessageCtx.Provider value={value}>
       {children}
-      {/* Portal-like 容器：居中显示 */}
+      {/* Portal-like 容器：顶部显示 */}
       <div
         className={cn(
-          "pointer-events-none fixed inset-0 z-50 flex items-center justify-center",
-          "px-4 py-10"
+          "pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center",
+          "px-4 py-4"
         )}
       >
         <div className="flex flex-col gap-3 w-full max-w-md">
@@ -96,6 +96,22 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
                   m.content
                 )}
               </div>
+              {m.type === "success" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    // 点击后先关闭消息，再跳转到工作台
+                    setMsgs((prev) => prev.filter((x) => x.id !== m.id));
+                    window.location.assign("/workspace");
+                  }}
+                  className={cn(
+                    "ml-auto text-sm font-medium underline underline-offset-4",
+                    "text-emerald-700 hover:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200"
+                  )}
+                >
+                  去控制台查看
+                </button>
+              ) : null}
             </div>
           ))}
         </div>
