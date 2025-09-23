@@ -1,0 +1,249 @@
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef TENCENTCLOUD_THPC_V20230321_MODEL_CFSOPTION_H_
+#define TENCENTCLOUD_THPC_V20230321_MODEL_CFSOPTION_H_
+
+#include <string>
+#include <vector>
+#include <map>
+#include <tencentcloud/core/utils/rapidjson/document.h>
+#include <tencentcloud/core/utils/rapidjson/writer.h>
+#include <tencentcloud/core/utils/rapidjson/stringbuffer.h>
+#include <tencentcloud/core/AbstractModel.h>
+
+
+namespace TencentCloud
+{
+    namespace Thpc
+    {
+        namespace V20230321
+        {
+            namespace Model
+            {
+                /**
+                * 描述CFS文件系统版本和挂载信息
+                */
+                class CFSOption : public AbstractModel
+                {
+                public:
+                    CFSOption();
+                    ~CFSOption() = default;
+                    void ToJsonObject(rapidjson::Value &value, rapidjson::Document::AllocatorType& allocator) const;
+                    CoreInternalOutcome Deserialize(const rapidjson::Value &value);
+
+
+                    /**
+                     * 获取文件系统本地挂载路径。
+                     * @return LocalPath 文件系统本地挂载路径。
+                     * 
+                     */
+                    std::string GetLocalPath() const;
+
+                    /**
+                     * 设置文件系统本地挂载路径。
+                     * @param _localPath 文件系统本地挂载路径。
+                     * 
+                     */
+                    void SetLocalPath(const std::string& _localPath);
+
+                    /**
+                     * 判断参数 LocalPath 是否已赋值
+                     * @return LocalPath 是否已赋值
+                     * 
+                     */
+                    bool LocalPathHasBeenSet() const;
+
+                    /**
+                     * 获取文件系统远程挂载ip及路径。
+                     * @return RemotePath 文件系统远程挂载ip及路径。
+                     * 
+                     */
+                    std::string GetRemotePath() const;
+
+                    /**
+                     * 设置文件系统远程挂载ip及路径。
+                     * @param _remotePath 文件系统远程挂载ip及路径。
+                     * 
+                     */
+                    void SetRemotePath(const std::string& _remotePath);
+
+                    /**
+                     * 判断参数 RemotePath 是否已赋值
+                     * @return RemotePath 是否已赋值
+                     * 
+                     */
+                    bool RemotePathHasBeenSet() const;
+
+                    /**
+                     * 获取文件系统协议类型。
+<li>NFS 3.0</li>
+<li>NFS 4.0</li>
+<li>TURBO</li>
+                     * @return Protocol 文件系统协议类型。
+<li>NFS 3.0</li>
+<li>NFS 4.0</li>
+<li>TURBO</li>
+                     * 
+                     */
+                    std::string GetProtocol() const;
+
+                    /**
+                     * 设置文件系统协议类型。
+<li>NFS 3.0</li>
+<li>NFS 4.0</li>
+<li>TURBO</li>
+                     * @param _protocol 文件系统协议类型。
+<li>NFS 3.0</li>
+<li>NFS 4.0</li>
+<li>TURBO</li>
+                     * 
+                     */
+                    void SetProtocol(const std::string& _protocol);
+
+                    /**
+                     * 判断参数 Protocol 是否已赋值
+                     * @return Protocol 是否已赋值
+                     * 
+                     */
+                    bool ProtocolHasBeenSet() const;
+
+                    /**
+                     * 获取文件系统存储类型，默认值SD；其中 SD 为通用标准型标准型存储， HP为通用性能型存储， TB为turbo标准型， TP 为turbo性能型。
+                     * @return StorageType 文件系统存储类型，默认值SD；其中 SD 为通用标准型标准型存储， HP为通用性能型存储， TB为turbo标准型， TP 为turbo性能型。
+                     * 
+                     */
+                    std::string GetStorageType() const;
+
+                    /**
+                     * 设置文件系统存储类型，默认值SD；其中 SD 为通用标准型标准型存储， HP为通用性能型存储， TB为turbo标准型， TP 为turbo性能型。
+                     * @param _storageType 文件系统存储类型，默认值SD；其中 SD 为通用标准型标准型存储， HP为通用性能型存储， TB为turbo标准型， TP 为turbo性能型。
+                     * 
+                     */
+                    void SetStorageType(const std::string& _storageType);
+
+                    /**
+                     * 判断参数 StorageType 是否已赋值
+                     * @return StorageType 是否已赋值
+                     * 
+                     */
+                    bool StorageTypeHasBeenSet() const;
+
+                    /**
+                     * 获取文件系统挂载挂载命令参数选项。
+- NFS 3.0默认值：vers=3,nolock,proto=tcp,noresvport
+- NFS 4.0默认值：vers=4.0,noresvport
+- TURBO默认值：user_xattr
+                     * @return MountOption 文件系统挂载挂载命令参数选项。
+- NFS 3.0默认值：vers=3,nolock,proto=tcp,noresvport
+- NFS 4.0默认值：vers=4.0,noresvport
+- TURBO默认值：user_xattr
+                     * 
+                     */
+                    std::string GetMountOption() const;
+
+                    /**
+                     * 设置文件系统挂载挂载命令参数选项。
+- NFS 3.0默认值：vers=3,nolock,proto=tcp,noresvport
+- NFS 4.0默认值：vers=4.0,noresvport
+- TURBO默认值：user_xattr
+                     * @param _mountOption 文件系统挂载挂载命令参数选项。
+- NFS 3.0默认值：vers=3,nolock,proto=tcp,noresvport
+- NFS 4.0默认值：vers=4.0,noresvport
+- TURBO默认值：user_xattr
+                     * 
+                     */
+                    void SetMountOption(const std::string& _mountOption);
+
+                    /**
+                     * 判断参数 MountOption 是否已赋值
+                     * @return MountOption 是否已赋值
+                     * 
+                     */
+                    bool MountOptionHasBeenSet() const;
+
+                    /**
+                     * 获取文件系统ID    文件系统ID通过调用接口[DescribeCfsFileSystems](https://cloud.tencent.com/document/product/582/38170)获取。
+                     * @return FileSystemId 文件系统ID    文件系统ID通过调用接口[DescribeCfsFileSystems](https://cloud.tencent.com/document/product/582/38170)获取。
+                     * 
+                     */
+                    std::string GetFileSystemId() const;
+
+                    /**
+                     * 设置文件系统ID    文件系统ID通过调用接口[DescribeCfsFileSystems](https://cloud.tencent.com/document/product/582/38170)获取。
+                     * @param _fileSystemId 文件系统ID    文件系统ID通过调用接口[DescribeCfsFileSystems](https://cloud.tencent.com/document/product/582/38170)获取。
+                     * 
+                     */
+                    void SetFileSystemId(const std::string& _fileSystemId);
+
+                    /**
+                     * 判断参数 FileSystemId 是否已赋值
+                     * @return FileSystemId 是否已赋值
+                     * 
+                     */
+                    bool FileSystemIdHasBeenSet() const;
+
+                private:
+
+                    /**
+                     * 文件系统本地挂载路径。
+                     */
+                    std::string m_localPath;
+                    bool m_localPathHasBeenSet;
+
+                    /**
+                     * 文件系统远程挂载ip及路径。
+                     */
+                    std::string m_remotePath;
+                    bool m_remotePathHasBeenSet;
+
+                    /**
+                     * 文件系统协议类型。
+<li>NFS 3.0</li>
+<li>NFS 4.0</li>
+<li>TURBO</li>
+                     */
+                    std::string m_protocol;
+                    bool m_protocolHasBeenSet;
+
+                    /**
+                     * 文件系统存储类型，默认值SD；其中 SD 为通用标准型标准型存储， HP为通用性能型存储， TB为turbo标准型， TP 为turbo性能型。
+                     */
+                    std::string m_storageType;
+                    bool m_storageTypeHasBeenSet;
+
+                    /**
+                     * 文件系统挂载挂载命令参数选项。
+- NFS 3.0默认值：vers=3,nolock,proto=tcp,noresvport
+- NFS 4.0默认值：vers=4.0,noresvport
+- TURBO默认值：user_xattr
+                     */
+                    std::string m_mountOption;
+                    bool m_mountOptionHasBeenSet;
+
+                    /**
+                     * 文件系统ID    文件系统ID通过调用接口[DescribeCfsFileSystems](https://cloud.tencent.com/document/product/582/38170)获取。
+                     */
+                    std::string m_fileSystemId;
+                    bool m_fileSystemIdHasBeenSet;
+
+                };
+            }
+        }
+    }
+}
+
+#endif // !TENCENTCLOUD_THPC_V20230321_MODEL_CFSOPTION_H_

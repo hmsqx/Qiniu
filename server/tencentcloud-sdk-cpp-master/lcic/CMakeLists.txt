@@ -1,0 +1,414 @@
+#
+# Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+set(lcic_public_header
+  include/tencentcloud/lcic/v20220817/LcicClient.h
+  )
+
+set(lcic_public_header_model
+  include/tencentcloud/lcic/v20220817/model/CreateRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeQuestionListRequest.h
+  include/tencentcloud/lcic/v20220817/model/ModifyRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeAppDetailResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteSupervisorRequest.h
+  include/tencentcloud/lcic/v20220817/model/DeleteUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/WatermarkConfig.h
+  include/tencentcloud/lcic/v20220817/model/DescribeSupervisorsResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeWhiteBoardSnapshotRequest.h
+  include/tencentcloud/lcic/v20220817/model/DeleteUserResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteWhiteBoardSnapshotRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchDeleteRecordRequest.h
+  include/tencentcloud/lcic/v20220817/model/ModifyAppResponse.h
+  include/tencentcloud/lcic/v20220817/model/UnblockKickedUserResponse.h
+  include/tencentcloud/lcic/v20220817/model/BatchRegisterRequest.h
+  include/tencentcloud/lcic/v20220817/model/StartRecordRequest.h
+  include/tencentcloud/lcic/v20220817/model/DeleteRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/ModifyUserProfileRequest.h
+  include/tencentcloud/lcic/v20220817/model/CreateGroupWithMembersRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDocumentsByRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchCreateGroupWithMembersResponse.h
+  include/tencentcloud/lcic/v20220817/model/GetRoomEventResponse.h
+  include/tencentcloud/lcic/v20220817/model/MemberRecord.h
+  include/tencentcloud/lcic/v20220817/model/DeleteAppCustomContentRequest.h
+  include/tencentcloud/lcic/v20220817/model/SendRoomNotificationMessageResponse.h
+  include/tencentcloud/lcic/v20220817/model/BatchAddGroupMemberResponse.h
+  include/tencentcloud/lcic/v20220817/model/ModifyUserProfileResponse.h
+  include/tencentcloud/lcic/v20220817/model/GetWatermarkResponse.h
+  include/tencentcloud/lcic/v20220817/model/LoginOriginIdRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchRegisterResponse.h
+  include/tencentcloud/lcic/v20220817/model/BindDocumentToRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/StopRecordResponse.h
+  include/tencentcloud/lcic/v20220817/model/CreateGroupWithSubGroupRequest.h
+  include/tencentcloud/lcic/v20220817/model/RoomItem.h
+  include/tencentcloud/lcic/v20220817/model/ClassScoreItem.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchDescribeDocumentRequest.h
+  include/tencentcloud/lcic/v20220817/model/RegisterUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchCreateRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/StartRecordResponse.h
+  include/tencentcloud/lcic/v20220817/model/UnbindDocumentFromRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/CreateDocumentResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeMarqueeRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeGroupResponse.h
+  include/tencentcloud/lcic/v20220817/model/SetAppCustomContentResponse.h
+  include/tencentcloud/lcic/v20220817/model/UnblockKickedUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/DeleteWhiteBoardSnapshotResponse.h
+  include/tencentcloud/lcic/v20220817/model/LoginUserResponse.h
+  include/tencentcloud/lcic/v20220817/model/ModifyGroupRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeAppDetailRequest.h
+  include/tencentcloud/lcic/v20220817/model/KickUserFromRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteGroupRequest.h
+  include/tencentcloud/lcic/v20220817/model/StartRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/AddGroupMemberRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeGroupListRequest.h
+  include/tencentcloud/lcic/v20220817/model/GetRoomMessageRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDocumentsResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRecordRequest.h
+  include/tencentcloud/lcic/v20220817/model/DocumentInfo.h
+  include/tencentcloud/lcic/v20220817/model/DeleteDocumentResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteRecordRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchDeleteGroupMemberResponse.h
+  include/tencentcloud/lcic/v20220817/model/CreateGroupWithSubGroupResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDocumentsRequest.h
+  include/tencentcloud/lcic/v20220817/model/MessageItem.h
+  include/tencentcloud/lcic/v20220817/model/GroupInfo.h
+  include/tencentcloud/lcic/v20220817/model/GetRoomEventRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRecordResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDocumentResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteGroupMemberResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeGroupMemberListResponse.h
+  include/tencentcloud/lcic/v20220817/model/SetMarqueeRequest.h
+  include/tencentcloud/lcic/v20220817/model/ForbidSendMsgRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRoomForbiddenUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/EventInfo.h
+  include/tencentcloud/lcic/v20220817/model/DescribeScoreListRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRecordStreamRequest.h
+  include/tencentcloud/lcic/v20220817/model/AppConfig.h
+  include/tencentcloud/lcic/v20220817/model/DeleteRecordResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeAnswerListRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchCreateRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeGroupMemberListRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRoomForbiddenUserResponse.h
+  include/tencentcloud/lcic/v20220817/model/UserInfo.h
+  include/tencentcloud/lcic/v20220817/model/DescribeUserResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeScoreListResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDocumentRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchDeleteRecordResponse.h
+  include/tencentcloud/lcic/v20220817/model/FaceMsgContent.h
+  include/tencentcloud/lcic/v20220817/model/SetAppCustomContentRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/RegisterUserResponse.h
+  include/tencentcloud/lcic/v20220817/model/StartRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/BindDocumentToRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/CreateDocumentRequest.h
+  include/tencentcloud/lcic/v20220817/model/GetRoomMessageResponse.h
+  include/tencentcloud/lcic/v20220817/model/BatchUserInfo.h
+  include/tencentcloud/lcic/v20220817/model/BatchAddGroupMemberRequest.h
+  include/tencentcloud/lcic/v20220817/model/TransferItem.h
+  include/tencentcloud/lcic/v20220817/model/DescribeUserDetailResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRecordStreamResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeCurrentMemberListRequest.h
+  include/tencentcloud/lcic/v20220817/model/SendRoomNotificationMessageRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeSdkAppIdUsersResponse.h
+  include/tencentcloud/lcic/v20220817/model/EventDataInfo.h
+  include/tencentcloud/lcic/v20220817/model/DescribeAnswerListResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRoomStatisticsResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteDocumentRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRecordTaskResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeSupervisorsRequest.h
+  include/tencentcloud/lcic/v20220817/model/MessageList.h
+  include/tencentcloud/lcic/v20220817/model/DescribeGroupRequest.h
+  include/tencentcloud/lcic/v20220817/model/EndRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/GetWatermarkRequest.h
+  include/tencentcloud/lcic/v20220817/model/EndRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/CreateGroupWithMembersResponse.h
+  include/tencentcloud/lcic/v20220817/model/BatchDeleteGroupMemberRequest.h
+  include/tencentcloud/lcic/v20220817/model/ImageInfo.h
+  include/tencentcloud/lcic/v20220817/model/ModifyAppRequest.h
+  include/tencentcloud/lcic/v20220817/model/UnbindDocumentFromRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/MutedAccountList.h
+  include/tencentcloud/lcic/v20220817/model/GroupBaseInfo.h
+  include/tencentcloud/lcic/v20220817/model/LoginUserRequest.h
+  include/tencentcloud/lcic/v20220817/model/StopRecordRequest.h
+  include/tencentcloud/lcic/v20220817/model/SingleStreamInfo.h
+  include/tencentcloud/lcic/v20220817/model/ImageMsgContent.h
+  include/tencentcloud/lcic/v20220817/model/AnswerStat.h
+  include/tencentcloud/lcic/v20220817/model/SendRoomNormalMessageResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteSupervisorResponse.h
+  include/tencentcloud/lcic/v20220817/model/SetWatermarkResponse.h
+  include/tencentcloud/lcic/v20220817/model/RoomInfo.h
+  include/tencentcloud/lcic/v20220817/model/DescribeMarqueeResponse.h
+  include/tencentcloud/lcic/v20220817/model/AnswerInfo.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRoomStatisticsRequest.h
+  include/tencentcloud/lcic/v20220817/model/CustomMsgContent.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDocumentsByRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/LoginOriginIdResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeQuestionListResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeUserDetailRequest.h
+  include/tencentcloud/lcic/v20220817/model/GetRoomsResponse.h
+  include/tencentcloud/lcic/v20220817/model/SetMarqueeResponse.h
+  include/tencentcloud/lcic/v20220817/model/QuestionInfo.h
+  include/tencentcloud/lcic/v20220817/model/KickUserFromRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/SetWatermarkRequest.h
+  include/tencentcloud/lcic/v20220817/model/GetRoomsRequest.h
+  include/tencentcloud/lcic/v20220817/model/ForbidSendMsgResponse.h
+  include/tencentcloud/lcic/v20220817/model/SendRoomNormalMessageRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeRecordTaskRequest.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDeveloperRequest.h
+  include/tencentcloud/lcic/v20220817/model/AppCustomContent.h
+  include/tencentcloud/lcic/v20220817/model/BatchDescribeDocumentResponse.h
+  include/tencentcloud/lcic/v20220817/model/DeleteGroupResponse.h
+  include/tencentcloud/lcic/v20220817/model/CreateRoomResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeWhiteBoardSnapshotResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeSdkAppIdUsersRequest.h
+  include/tencentcloud/lcic/v20220817/model/AddGroupMemberResponse.h
+  include/tencentcloud/lcic/v20220817/model/MsgBody.h
+  include/tencentcloud/lcic/v20220817/model/CreateSupervisorResponse.h
+  include/tencentcloud/lcic/v20220817/model/SceneItem.h
+  include/tencentcloud/lcic/v20220817/model/DeleteRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/BatchCreateGroupWithMembersRequest.h
+  include/tencentcloud/lcic/v20220817/model/DeleteGroupMemberRequest.h
+  include/tencentcloud/lcic/v20220817/model/CreateSupervisorRequest.h
+  include/tencentcloud/lcic/v20220817/model/BackgroundPictureConfig.h
+  include/tencentcloud/lcic/v20220817/model/DeleteAppCustomContentResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeCurrentMemberListResponse.h
+  include/tencentcloud/lcic/v20220817/model/ModifyGroupResponse.h
+  include/tencentcloud/lcic/v20220817/model/DescribeGroupListResponse.h
+  include/tencentcloud/lcic/v20220817/model/ModifyRoomRequest.h
+  include/tencentcloud/lcic/v20220817/model/CustomRecordInfo.h
+  include/tencentcloud/lcic/v20220817/model/DescribeDeveloperResponse.h
+  include/tencentcloud/lcic/v20220817/model/TextMsgContent.h
+  include/tencentcloud/lcic/v20220817/model/TextMarkConfig.h
+  )
+
+set(lcic_src
+  src/v20220817/LcicClient.cpp
+  src/v20220817/model/CreateRoomRequest.cpp
+  src/v20220817/model/DescribeQuestionListRequest.cpp
+  src/v20220817/model/ModifyRoomResponse.cpp
+  src/v20220817/model/DescribeAppDetailResponse.cpp
+  src/v20220817/model/DeleteSupervisorRequest.cpp
+  src/v20220817/model/DeleteUserRequest.cpp
+  src/v20220817/model/WatermarkConfig.cpp
+  src/v20220817/model/DescribeSupervisorsResponse.cpp
+  src/v20220817/model/DescribeWhiteBoardSnapshotRequest.cpp
+  src/v20220817/model/DeleteUserResponse.cpp
+  src/v20220817/model/DeleteWhiteBoardSnapshotRequest.cpp
+  src/v20220817/model/BatchDeleteRecordRequest.cpp
+  src/v20220817/model/ModifyAppResponse.cpp
+  src/v20220817/model/UnblockKickedUserResponse.cpp
+  src/v20220817/model/BatchRegisterRequest.cpp
+  src/v20220817/model/StartRecordRequest.cpp
+  src/v20220817/model/DeleteRoomResponse.cpp
+  src/v20220817/model/ModifyUserProfileRequest.cpp
+  src/v20220817/model/CreateGroupWithMembersRequest.cpp
+  src/v20220817/model/DescribeDocumentsByRoomRequest.cpp
+  src/v20220817/model/BatchCreateGroupWithMembersResponse.cpp
+  src/v20220817/model/GetRoomEventResponse.cpp
+  src/v20220817/model/MemberRecord.cpp
+  src/v20220817/model/DeleteAppCustomContentRequest.cpp
+  src/v20220817/model/SendRoomNotificationMessageResponse.cpp
+  src/v20220817/model/BatchAddGroupMemberResponse.cpp
+  src/v20220817/model/ModifyUserProfileResponse.cpp
+  src/v20220817/model/GetWatermarkResponse.cpp
+  src/v20220817/model/LoginOriginIdRequest.cpp
+  src/v20220817/model/BatchRegisterResponse.cpp
+  src/v20220817/model/BindDocumentToRoomResponse.cpp
+  src/v20220817/model/StopRecordResponse.cpp
+  src/v20220817/model/CreateGroupWithSubGroupRequest.cpp
+  src/v20220817/model/RoomItem.cpp
+  src/v20220817/model/ClassScoreItem.cpp
+  src/v20220817/model/DescribeRoomRequest.cpp
+  src/v20220817/model/BatchDescribeDocumentRequest.cpp
+  src/v20220817/model/RegisterUserRequest.cpp
+  src/v20220817/model/BatchCreateRoomResponse.cpp
+  src/v20220817/model/StartRecordResponse.cpp
+  src/v20220817/model/UnbindDocumentFromRoomResponse.cpp
+  src/v20220817/model/CreateDocumentResponse.cpp
+  src/v20220817/model/DescribeMarqueeRequest.cpp
+  src/v20220817/model/DescribeGroupResponse.cpp
+  src/v20220817/model/SetAppCustomContentResponse.cpp
+  src/v20220817/model/UnblockKickedUserRequest.cpp
+  src/v20220817/model/BatchUserRequest.cpp
+  src/v20220817/model/DeleteWhiteBoardSnapshotResponse.cpp
+  src/v20220817/model/LoginUserResponse.cpp
+  src/v20220817/model/ModifyGroupRequest.cpp
+  src/v20220817/model/DescribeAppDetailRequest.cpp
+  src/v20220817/model/KickUserFromRoomResponse.cpp
+  src/v20220817/model/DeleteGroupRequest.cpp
+  src/v20220817/model/StartRoomRequest.cpp
+  src/v20220817/model/AddGroupMemberRequest.cpp
+  src/v20220817/model/DescribeGroupListRequest.cpp
+  src/v20220817/model/GetRoomMessageRequest.cpp
+  src/v20220817/model/DescribeDocumentsResponse.cpp
+  src/v20220817/model/DescribeRecordRequest.cpp
+  src/v20220817/model/DocumentInfo.cpp
+  src/v20220817/model/DeleteDocumentResponse.cpp
+  src/v20220817/model/DeleteRecordRequest.cpp
+  src/v20220817/model/BatchDeleteGroupMemberResponse.cpp
+  src/v20220817/model/CreateGroupWithSubGroupResponse.cpp
+  src/v20220817/model/DescribeDocumentsRequest.cpp
+  src/v20220817/model/MessageItem.cpp
+  src/v20220817/model/GroupInfo.cpp
+  src/v20220817/model/GetRoomEventRequest.cpp
+  src/v20220817/model/DescribeRecordResponse.cpp
+  src/v20220817/model/DescribeDocumentResponse.cpp
+  src/v20220817/model/DeleteGroupMemberResponse.cpp
+  src/v20220817/model/DescribeGroupMemberListResponse.cpp
+  src/v20220817/model/SetMarqueeRequest.cpp
+  src/v20220817/model/ForbidSendMsgRequest.cpp
+  src/v20220817/model/DescribeRoomForbiddenUserRequest.cpp
+  src/v20220817/model/EventInfo.cpp
+  src/v20220817/model/DescribeScoreListRequest.cpp
+  src/v20220817/model/DescribeRecordStreamRequest.cpp
+  src/v20220817/model/AppConfig.cpp
+  src/v20220817/model/DeleteRecordResponse.cpp
+  src/v20220817/model/DescribeAnswerListRequest.cpp
+  src/v20220817/model/BatchCreateRoomRequest.cpp
+  src/v20220817/model/DescribeGroupMemberListRequest.cpp
+  src/v20220817/model/DescribeRoomForbiddenUserResponse.cpp
+  src/v20220817/model/UserInfo.cpp
+  src/v20220817/model/DescribeUserResponse.cpp
+  src/v20220817/model/DescribeScoreListResponse.cpp
+  src/v20220817/model/DescribeDocumentRequest.cpp
+  src/v20220817/model/BatchDeleteRecordResponse.cpp
+  src/v20220817/model/FaceMsgContent.cpp
+  src/v20220817/model/SetAppCustomContentRequest.cpp
+  src/v20220817/model/DescribeUserRequest.cpp
+  src/v20220817/model/RegisterUserResponse.cpp
+  src/v20220817/model/StartRoomResponse.cpp
+  src/v20220817/model/BindDocumentToRoomRequest.cpp
+  src/v20220817/model/CreateDocumentRequest.cpp
+  src/v20220817/model/GetRoomMessageResponse.cpp
+  src/v20220817/model/BatchUserInfo.cpp
+  src/v20220817/model/BatchAddGroupMemberRequest.cpp
+  src/v20220817/model/TransferItem.cpp
+  src/v20220817/model/DescribeUserDetailResponse.cpp
+  src/v20220817/model/DescribeRoomResponse.cpp
+  src/v20220817/model/DescribeRecordStreamResponse.cpp
+  src/v20220817/model/DescribeCurrentMemberListRequest.cpp
+  src/v20220817/model/SendRoomNotificationMessageRequest.cpp
+  src/v20220817/model/DescribeSdkAppIdUsersResponse.cpp
+  src/v20220817/model/EventDataInfo.cpp
+  src/v20220817/model/DescribeAnswerListResponse.cpp
+  src/v20220817/model/DescribeRoomStatisticsResponse.cpp
+  src/v20220817/model/DeleteDocumentRequest.cpp
+  src/v20220817/model/DescribeRecordTaskResponse.cpp
+  src/v20220817/model/DescribeSupervisorsRequest.cpp
+  src/v20220817/model/MessageList.cpp
+  src/v20220817/model/DescribeGroupRequest.cpp
+  src/v20220817/model/EndRoomResponse.cpp
+  src/v20220817/model/GetWatermarkRequest.cpp
+  src/v20220817/model/EndRoomRequest.cpp
+  src/v20220817/model/CreateGroupWithMembersResponse.cpp
+  src/v20220817/model/BatchDeleteGroupMemberRequest.cpp
+  src/v20220817/model/ImageInfo.cpp
+  src/v20220817/model/ModifyAppRequest.cpp
+  src/v20220817/model/UnbindDocumentFromRoomRequest.cpp
+  src/v20220817/model/MutedAccountList.cpp
+  src/v20220817/model/GroupBaseInfo.cpp
+  src/v20220817/model/LoginUserRequest.cpp
+  src/v20220817/model/StopRecordRequest.cpp
+  src/v20220817/model/SingleStreamInfo.cpp
+  src/v20220817/model/ImageMsgContent.cpp
+  src/v20220817/model/AnswerStat.cpp
+  src/v20220817/model/SendRoomNormalMessageResponse.cpp
+  src/v20220817/model/DeleteSupervisorResponse.cpp
+  src/v20220817/model/SetWatermarkResponse.cpp
+  src/v20220817/model/RoomInfo.cpp
+  src/v20220817/model/DescribeMarqueeResponse.cpp
+  src/v20220817/model/AnswerInfo.cpp
+  src/v20220817/model/DescribeRoomStatisticsRequest.cpp
+  src/v20220817/model/CustomMsgContent.cpp
+  src/v20220817/model/DescribeDocumentsByRoomResponse.cpp
+  src/v20220817/model/LoginOriginIdResponse.cpp
+  src/v20220817/model/DescribeQuestionListResponse.cpp
+  src/v20220817/model/DescribeUserDetailRequest.cpp
+  src/v20220817/model/GetRoomsResponse.cpp
+  src/v20220817/model/SetMarqueeResponse.cpp
+  src/v20220817/model/QuestionInfo.cpp
+  src/v20220817/model/KickUserFromRoomRequest.cpp
+  src/v20220817/model/SetWatermarkRequest.cpp
+  src/v20220817/model/GetRoomsRequest.cpp
+  src/v20220817/model/ForbidSendMsgResponse.cpp
+  src/v20220817/model/SendRoomNormalMessageRequest.cpp
+  src/v20220817/model/DescribeRecordTaskRequest.cpp
+  src/v20220817/model/DescribeDeveloperRequest.cpp
+  src/v20220817/model/AppCustomContent.cpp
+  src/v20220817/model/BatchDescribeDocumentResponse.cpp
+  src/v20220817/model/DeleteGroupResponse.cpp
+  src/v20220817/model/CreateRoomResponse.cpp
+  src/v20220817/model/DescribeWhiteBoardSnapshotResponse.cpp
+  src/v20220817/model/DescribeSdkAppIdUsersRequest.cpp
+  src/v20220817/model/AddGroupMemberResponse.cpp
+  src/v20220817/model/MsgBody.cpp
+  src/v20220817/model/CreateSupervisorResponse.cpp
+  src/v20220817/model/SceneItem.cpp
+  src/v20220817/model/DeleteRoomRequest.cpp
+  src/v20220817/model/BatchCreateGroupWithMembersRequest.cpp
+  src/v20220817/model/DeleteGroupMemberRequest.cpp
+  src/v20220817/model/CreateSupervisorRequest.cpp
+  src/v20220817/model/BackgroundPictureConfig.cpp
+  src/v20220817/model/DeleteAppCustomContentResponse.cpp
+  src/v20220817/model/DescribeCurrentMemberListResponse.cpp
+  src/v20220817/model/ModifyGroupResponse.cpp
+  src/v20220817/model/DescribeGroupListResponse.cpp
+  src/v20220817/model/ModifyRoomRequest.cpp
+  src/v20220817/model/CustomRecordInfo.cpp
+  src/v20220817/model/DescribeDeveloperResponse.cpp
+  src/v20220817/model/TextMsgContent.cpp
+  src/v20220817/model/TextMarkConfig.cpp
+  )
+
+set(lcic_include
+    include/tencentcloud/lcic
+  )
+
+add_library(lcic ${LIB_TYPE}
+  ${lcic_public_header}
+  ${lcic_public_header_model}
+  ${lcic_src})
+
+set_target_properties(lcic
+  PROPERTIES
+  LINKER_LANGUAGE CXX
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+  OUTPUT_NAME ${TARGET_OUTPUT_NAME_PREFIX}lcic
+  )
+
+target_include_directories(lcic
+  PRIVATE include
+    ${CMAKE_SOURCE_DIR}/core/include
+  )
+target_link_libraries(lcic
+  core)
+
+#install(FILES ${lcic_public_header}
+#  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tencentcloud/lcic/v20220817)
+#install(FILES ${lcic_public_header_model}
+#  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tencentcloud/lcic/v20220817/model)
+install(DIRECTORY ${lcic_include}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tencentcloud)
+
+install(TARGETS lcic
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  )

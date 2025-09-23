@@ -1,0 +1,119 @@
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <tencentcloud/cdn/v20180606/model/FollowRedirect.h>
+
+using TencentCloud::CoreInternalOutcome;
+using namespace TencentCloud::Cdn::V20180606::Model;
+using namespace std;
+
+FollowRedirect::FollowRedirect() :
+    m_switchHasBeenSet(false),
+    m_redirectConfigHasBeenSet(false)
+{
+}
+
+CoreInternalOutcome FollowRedirect::Deserialize(const rapidjson::Value &value)
+{
+    string requestId = "";
+
+
+    if (value.HasMember("Switch") && !value["Switch"].IsNull())
+    {
+        if (!value["Switch"].IsString())
+        {
+            return CoreInternalOutcome(Core::Error("response `FollowRedirect.Switch` IsString=false incorrectly").SetRequestId(requestId));
+        }
+        m_switch = string(value["Switch"].GetString());
+        m_switchHasBeenSet = true;
+    }
+
+    if (value.HasMember("RedirectConfig") && !value["RedirectConfig"].IsNull())
+    {
+        if (!value["RedirectConfig"].IsObject())
+        {
+            return CoreInternalOutcome(Core::Error("response `FollowRedirect.RedirectConfig` is not object type").SetRequestId(requestId));
+        }
+
+        CoreInternalOutcome outcome = m_redirectConfig.Deserialize(value["RedirectConfig"]);
+        if (!outcome.IsSuccess())
+        {
+            outcome.GetError().SetRequestId(requestId);
+            return outcome;
+        }
+
+        m_redirectConfigHasBeenSet = true;
+    }
+
+
+    return CoreInternalOutcome(true);
+}
+
+void FollowRedirect::ToJsonObject(rapidjson::Value &value, rapidjson::Document::AllocatorType& allocator) const
+{
+
+    if (m_switchHasBeenSet)
+    {
+        rapidjson::Value iKey(rapidjson::kStringType);
+        string key = "Switch";
+        iKey.SetString(key.c_str(), allocator);
+        value.AddMember(iKey, rapidjson::Value(m_switch.c_str(), allocator).Move(), allocator);
+    }
+
+    if (m_redirectConfigHasBeenSet)
+    {
+        rapidjson::Value iKey(rapidjson::kStringType);
+        string key = "RedirectConfig";
+        iKey.SetString(key.c_str(), allocator);
+        value.AddMember(iKey, rapidjson::Value(rapidjson::kObjectType).Move(), allocator);
+        m_redirectConfig.ToJsonObject(value[key.c_str()], allocator);
+    }
+
+}
+
+
+string FollowRedirect::GetSwitch() const
+{
+    return m_switch;
+}
+
+void FollowRedirect::SetSwitch(const string& _switch)
+{
+    m_switch = _switch;
+    m_switchHasBeenSet = true;
+}
+
+bool FollowRedirect::SwitchHasBeenSet() const
+{
+    return m_switchHasBeenSet;
+}
+
+RedirectConfig FollowRedirect::GetRedirectConfig() const
+{
+    return m_redirectConfig;
+}
+
+void FollowRedirect::SetRedirectConfig(const RedirectConfig& _redirectConfig)
+{
+    m_redirectConfig = _redirectConfig;
+    m_redirectConfigHasBeenSet = true;
+}
+
+bool FollowRedirect::RedirectConfigHasBeenSet() const
+{
+    return m_redirectConfigHasBeenSet;
+}
+
