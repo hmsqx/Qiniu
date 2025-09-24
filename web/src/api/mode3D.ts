@@ -1,12 +1,22 @@
-import { get } from "@/utils/request";
+import { get, post } from "@/utils/request";
+import { buildAssetUrl } from "@/utils/asset";
 
-export type JobStatus = "排队中" | "处理中" | "完成" | string;
+export type RawJobStatus =
+  | "DONE"
+  | "RUN"
+  | "WAITING"
+  | "QUEUE"
+  | "QUERY_FAILED"
+  | "FAILED";
 
 export interface JobItem {
   jobId: string;
-  status: JobStatus;
+  status: RawJobStatus;
   imgUrl?: string | null;
   modelUrl?: string | null;
+  isPrivate?: boolean;
+  // 后端在某些失败状态下返回的错误信息（例如 QUERY_FAILED）
+  errorMsg?: string;
 }
 
 export interface QueryJobsParams {
@@ -23,56 +33,38 @@ export interface QueryJobsResult {
 function normalize(resp: any): QueryJobsResult {
   const data = resp?.data ?? resp;
 
-  if (Array.isArray(data?.taskList)) {
-    const list = data.taskList.map((t: any) => ({
+  if (!Array.isArray(data?.taskList)) {
+    return { list: [], total: 0 };
+  }
+
+  const list: JobItem[] = data.taskList.map((t: any) => {
+    const raw = (t.status || "").toString().toUpperCase();
+    const status = raw as RawJobStatus;
+    return {
       jobId: String(t.jobId || t.jobId),
-      // Normalize status codes so the UI substring checks match.
-      status: ((): string => {
-        const s = (t.status || "").toString();
-        const up = s.toUpperCase();
-        if (up === "DONE" || up === "SUCCESS" || up === "SUCCEEDED")
-          return "完成";
-        if (
-          up === "PROCESSING" ||
-          up === "IN_PROGRESS" ||
-          up === "RUNNING" ||
-          up === "RUN"
-        )
-          return "处理中";
-        if (up === "PENDING" || up === "QUEUED" || up === "WAITING")
-          return "排队中";
-        return s;
-      })(),
-      imgUrl:
-        Array.isArray(t.previewImages) && t.previewImages.length > 0
-          ? t.previewImages[0]
-          : undefined,
-      modelUrl:
+      status,
+      imgUrl: t.previewImages,
+      modelUrl: buildAssetUrl(
         Array.isArray(t.modelList) && t.modelList.length > 0
           ? t.modelList[0].fileUrl || t.modelList[0].fileUrl
+          : undefined
+      ),
+      // 兼容大小写不同的字段（后端示例返回为 Isprivate）
+      isPrivate:
+        typeof t.isPrivate === "boolean"
+          ? t.isPrivate
+          : typeof t.Isprivate === "boolean"
+          ? t.Isprivate
+          : typeof t.isprivate === "boolean"
+          ? t.isprivate
           : undefined,
-    }));
-    const total =
-      Number(data?.pageInfo?.totalCount ?? data.total ?? 0) || list.length;
-    return { list, total };
-  }
-
-  if (Array.isArray(data?.list)) {
-    return { list: data.list as JobItem[], total: Number(data.total) || 0 };
-  }
-
-  if (Array.isArray(data?.records)) {
-    return { list: data.records as JobItem[], total: Number(data.total) || 0 };
-  }
-
-  if (Array.isArray(data)) {
-    return {
-      list: data as JobItem[],
-      total: Number(resp?.total) || data.length,
+      errorMsg: typeof t.errorMsg === "string" ? t.errorMsg : undefined,
     };
-  }
+  });
 
-  return { list: [], total: 0 };
+  const total =
+    Number(data?.pageInfo?.totalCount ?? list.length) || list.length;
+  return { list, total };
 }
 
 export async function queryJobsByPage(
@@ -85,4 +77,16 @@ export async function queryJobsByPage(
   });
   const resp = await get<any>("/api/query", { params: formattedParams });
   return normalize(resp);
+}
+
+export interface ToggleVisibilityResponse {
+  jobId: string;
+  isPrivate?: boolean;
+  [k: string]: any;
+}
+
+export async function toggleJobVisibility(jobId: string) {
+  if (!jobId) throw new Error("jobId 不能为空");
+  const resp = await post<any>("/api/toggleJobIsPrivate", { jobId });
+  return (resp?.data || resp) as ToggleVisibilityResponse;
 }

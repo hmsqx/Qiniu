@@ -1,7 +1,11 @@
-import { Download, ImageOff, Loader2 } from "lucide-react";
+import React from "react";
+import { buildAssetUrl } from "@/utils/asset";
+import { Download, ImageOff, Loader2, Globe2, Lock } from "lucide-react";
 import type { JobItem } from "@/api/mode3D";
+import { Checkbox } from "@/components/ui/checkbox";
 import { StatusBadge } from "./StatusBadge";
 import { Link } from "react-router-dom";
+import { downloadModelFile } from "@/utils/download";
 
 function getExt(url?: string | null): string | null {
   if (!url) return null;
@@ -16,30 +20,62 @@ function toProxiedUrl(url?: string | null): string {
   if (!url) return "";
   try {
     const u = new URL(url);
-    // 将 COS 域名的绝对地址改写为 /cos 前缀，交给 Vite 代理
-    if (u.hostname.endsWith("tencentcos.cn")) {
-      return "/cos" + u.pathname + (u.search || "");
-    }
-    // 其它域名：保持原样（若目标已允许 CORS）
-    return url;
+    return "/model" + u.pathname + (u.search || "");
   } catch {
     return url || "";
   }
 }
 
-export function JobCard({ item }: { item: JobItem }) {
-  const statusText = item.status || "";
-  const isDone = statusText.includes("完成");
+interface JobCardProps {
+  item: JobItem;
+  selectable?: boolean; // 是否显示复选框
+  selected?: boolean; // 当前是否选中
+  onToggleSelect?: (jobId: string) => void;
+  onToggleVisibility?: (job: JobItem) => void; // 单个切换
+  toggling?: boolean; // 当前是否在切换此任务
+}
+
+export function JobCard({
+  item,
+  selectable,
+  selected,
+  onToggleSelect,
+  onToggleVisibility,
+  toggling,
+}: JobCardProps) {
+  const rawStatus = (item.status || "").toUpperCase();
+  const isDone = rawStatus === "DONE";
   const isProcessing =
-    statusText.includes("处理中") || statusText.includes("进行");
+    rawStatus === "RUN" || rawStatus === "WAITING" || rawStatus === "QUEUE";
   const hasPreview = !!item.imgUrl;
+  const [downloading, setDownloading] = React.useState(false);
+
+  function handleDownload(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!item.modelUrl || downloading) return;
+    setDownloading(true);
+    downloadModelFile(item.modelUrl, {
+      jobId: item.jobId,
+      fileName: item.jobId,
+      extHint: getExt(item.modelUrl) || undefined,
+      onSuccess: () => setDownloading(false),
+      onError: () => setDownloading(false),
+    });
+  }
 
   return (
-    <div className="bg-slate-800/50 rounded-lg p-3 flex flex-col hover:shadow-xl hover:shadow-purple-900/10 transition-all duration-300 border border-slate-700/30 hover:border-purple-500/40 hover:-translate-y-0.5">
+    <div
+      className={`relative bg-slate-800/50 rounded-lg p-3 flex flex-col hover:shadow-xl hover:shadow-purple-900/10 transition-all duration-300 border border-slate-700/30 hover:border-purple-500/40 hover:-translate-y-0.5 ${
+        selected ? "ring-2 ring-purple-500 border-purple-500" : ""
+      }`}
+      onClick={() => {
+        if (selectable && onToggleSelect) onToggleSelect(item.jobId);
+      }}
+    >
       <div className="w-full h-60 bg-black/20 rounded-md flex items-center justify-center overflow-hidden relative group">
         {hasPreview ? (
           <img
-            src={item.imgUrl ?? undefined}
+            src={buildAssetUrl(item.imgUrl) || undefined}
             alt={item.jobId}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
@@ -53,6 +89,40 @@ export function JobCard({ item }: { item: JobItem }) {
         <div className="absolute left-2 top-2">
           <StatusBadge status={item.status} />
         </div>
+
+        {typeof item.isPrivate === "boolean" && !selectable && (
+          <button
+            type="button"
+            title={item.isPrivate ? "设为公开" : "设为私有"}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (toggling) return;
+              onToggleVisibility?.(item);
+            }}
+            disabled={toggling}
+            className="absolute right-2 top-2 text-[10px] px-1.5 py-0.5 rounded bg-black/60 backdrop-blur border border-white/10 font-medium tracking-wide flex items-center gap-1 hover:bg-black/70 disabled:opacity-50"
+          >
+            {toggling ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : item.isPrivate ? (
+              <Lock className="w-3 h-3" />
+            ) : (
+              <Globe2 className="w-3 h-3" />
+            )}
+            {item.isPrivate ? "私有" : "公开"}
+          </button>
+        )}
+
+        {selectable && (
+          <div className="absolute left-2 bottom-2">
+            <Checkbox
+              checked={!!selected}
+              onCheckedChange={() => onToggleSelect?.(item.jobId)}
+              onClick={(e) => e.stopPropagation()}
+              className="size-5 border-white/40 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+            />
+          </div>
+        )}
 
         {isProcessing && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -69,10 +139,11 @@ export function JobCard({ item }: { item: JobItem }) {
               <Link
                 to={`/viewer?url=${encodeURIComponent(
                   toProxiedUrl(item.modelUrl)
-                )}&format=${getExt(item.modelUrl) || ""}`}
+                )}&format=${
+                  getExt(item.modelUrl) || ""
+                }&jobId=${encodeURIComponent(item.jobId)}`}
                 className="inline-flex items-center gap-1 text-emerald-400 hover:underline hover:text-emerald-300"
               >
-                {/* Using Download icon for consistency if View not available */}
                 <svg
                   viewBox="0 0 24 24"
                   className="w-3.5 h-3.5"
@@ -87,14 +158,21 @@ export function JobCard({ item }: { item: JobItem }) {
                 </svg>
                 预览
               </Link>
-              <a
-                href={item.modelUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-purple-400 hover:underline hover:text-purple-300"
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="inline-flex items-center text-purple-400 hover:text-purple-300 disabled:opacity-60"
+                aria-label="下载模型"
               >
-                <Download className="w-3.5 h-3.5" /> 下载
-              </a>
+                {downloading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Download className="w-4 h-4" />
+                    <span>下载</span>
+                  </div>
+                )}
+              </button>
             </>
           ) : (
             <div className="h-5" />

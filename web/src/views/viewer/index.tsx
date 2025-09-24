@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { downloadModelFile } from "@/utils/download";
+import { Download, Loader2 } from "lucide-react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -7,9 +9,6 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
-
-// USDZ is primarily for iOS AR Quick Look. In web, we can't easily render USDZ with three without heavy deps.
-// We'll just provide a download/open hint for USDZ, and render MP4 via <video>.
 
 function useContainerSize(
   containerRef: React.RefObject<HTMLDivElement | null>
@@ -37,24 +36,27 @@ function getFormatFromUrl(url: string | null): string | null {
   return m ? m[1].toLowerCase() : null;
 }
 
-// No explicit background color; render transparent
-
 const Viewer: React.FC = () => {
   const [search] = useSearchParams();
   const rawUrl = search.get("url");
+
   const urlParam = useMemo(() => {
     if (!rawUrl) return rawUrl;
     try {
       const u = new URL(rawUrl, window.location.origin);
       if (u.hostname.endsWith("tencentcos.cn")) {
-        return "/cos" + u.pathname + (u.search || "");
+        console.log("Proxying model URL through /model");
+        console.log("/model" + u.pathname + (u.search || ""));
+        return "/model" + u.pathname + (u.search || "");
       }
       return rawUrl;
     } catch {
       return rawUrl;
     }
   }, [rawUrl]);
+
   const formatParam = (search.get("format") || "").toLowerCase();
+  const jobIdParam = search.get("jobId") || "";
   const format = useMemo(
     () => formatParam || getFormatFromUrl(urlParam) || "",
     [formatParam, urlParam]
@@ -71,6 +73,20 @@ const Viewer: React.FC = () => {
   const [showGrid, setShowGrid] = useState(true);
   const [autoRotate, setAutoRotate] = useState(false);
   const [stlColor, setStlColor] = useState<string>("#aaaaaa");
+  const [downloading, setDownloading] = useState(false);
+
+  function handleDownload(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!urlParam || downloading) return;
+    setDownloading(true);
+    downloadModelFile(urlParam, {
+      jobId: jobIdParam || undefined,
+      fileName: jobIdParam || "model",
+      extHint: format || undefined,
+      onSuccess: () => setDownloading(false),
+      onError: () => setDownloading(false),
+    });
+  }
 
   // Refs for three objects
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -91,7 +107,7 @@ const Viewer: React.FC = () => {
 
     const container = containerRef.current;
 
-    // Loading manager: rewrite any sub-asset URL (textures/MTL) to go through /cos proxy when needed
+    // Loading manager: rewrite any sub-asset URL (textures/MTL) to go through /model proxy when needed
     const manager = new THREE.LoadingManager();
     const proxyify = (inputUrl: string) => {
       try {
@@ -100,7 +116,7 @@ const Viewer: React.FC = () => {
         if (/^(\.\.\/|\.\/|\/)/.test(inputUrl)) return inputUrl;
         const u = new URL(inputUrl, window.location.origin);
         if (u.hostname.endsWith("tencentcos.cn")) {
-          return "/cos" + u.pathname + (u.search || "");
+          return "/model" + u.pathname + (u.search || "");
         }
         return inputUrl;
       } catch {
@@ -360,15 +376,21 @@ const Viewer: React.FC = () => {
           {format.toUpperCase()} | {Math.round(width)}x{Math.round(height)}
         </span>
         <div className="flex items-center gap-2 bg-black/30 px-2 py-1 rounded">
-          <a
-            href={rawUrl || urlParam || "#"}
-            target="_blank"
-            rel="noreferrer"
-            className="text-emerald-300 hover:text-emerald-200"
+          <button
+            onClick={handleDownload}
+            disabled={downloading}
+            className="flex items-center gap-1 text-emerald-300 hover:text-emerald-200 disabled:opacity-60"
             title="下载模型"
           >
-            下载
-          </a>
+            {downloading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <>
+                <Download className="w-3.5 h-3.5" />
+                <span>下载</span>
+              </>
+            )}
+          </button>
           <button
             onClick={handleScreenshot}
             className="text-sky-300 hover:text-sky-200"
