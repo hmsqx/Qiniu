@@ -51,7 +51,6 @@ export const LoginModal: React.FC = () => {
   const { isSubmitting: loginSubmitting } = loginForm.formState;
   const { isSubmitting: registerSubmitting } = registerForm.formState;
 
-  // 当模式切换时，重置表单状态和服务器错误信息
   const toggleMode = () => {
     setMode((prevMode) => (prevMode === "login" ? "register" : "login"));
     loginForm.reset();

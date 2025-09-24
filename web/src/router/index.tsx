@@ -6,6 +6,7 @@ import Workspace from "@/views/workspace";
 import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
+import Viewer from "@/views/viewer";
 
 // small Protected wrapper component used in routes
 const Protected: React.FC<{ children: React.ReactElement }> = ({
@@ -46,6 +47,11 @@ const router = createBrowserRouter([
             <Workspace />
           </Protected>
         ),
+      },
+      {
+        path: "viewer",
+        // 公共预览页，不需要鉴权
+        element: <Viewer />,
       },
     ],
   },

@@ -1,13 +1,6 @@
-// 轻量级的类型化 axios 封装
-// 用法：
-// import http from '@/utils/request'
-// const { data } = await http.get<MyType>('/api/foo', { params: { q: 'bar' } })
-
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
-// 根据 Vite 环境变量确定 baseURL。在开发环境下 `.env` 设置 VITE_API_BASE=/api
-// 会命中开发代理。在生产环境下 `.env.production` 可以设置为绝对 URL。
 const VITE_API_BASE =
   (import.meta.env as Record<string, any>).VITE_API_BASE || "/";
 
@@ -15,7 +8,6 @@ console.log("使用的 API 基础地址:", VITE_API_BASE);
 // 创建基础 axios 实例 — 使用 VITE_API_BASE
 const instance: AxiosInstance = axios.create({
   baseURL: VITE_API_BASE,
-  // 客户端超时时间设置为 30 秒 — 某些后端操作在开发或高负载下可能需要更长时间
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
@@ -25,7 +17,7 @@ const instance: AxiosInstance = axios.create({
 // 请求/响应拦截器，可以添加日志或全局错误处理。Token 逻辑可在请求拦截器中后续添加。
 instance.interceptors.request.use(
   (config: AxiosRequestConfig | any) => {
-    // 从本地存储获取 Authorization 头部（如果有）
+    // 从本地存储获取 sessionToken 写入自定义 Session-Token 头
     try {
       const raw = localStorage.getItem("gen3d_auth");
       if (raw) {
@@ -33,10 +25,11 @@ instance.interceptors.request.use(
         const token = parsed?.sessionToken;
         if (token) {
           config.headers = config.headers || {};
-          // 使用标准 'Authorization' 保持头部大小写一致
-          (config.headers as Record<string, any>)[
-            "Authorization"
-          ] = `Bearer ${token}`;
+          (config.headers as Record<string, any>)["Session-Token"] = token;
+          // 确保不再发送 Authorization 头
+          if ((config.headers as Record<string, any>)["Authorization"]) {
+            delete (config.headers as Record<string, any>)["Authorization"];
+          }
         }
       }
     } catch (_) {
@@ -47,11 +40,13 @@ instance.interceptors.request.use(
   (error: any) => Promise.reject(error)
 );
 
-// 可选：编程式设置 token，如果不希望每次都从存储读取
 export function setAuthToken(token?: string | null) {
   if (token) {
-    instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    instance.defaults.headers.common["Session-Token"] = token;
+    // 清理旧的 Authorization
+    delete instance.defaults.headers.common["Authorization"];
   } else {
+    delete instance.defaults.headers.common["Session-Token"];
     delete instance.defaults.headers.common["Authorization"];
   }
 }
@@ -115,7 +110,6 @@ const http = new Http(instance);
 
 export default http;
 
-// Named exports for convenience
 export const get = <T = any>(url: string, config?: AxiosRequestConfig) =>
   http.get<T>(url, config);
 export const post = <T = any>(
@@ -131,10 +125,7 @@ export const put = <T = any>(
 export const del = <T = any>(url: string, config?: AxiosRequestConfig) =>
   http.delete<T>(url, config);
 
-// Example helper: call a server-provided configuration endpoint
-// Usage: const cfg = await callApi<ConfigType>('config')
 export const callApi = <T = any>(path = "config") => {
-  // ensures leading slash is handled by axios baseURL
   const url = path.startsWith("/") ? path : `/${path}`;
   return http.get<T>(url);
 };

@@ -7,6 +7,9 @@ export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd());
 
   const proxyTarget = env.VITE_PROXY_TARGET || "http://localhost:3000";
+  const cosTarget =
+    env.VITE_COS_TARGET ||
+    "https://hunyuan-prod-1258344699.cos.ap-guangzhou.tencentcos.cn";
 
   return defineConfig({
     plugins: [react(), tailwindcss()],
@@ -21,6 +24,13 @@ export default ({ mode }: { mode: string }) => {
           target: proxyTarget,
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api/, ""),
+        },
+        "/cos": {
+          target: cosTarget,
+          changeOrigin: true,
+          secure: true,
+          // Map /cos/<path> -> cosTarget/<path>
+          rewrite: (p) => p.replace(/^\/cos/, ""),
         },
       },
     },
