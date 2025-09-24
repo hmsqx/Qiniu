@@ -1,5 +1,7 @@
 #include "tx_ai3d.h"
 #include "config.h"
+#include "model_downloader.h"
+#include "db_utils.h"
 
 #include <tencentcloud/ai3d/v20250513/Ai3dClient.h>
 #include <tencentcloud/ai3d/v20250513/model/SubmitHunyuanTo3DJobRequest.h>
@@ -11,10 +13,53 @@
 #include <tencentcloud/core/profile/HttpProfile.h>
 #include <iostream>
 #include <stdexcept>
+#include <jsoncpp/json/json.h>
+#include <sstream>
+#include <algorithm>
 
 using namespace TencentCloud;
 using namespace TencentCloud::Ai3d::V20250513;
 using namespace TencentCloud::Ai3d::V20250513::Model;
+
+// 辅助函数：下载文件并保存到数据库
+static void downloadAndSaveFiles(const std::string& jobId, 
+                                const Json::Value& modelList, 
+                                const Json::Value& previewList,
+                                Json::Value& taskInfo)
+{
+    try {
+        Json::Value downloadResult = downloadModelFiles(modelList, previewList);
+        if (downloadResult["success"].asBool()) {
+            // 将本地文件URL保存到数据库
+            Json::Value localModels = downloadResult["modelList"];
+            Json::Value localPreviews = downloadResult["previewImages"];
+            
+            // 构建本地文件URL字符串
+            std::string localFileUrls;
+            std::string localPreviewUrls;
+            
+            for (const auto& model : localModels) {
+                if (!localFileUrls.empty()) localFileUrls += ",";
+                localFileUrls += model["fileUrl"].asString();
+            }
+            
+            for (const auto& preview : localPreviews) {
+                if (!localPreviewUrls.empty()) localPreviewUrls += ",";
+                localPreviewUrls += preview.asString();
+            }
+            
+            // 更新数据库
+            updateAi3dTaskFiles(jobId, localFileUrls, localPreviewUrls);
+            
+            // 更新返回结果，使用本地URL
+            taskInfo["modelList"] = localModels;
+            taskInfo["previewImages"] = localPreviews;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "下载文件失败: " << e.what() << std::endl;
+        // 下载失败不影响原有逻辑，继续返回腾讯云的URL
+    }
+}
 
 static Ai3dClient buildClient()
 {
@@ -168,6 +213,57 @@ Json::Value queryTaskStatusFromTx(const std::string &jobId)
             }
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
+            
+            // 检查数据库中是否已经存在本地文件URL
+            Json::Value existingFiles = getTaskFileInfo(jobId);
+            if (existingFiles.get("found", false).asBool()) {
+                std::string existingFileUrls = existingFiles.get("fileurl", "").asString();
+                std::string existingPreviewUrls = existingFiles.get("previewImages", "").asString();
+                
+                // 如果数据库中已经有本地文件URL，则使用现有的，不重新下载
+                if (!existingFileUrls.empty()) {
+                    std::cout << "任务 " << jobId << " 已存在本地文件，跳过下载" << std::endl;
+                    
+                    // 解析现有的本地文件URL并设置到返回结果中
+                    Json::Value localModels(Json::arrayValue);
+                    Json::Value localPreviews(Json::arrayValue);
+                    
+                    // 分割文件URL
+                    std::stringstream ss1(existingFileUrls);
+                    std::string item;
+                    while (std::getline(ss1, item, ',')) {
+                        if (!item.empty()) {
+                            Json::Value modelItem;
+                            modelItem["fileUrl"] = item;
+                            // 从URL中提取文件格式
+                            std::string ext = item.substr(item.find_last_of(".") + 1);
+                            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+                            modelItem["fileFormat"] = ext;
+                            localModels.append(modelItem);
+                        }
+                    }
+                    
+                    // 分割预览图片URL
+                    std::stringstream ss2(existingPreviewUrls);
+                    while (std::getline(ss2, item, ',')) {
+                        if (!item.empty()) {
+                            localPreviews.append(item);
+                        }
+                    }
+                    
+                    // 使用现有的本地URL
+                    taskInfo["modelList"] = localModels;
+                    taskInfo["previewImages"] = localPreviews;
+                } else {
+                    // 数据库中不存在本地文件URL，进行下载
+                    std::cout << "任务 " << jobId << " 不存在本地文件，开始下载" << std::endl;
+                    downloadAndSaveFiles(jobId, modelList, previewList, taskInfo);
+                }
+            } else {
+                // 数据库中不存在任务记录，进行下载
+                std::cout << "任务 " << jobId << " 不存在数据库记录，开始下载" << std::endl;
+                downloadAndSaveFiles(jobId, modelList, previewList, taskInfo);
+            }
         }
         else if (resp.GetStatus() == "FAIL")
         {
@@ -229,6 +325,57 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
             }
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
+            
+            // 检查数据库中是否已经存在本地文件URL
+            Json::Value existingFiles = getTaskFileInfo(jobId);
+            if (existingFiles.get("found", false).asBool()) {
+                std::string existingFileUrls = existingFiles.get("fileurl", "").asString();
+                std::string existingPreviewUrls = existingFiles.get("previewImages", "").asString();
+                
+                // 如果数据库中已经有本地文件URL，则使用现有的，不重新下载
+                if (!existingFileUrls.empty()) {
+                    std::cout << "任务 " << jobId << " 已存在本地文件，跳过下载" << std::endl;
+                    
+                    // 解析现有的本地文件URL并设置到返回结果中
+                    Json::Value localModels(Json::arrayValue);
+                    Json::Value localPreviews(Json::arrayValue);
+                    
+                    // 分割文件URL
+                    std::stringstream ss1(existingFileUrls);
+                    std::string item;
+                    while (std::getline(ss1, item, ',')) {
+                        if (!item.empty()) {
+                            Json::Value modelItem;
+                            modelItem["fileUrl"] = item;
+                            // 从URL中提取文件格式
+                            std::string ext = item.substr(item.find_last_of(".") + 1);
+                            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+                            modelItem["fileFormat"] = ext;
+                            localModels.append(modelItem);
+                        }
+                    }
+                    
+                    // 分割预览图片URL
+                    std::stringstream ss2(existingPreviewUrls);
+                    while (std::getline(ss2, item, ',')) {
+                        if (!item.empty()) {
+                            localPreviews.append(item);
+                        }
+                    }
+                    
+                    // 使用现有的本地URL
+                    taskInfo["modelList"] = localModels;
+                    taskInfo["previewImages"] = localPreviews;
+                } else {
+                    // 数据库中不存在本地文件URL，进行下载
+                    std::cout << "任务 " << jobId << " 不存在本地文件，开始下载" << std::endl;
+                    downloadAndSaveFiles(jobId, modelList, previewList, taskInfo);
+                }
+            } else {
+                // 数据库中不存在任务记录，进行下载
+                std::cout << "任务 " << jobId << " 不存在数据库记录，开始下载" << std::endl;
+                downloadAndSaveFiles(jobId, modelList, previewList, taskInfo);
+            }
         }
         else if (resp.GetStatus() == "FAIL")
         {
@@ -287,6 +434,57 @@ Json::Value queryTaskStatusFromTxRapid(const std::string &jobId)
             }
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
+            
+            // 检查数据库中是否已经存在本地文件URL
+            Json::Value existingFiles = getTaskFileInfo(jobId);
+            if (existingFiles.get("found", false).asBool()) {
+                std::string existingFileUrls = existingFiles.get("fileurl", "").asString();
+                std::string existingPreviewUrls = existingFiles.get("previewImages", "").asString();
+                
+                // 如果数据库中已经有本地文件URL，则使用现有的，不重新下载
+                if (!existingFileUrls.empty()) {
+                    std::cout << "任务 " << jobId << " 已存在本地文件，跳过下载" << std::endl;
+                    
+                    // 解析现有的本地文件URL并设置到返回结果中
+                    Json::Value localModels(Json::arrayValue);
+                    Json::Value localPreviews(Json::arrayValue);
+                    
+                    // 分割文件URL
+                    std::stringstream ss1(existingFileUrls);
+                    std::string item;
+                    while (std::getline(ss1, item, ',')) {
+                        if (!item.empty()) {
+                            Json::Value modelItem;
+                            modelItem["fileUrl"] = item;
+                            // 从URL中提取文件格式
+                            std::string ext = item.substr(item.find_last_of(".") + 1);
+                            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+                            modelItem["fileFormat"] = ext;
+                            localModels.append(modelItem);
+                        }
+                    }
+                    
+                    // 分割预览图片URL
+                    std::stringstream ss2(existingPreviewUrls);
+                    while (std::getline(ss2, item, ',')) {
+                        if (!item.empty()) {
+                            localPreviews.append(item);
+                        }
+                    }
+                    
+                    // 使用现有的本地URL
+                    taskInfo["modelList"] = localModels;
+                    taskInfo["previewImages"] = localPreviews;
+                } else {
+                    // 数据库中不存在本地文件URL，进行下载
+                    std::cout << "任务 " << jobId << " 不存在本地文件，开始下载" << std::endl;
+                    downloadAndSaveFiles(jobId, modelList, previewList, taskInfo);
+                }
+            } else {
+                // 数据库中不存在任务记录，进行下载
+                std::cout << "任务 " << jobId << " 不存在数据库记录，开始下载" << std::endl;
+                downloadAndSaveFiles(jobId, modelList, previewList, taskInfo);
+            }
         }
         else if (resp.GetStatus() == "FAIL")
         {

@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 project(tencent_cloud_cpp_sample)
 
-set(CMAKE_CXX_STANDARD 11)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 查找 jsoncpp 包
 find_package(jsoncpp REQUIRED)
@@ -12,6 +14,9 @@ file(GLOB SERVER_SOURCES
 )
 include_directories(include)
 include_directories(.)
+
+# 确保包含新的数据库连接管理文件
+set(SERVER_SOURCES ${SERVER_SOURCES} src/db_connection.cc)
 
 add_executable(tencent_cloud_cpp_sample main.cc ${SERVER_SOURCES})
 
@@ -28,6 +33,9 @@ if(NOT MYSQLCLIENT_LIB)
     set(MYSQLCLIENT_LIB mysqlclient)
 endif()
 
+# CURL库
+find_package(CURL REQUIRED)
+
 # 链接依赖
 target_link_libraries(tencent_cloud_cpp_sample 
     tencentcloud-sdk-cpp-ai3d 
@@ -36,4 +44,5 @@ target_link_libraries(tencent_cloud_cpp_sample
     ${MYSQLCLIENT_LIB}
     OpenSSL::Crypto
     Threads::Threads
+    CURL::libcurl
 )

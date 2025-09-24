@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <jsoncpp/json/json.h>
+#include "db_connection.h"
 
 // 返回 <总条数, 当前页任务ID列表>
 std::pair<int, std::vector<std::pair<std::string, std::string>>> getTaskIdsByMySQLCAPI(const std::string &userId,
@@ -19,6 +20,11 @@ bool insertAi3dTask(const std::string &userId,
                     const std::string &resultFormat,
                     const std::string &status,
                     const std::string &version);
+
+// 更新任务的文件URL和预览图片
+bool updateAi3dTaskFiles(const std::string &jobId, 
+                        const std::string &fileUrl, 
+                        const std::string &previewImages);
 
 // 更新任务状态
 bool updateAi3dTaskStatus(const std::string &jobId, const std::string &status);
@@ -48,3 +54,9 @@ bool updateUserTokenCount(const std::string& userId, int delta);
 
 //修改任务私有属性
 bool toggleJobIsPrivate(const std::string& jobId);
+
+// 获取任务的详细文件信息
+Json::Value getTaskFileInfo(const std::string& jobId);
+
+// 获取任务的完整信息（包含文件URL和私有状态）
+Json::Value getTaskCompleteInfo(const std::string& jobId);

@@ -19,3 +19,6 @@ void handleShowModel(const httplib::Request &req, httplib::Response &res);
 void handleIncrTokenCount(const httplib::Request &req, httplib::Response &res);
 void handleToggleJobIsPrivate(const httplib::Request &req, httplib::Response &res);
 
+// 获取任务的详细文件信息
+void handleGetTaskFiles(const httplib::Request &req, httplib::Response &res);
+

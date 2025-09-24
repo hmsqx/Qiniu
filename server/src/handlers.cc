@@ -243,7 +243,10 @@ void handleQueryJobsByPage(const httplib::Request &req, httplib::Response &res)
         Json::Value currentPageData;
         for (const auto &job : taskIdList)
         {
-            //查询分流
+            // 首先从数据库获取完整的任务信息
+            Json::Value dbInfo = getTaskCompleteInfo(job.first);
+            
+            // 然后从腾讯云获取最新的任务状态
             Json::Value taskInfo;
             std::cout <<"UserId: "<< userId<<" jobId: "<<job.first<<" job version:" <<job.second <<std::endl;
             if(job.second == "rapid")
@@ -253,8 +256,18 @@ void handleQueryJobsByPage(const httplib::Request &req, httplib::Response &res)
             else
             taskInfo = queryTaskStatusFromTx(job.first);
 
+            // 合并数据库信息和腾讯云状态信息
+            if (dbInfo.get("found", false).asBool()) {
+                taskInfo["fileurl"] = dbInfo["fileurl"];
+                if(!dbInfo["previewImages"].empty())
+                taskInfo["previewImages"] = dbInfo["previewImages"];
+                taskInfo["Isprivate"] = dbInfo["Isprivate"];
+                taskInfo["downloadCount"] = dbInfo["downloadCount"];
+                taskInfo["like"] = dbInfo["like"];
+                taskInfo["createTime"] = dbInfo["createTime"];
+            }
+
             currentPageData.append(taskInfo);
-            
         }
 
         Json::Value successResp;
@@ -684,4 +697,95 @@ void handleToggleJobIsPrivate(const httplib::Request &req, httplib::Response &re
     Json::StreamWriterBuilder writer;
     res.status = 200;
     res.set_content(Json::writeString(writer, respJson), "application/json");
+}
+
+void handleGetTaskFiles(const httplib::Request &req, httplib::Response &res)
+{
+    std::string jobId;
+    
+    // 从URL参数或请求体中获取jobId
+    if (req.has_param("jobId")) {
+        jobId = req.get_param_value("jobId");
+    } else {
+        Json::Value root;
+        Json::CharReaderBuilder reader;
+        std::string errors;
+        std::istringstream reqBodyStream(req.body);
+        
+        if (Json::parseFromStream(reader, reqBodyStream, &root, &errors)) {
+            jobId = root.get("jobId", "").asString();
+        }
+    }
+    
+    if (jobId.empty()) {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 400;
+        errorResponse["message"] = "jobId 必填";
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    
+    Json::Value taskInfo = getTaskFileInfo(jobId);
+    
+    if (!taskInfo.get("found", false).asBool()) {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 404;
+        errorResponse["message"] = "任务不存在";
+        Json::StreamWriterBuilder writer;
+        res.status = 404;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    
+    // 解析文件URL和预览图片URL
+    std::string fileUrls = taskInfo.get("fileurl", "").asString();
+    std::string previewUrls = taskInfo.get("previewImages", "").asString();
+    
+    Json::Value fileList(Json::arrayValue);
+    Json::Value previewList(Json::arrayValue);
+    
+    // 分割文件URL（用逗号分隔）
+    if (!fileUrls.empty()) {
+        std::stringstream ss(fileUrls);
+        std::string item;
+        while (std::getline(ss, item, ',')) {
+            if (!item.empty()) {
+                fileList.append(item);
+            }
+        }
+    }
+    
+    // 分割预览图片URL（用逗号分隔）
+    if (!previewUrls.empty()) {
+        std::stringstream ss(previewUrls);
+        std::string item;
+        while (std::getline(ss, item, ',')) {
+            if (!item.empty()) {
+                previewList.append(item);
+            }
+        }
+    }
+    
+    Json::Value response;
+    response["status"] = "success";
+    response["code"] = 200;
+    response["message"] = "获取任务文件信息成功";
+    response["data"]["jobId"] = taskInfo.get("jobId", "");
+    response["data"]["Isprivate"] = taskInfo.get("Isprivate", "");
+    response["data"]["status"] = taskInfo.get("status", "");
+    response["data"]["prompt"] = taskInfo.get("prompt", "");
+    response["data"]["resultFormat"] = taskInfo.get("resultFormat", "");
+    response["data"]["version"] = taskInfo.get("version", "");
+    response["data"]["createTime"] = taskInfo.get("createTime", "");
+    response["data"]["fileList"] = fileList;
+    response["data"]["previewList"] = previewList;
+
+    
+    Json::StreamWriterBuilder writer;
+    res.status = 200;
+    res.set_content(Json::writeString(writer, response), "application/json");
 }
