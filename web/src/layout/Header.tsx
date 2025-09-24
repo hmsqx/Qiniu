@@ -49,6 +49,7 @@ const menuItems: MenuItem[] = [
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   const [activeItem, setActiveItem] = useState("");
 
@@ -120,7 +121,9 @@ export const Header = () => {
         >
           <Sparkles className="h-4 w-4 text-primary" />
           <span className="hidden md:inline text-muted-foreground">次数：</span>
-          <span className="font-semibold text-foreground">16</span>
+          <span className="font-semibold text-foreground">
+            {user?.tokenCount !== undefined ? user.tokenCount : "—"}
+          </span>
         </Badge>
 
         <div>
