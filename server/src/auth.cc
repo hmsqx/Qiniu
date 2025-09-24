@@ -125,8 +125,8 @@ Json::Value registerUser(const std::string &username,
         unsigned long slen = mysql_real_escape_string(conn, &escSalt[0], saltHex.c_str(), saltHex.size());
         escSalt.resize(slen);
 
-        std::string insert = "INSERT INTO users (user_id, username, email, password_hash, password_salt, status, create_time, update_time) VALUES ("
-                             "UUID(), '" + escUsername + "', '" + escEmail + "', '" + escHash + "', '" + escSalt + "', 1, NOW(), NOW())";
+        std::string insert = "INSERT INTO users (user_id, username, email, password_hash, password_salt, status, create_time, update_time, token_count, role) VALUES ("
+                             "UUID(), '" + escUsername + "', '" + escEmail + "', '" + escHash + "', '" + escSalt + "', 1, NOW(), NOW(), 20, 'user')";
         if (mysql_query(conn, insert.c_str()) != 0)
         {
             resp["status"] = "error";
@@ -269,4 +269,22 @@ Json::Value loginUser(const std::string &usernameOrEmail,
     resp["data"]["sessionToken"] = tokenHex;
     resp["data"]["expireInSeconds"] = SESSION_TTL_SECONDS;
     return resp;
-} 
+}
+
+bool updateUserTokenCount(const std::string& userId, int delta)
+{
+    MYSQL *conn = nullptr;
+    if (!openConnection(&conn)) {
+        return false;
+    }
+    std::string escUserId;
+    escUserId.resize(userId.size() * 2 + 1);
+    unsigned long ulen = mysql_real_escape_string(conn, &escUserId[0], userId.c_str(), userId.size());
+    escUserId.resize(ulen);
+    std::ostringstream oss;
+    oss << "UPDATE users SET token_count = token_count + " << delta << ", update_time = NOW() WHERE user_id='" << escUserId << "'";
+    std::string query = oss.str();
+    bool ok = (mysql_query(conn, query.c_str()) == 0);
+    mysql_close(conn);
+    return ok;
+}

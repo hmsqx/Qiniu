@@ -414,3 +414,33 @@ std::pair<int, Json::Value> queryModelsByPrivacy(bool isPrivate,
     mysql_close(conn);
     return {total, list};
 }
+
+bool toggleJobIsPrivate(const std::string& jobId)
+{
+    MYSQL *conn = mysql_init(nullptr);
+    if (conn == nullptr)
+    {
+        std::cerr << "MySQL 初始化失败：" << mysql_error(conn) << std::endl;
+        return false;
+    }
+    if (mysql_real_connect(conn, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, MYSQL_PORT, nullptr, 0) == nullptr)
+    {
+        std::cerr << "MySQL 连接失败：" << mysql_error(conn) << std::endl;
+        mysql_close(conn);
+        return false;
+    }
+    if (mysql_set_character_set(conn, "utf8mb4") != 0)
+    {
+        std::cerr << "设置字符集失败：" << mysql_error(conn) << std::endl;
+        mysql_close(conn);
+        return false;
+    }
+    std::string escJobId;
+    escJobId.resize(jobId.size() * 2 + 1);
+    unsigned long jlen = mysql_real_escape_string(conn, &escJobId[0], jobId.c_str(), jobId.size());
+    escJobId.resize(jlen);
+    std::string query = "UPDATE ai3d_tasks SET Isprivate = NOT Isprivate WHERE tx_job_id='" + escJobId + "'";
+    bool ok = (mysql_query(conn, query.c_str()) == 0);
+    mysql_close(conn);
+    return ok;
+}

@@ -15,3 +15,7 @@ void handleMe(const httplib::Request &req, httplib::Response &res);
 void handleDownloadModel(const httplib::Request &req, httplib::Response &res);
 void handleLikeModel(const httplib::Request &req, httplib::Response &res);
 void handleShowModel(const httplib::Request &req, httplib::Response &res);
+
+void handleIncrTokenCount(const httplib::Request &req, httplib::Response &res);
+void handleToggleJobIsPrivate(const httplib::Request &req, httplib::Response &res);
+

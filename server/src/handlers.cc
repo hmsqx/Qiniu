@@ -600,3 +600,88 @@ void handleShowModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResp), "application/json");
     }
 }
+
+void handleIncrTokenCount(const httplib::Request &req, httplib::Response &res)
+{
+    std::string sessionToken;
+    if (req.has_header("Session-Token")) {
+        sessionToken = req.get_header_value("Session-Token");
+    }
+    if (sessionToken.empty()) {
+        Json::Value errorResp;
+        errorResp["status"] = "error";
+        errorResp["code"] = 401;
+        errorResp["message"] = "缺少 Session-Token";
+        Json::StreamWriterBuilder writer;
+        res.status = 401;
+        res.set_content(Json::writeString(writer, errorResp), "application/json");
+        return;
+    }
+
+    Json::Value info = getUserInfoBySessionToken(sessionToken);
+    std::string userId = info.get("userId", "").asString();
+    if (userId.empty()) {
+        Json::Value errorResp;
+        errorResp["status"] = "error";
+        errorResp["code"] = 401;
+        errorResp["message"] = "无效或过期的会话";
+        Json::StreamWriterBuilder writer;
+        res.status = 401;
+        res.set_content(Json::writeString(writer, errorResp), "application/json");
+        return;
+    }
+    int delta = 1;
+    delta = stoi(req.get_header_value("delta"));
+    bool ok = updateUserTokenCount(userId, delta);
+    if (!ok) {
+        Json::Value errorResp;
+        errorResp["status"] = "error";
+        errorResp["code"] = 500;
+        errorResp["message"] = "token_count 增加失败";
+        Json::StreamWriterBuilder writer;
+        res.status = 500;
+        res.set_content(Json::writeString(writer, errorResp), "application/json");
+        return;
+    }
+
+    Json::Value respJson;
+    respJson["status"] = "success";
+    respJson["code"] = 200;
+    respJson["message"] = "token_count +1";
+    Json::StreamWriterBuilder writer;
+    res.status = 200;
+    res.set_content(Json::writeString(writer, respJson), "application/json");
+}
+
+void handleToggleJobIsPrivate(const httplib::Request &req, httplib::Response &res)
+{
+    Json::Value respJson;
+    Json::Reader reader;
+    Json::Value body;
+    if (!reader.parse(req.body, body) || !body.isMember("jobId")) {
+        respJson["status"] = "error";
+        respJson["code"] = 400;
+        respJson["message"] = "缺少 jobId 参数";
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, respJson), "application/json");
+        return;
+    }
+    std::string jobId = body["jobId"].asString();
+    bool ok = toggleJobIsPrivate(jobId);
+    if (!ok) {
+        respJson["status"] = "error";
+        respJson["code"] = 500;
+        respJson["message"] = "修改失败";
+        Json::StreamWriterBuilder writer;
+        res.status = 500;
+        res.set_content(Json::writeString(writer, respJson), "application/json");
+        return;
+    }
+    respJson["status"] = "success";
+    respJson["code"] = 200;
+    respJson["message"] = "Isprivate 已取反";
+    Json::StreamWriterBuilder writer;
+    res.status = 200;
+    res.set_content(Json::writeString(writer, respJson), "application/json");
+}

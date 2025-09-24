@@ -16,6 +16,8 @@ int main()
     server.Get("/api/showModel", handleShowModel);
     server.Get("/health", [](const httplib::Request &, httplib::Response &res)
               { res.set_content("服务正常运行", "text/plain"); });
+    server.Post("/api/IncrTokenCount", handleIncrTokenCount);
+    server.Post("/api/toggleJobIsPrivate", handleToggleJobIsPrivate);
 
     std::cout << "启动HTTP服务器，监听端口8080..." << std::endl;
     server.listen("0.0.0.0", 8080);

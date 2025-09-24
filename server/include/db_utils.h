@@ -42,3 +42,9 @@ bool incrementModelLikeCount(const std::string &jobId);
 std::pair<int, Json::Value> queryModelsByPrivacy(bool isPrivate,
                                                  int pageNum,
                                                  int pageSize);
+
+//修改用户余额
+bool updateUserTokenCount(const std::string& userId, int delta);
+
+//修改任务私有属性
+bool toggleJobIsPrivate(const std::string& jobId);
