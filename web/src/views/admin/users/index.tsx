@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useUsers } from "./hooks/useUsers";
 import { Pagination } from "@/views/workspace/_modules/workspace-gallery/components/Pagination";
 import { Filters } from "./_modules/Filters";
@@ -10,7 +10,6 @@ const AdminUsers: React.FC = () => {
     total,
     page,
     pageSize,
-    // legacy keyword (unused when separate fields active)
     setKeyword,
     loading,
     nextPage,
@@ -25,27 +24,14 @@ const AdminUsers: React.FC = () => {
     setPage,
   } = useUsers();
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  // draft filter state (controlled for Filters component)
-  const [draftFilters, setDraftFilters] = useState({
-    username: username,
-    email: email,
-    role: role,
-  });
-
-  const applyFilters = () => {
-    setUsername(draftFilters.username.trim());
-    setEmail(draftFilters.email.trim());
-    setRole(draftFilters.role.trim());
-    setKeyword("");
-    setPage(1);
-  };
-
-  const resetFilters = () => {
-    const empty = { username: "", email: "", role: "" };
-    setDraftFilters(empty);
-    setUsername("");
-    setEmail("");
-    setRole("");
+  const handleApply = (s: {
+    username: string;
+    email: string;
+    role: string;
+  }) => {
+    setUsername(s.username);
+    setEmail(s.email);
+    setRole(s.role);
     setKeyword("");
     setPage(1);
   };
@@ -53,11 +39,9 @@ const AdminUsers: React.FC = () => {
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-6 pb-10">
       <Filters
-        value={draftFilters}
+        initial={{ username, email, role }}
         loading={loading}
-        onFiltersChange={(v) => setDraftFilters(v)}
-        onSearch={applyFilters}
-        onReset={resetFilters}
+        onApply={handleApply}
         onRefresh={refresh}
       />
 

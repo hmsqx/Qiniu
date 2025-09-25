@@ -21,7 +21,6 @@ export function useUsers() {
       const resp = await listUsers({
         page,
         pageSize,
-        // 单字段任意一个有值时，不再发 keyword
         keyword: username || email || role ? undefined : keyword || undefined,
         username: username || undefined,
         email: email || undefined,

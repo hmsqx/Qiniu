@@ -10,7 +10,7 @@ interface PaginationProps {
   loading: boolean;
   onPrev: () => void;
   onNext: () => void;
-  onJump?: (page: number) => void; // 新增: 直接跳转
+  onJump?: (page: number) => void;
 }
 
 export function Pagination({
@@ -25,7 +25,7 @@ export function Pagination({
   const [jumpVal, setJumpVal] = useState("");
   const [jumpError, setJumpError] = useState("");
   const [jumping, setJumping] = useState(false);
-  if (total <= 0) return null;
+  const hideAll = total <= 0;
 
   const buildPages = () => {
     const span = 2;
@@ -73,9 +73,10 @@ export function Pagination({
   };
 
   useEffect(() => {
-    // 数据加载完后结束 jumping 状态
     if (!loading && jumping) setJumping(false);
   }, [loading, jumping]);
+
+  if (hideAll) return null;
 
   return (
     <div className="mt-8 flex flex-col md:flex-row md:items-center md:justify-between text-sm gap-4">

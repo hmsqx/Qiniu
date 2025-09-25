@@ -69,7 +69,6 @@ const Viewer: React.FC = () => {
   const isVideo = format === "mp4";
   const isUsd = format === "usdz" || format === "usd";
 
-  // UI states
   const [showGrid, setShowGrid] = useState(true);
   const [autoRotate, setAutoRotate] = useState(false);
   const [stlColor, setStlColor] = useState<string>("#aaaaaa");

@@ -8,7 +8,14 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { RoleBadge } from "./RoleBadge";
-import type { UserItem } from "../types";
+
+export interface UserItem {
+  id: string | number;
+  username: string;
+  email: string;
+  role: string;
+  createdAt: string | number | Date;
+}
 
 interface UsersTableProps {
   list: UserItem[];

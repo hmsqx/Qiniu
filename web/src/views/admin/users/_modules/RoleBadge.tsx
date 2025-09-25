@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { roleColor } from "./constants";
+import { roleColor } from "../data/constants";
 
 interface RoleBadgeProps {
   role: string;

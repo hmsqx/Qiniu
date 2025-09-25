@@ -1,5 +1,4 @@
 import React from "react";
-import { Badge } from "@/components/ui/badge";
 import { Sparkles } from "lucide-react";
 
 interface SectionHeaderProps {
@@ -15,13 +14,6 @@ export function SectionHeader({ title, icon }: SectionHeaderProps) {
         <h2 className="text-2xl font-semibold tracking-tight text-slate-200">
           {title}
         </h2>
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="secondary">全部</Badge>
-        <Badge variant="outline">UI</Badge>
-        <Badge variant="outline">插画</Badge>
-        <Badge variant="outline">动效</Badge>
-        <Badge variant="outline">配色</Badge>
       </div>
     </div>
   );
