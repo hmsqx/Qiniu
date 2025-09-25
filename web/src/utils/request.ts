@@ -5,7 +5,6 @@ const VITE_API_BASE =
   (import.meta.env as Record<string, any>).VITE_API_BASE || "/";
 
 console.log("使用的 API 基础地址:", VITE_API_BASE);
-// 创建基础 axios 实例 — 使用 VITE_API_BASE
 const instance: AxiosInstance = axios.create({
   baseURL: VITE_API_BASE,
   timeout: 30000,
@@ -14,10 +13,8 @@ const instance: AxiosInstance = axios.create({
   },
 });
 
-// 请求/响应拦截器，可以添加日志或全局错误处理。Token 逻辑可在请求拦截器中后续添加。
 instance.interceptors.request.use(
   (config: AxiosRequestConfig | any) => {
-    // 从本地存储获取 sessionToken 写入自定义 Session-Token 头
     try {
       const raw = localStorage.getItem("gen3d_auth");
       if (raw) {
@@ -26,7 +23,7 @@ instance.interceptors.request.use(
         if (token) {
           config.headers = config.headers || {};
           (config.headers as Record<string, any>)["Session-Token"] = token;
-          // 确保不再发送 Authorization 头
+
           if ((config.headers as Record<string, any>)["Authorization"]) {
             delete (config.headers as Record<string, any>)["Authorization"];
           }
