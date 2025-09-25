@@ -1,0 +1,257 @@
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef TENCENTCLOUD_TSF_V20180326_MODEL_DESCRIBEJVMMONITORREQUEST_H_
+#define TENCENTCLOUD_TSF_V20180326_MODEL_DESCRIBEJVMMONITORREQUEST_H_
+
+#include <string>
+#include <vector>
+#include <map>
+#include <tencentcloud/core/AbstractModel.h>
+
+
+namespace TencentCloud
+{
+    namespace Tsf
+    {
+        namespace V20180326
+        {
+            namespace Model
+            {
+                /**
+                * DescribeJvmMonitor请求参数结构体
+                */
+                class DescribeJvmMonitorRequest : public AbstractModel
+                {
+                public:
+                    DescribeJvmMonitorRequest();
+                    ~DescribeJvmMonitorRequest() = default;
+                    std::string ToJsonString() const;
+
+
+                    /**
+                     * 获取查询的实例ID
+可通过调用[DescribeClusterInstances](https://cloud.tencent.com/document/product/649/36048)查询已导入的实例列表或登录[控制台](https://console.cloud.tencent.com/tsf/resource?rid=1&tab=instance)进行查询。实例ID例如：ins-6decplwk
+                     * @return InstanceId 查询的实例ID
+可通过调用[DescribeClusterInstances](https://cloud.tencent.com/document/product/649/36048)查询已导入的实例列表或登录[控制台](https://console.cloud.tencent.com/tsf/resource?rid=1&tab=instance)进行查询。实例ID例如：ins-6decplwk
+                     * 
+                     */
+                    std::string GetInstanceId() const;
+
+                    /**
+                     * 设置查询的实例ID
+可通过调用[DescribeClusterInstances](https://cloud.tencent.com/document/product/649/36048)查询已导入的实例列表或登录[控制台](https://console.cloud.tencent.com/tsf/resource?rid=1&tab=instance)进行查询。实例ID例如：ins-6decplwk
+                     * @param _instanceId 查询的实例ID
+可通过调用[DescribeClusterInstances](https://cloud.tencent.com/document/product/649/36048)查询已导入的实例列表或登录[控制台](https://console.cloud.tencent.com/tsf/resource?rid=1&tab=instance)进行查询。实例ID例如：ins-6decplwk
+                     * 
+                     */
+                    void SetInstanceId(const std::string& _instanceId);
+
+                    /**
+                     * 判断参数 InstanceId 是否已赋值
+                     * @return InstanceId 是否已赋值
+                     * 
+                     */
+                    bool InstanceIdHasBeenSet() const;
+
+                    /**
+                     * 获取实例所属应用ID
+可通过调用[DescribeApplications](https://cloud.tencent.com/document/product/649/36090)查询已经存在的应用列表或登录[控制台](https://console.cloud.tencent.com/tsf/app?rid=1)查看。应用ID例如：application-v378ewna
+                     * @return ApplicationId 实例所属应用ID
+可通过调用[DescribeApplications](https://cloud.tencent.com/document/product/649/36090)查询已经存在的应用列表或登录[控制台](https://console.cloud.tencent.com/tsf/app?rid=1)查看。应用ID例如：application-v378ewna
+                     * 
+                     */
+                    std::string GetApplicationId() const;
+
+                    /**
+                     * 设置实例所属应用ID
+可通过调用[DescribeApplications](https://cloud.tencent.com/document/product/649/36090)查询已经存在的应用列表或登录[控制台](https://console.cloud.tencent.com/tsf/app?rid=1)查看。应用ID例如：application-v378ewna
+                     * @param _applicationId 实例所属应用ID
+可通过调用[DescribeApplications](https://cloud.tencent.com/document/product/649/36090)查询已经存在的应用列表或登录[控制台](https://console.cloud.tencent.com/tsf/app?rid=1)查看。应用ID例如：application-v378ewna
+                     * 
+                     */
+                    void SetApplicationId(const std::string& _applicationId);
+
+                    /**
+                     * 判断参数 ApplicationId 是否已赋值
+                     * @return ApplicationId 是否已赋值
+                     * 
+                     */
+                    bool ApplicationIdHasBeenSet() const;
+
+                    /**
+                     * 获取时间粒度,单位:秒
+                     * @return TimeGranularity 时间粒度,单位:秒
+                     * 
+                     */
+                    int64_t GetTimeGranularity() const;
+
+                    /**
+                     * 设置时间粒度,单位:秒
+                     * @param _timeGranularity 时间粒度,单位:秒
+                     * 
+                     */
+                    void SetTimeGranularity(const int64_t& _timeGranularity);
+
+                    /**
+                     * 判断参数 TimeGranularity 是否已赋值
+                     * @return TimeGranularity 是否已赋值
+                     * 
+                     */
+                    bool TimeGranularityHasBeenSet() const;
+
+                    /**
+                     * 获取查询数据起始时间格式(yyyy-MM-dd HH:mm:ss)
+                     * @return From 查询数据起始时间格式(yyyy-MM-dd HH:mm:ss)
+                     * 
+                     */
+                    std::string GetFrom() const;
+
+                    /**
+                     * 设置查询数据起始时间格式(yyyy-MM-dd HH:mm:ss)
+                     * @param _from 查询数据起始时间格式(yyyy-MM-dd HH:mm:ss)
+                     * 
+                     */
+                    void SetFrom(const std::string& _from);
+
+                    /**
+                     * 判断参数 From 是否已赋值
+                     * @return From 是否已赋值
+                     * 
+                     */
+                    bool FromHasBeenSet() const;
+
+                    /**
+                     * 获取查询数据结束时间格式(yyyy-MM-dd HH:mm:ss)
+                     * @return To 查询数据结束时间格式(yyyy-MM-dd HH:mm:ss)
+                     * 
+                     */
+                    std::string GetTo() const;
+
+                    /**
+                     * 设置查询数据结束时间格式(yyyy-MM-dd HH:mm:ss)
+                     * @param _to 查询数据结束时间格式(yyyy-MM-dd HH:mm:ss)
+                     * 
+                     */
+                    void SetTo(const std::string& _to);
+
+                    /**
+                     * 判断参数 To 是否已赋值
+                     * @return To 是否已赋值
+                     * 
+                     */
+                    bool ToHasBeenSet() const;
+
+                    /**
+                     * 获取查询的监控图列表，以返回值属性名作为入参，可选值：
+heapMemory：堆内存监控图；nonHeapMemory：非堆内存监控图；edenSpace：伊甸区监控图；survivorSpace：幸存者区监控图；oldSpace：老年代监控图；metaSpace：元空间监控图；youngGC：youngGC增量监控图；fullGC：fullGC增量监控图；cpuUsage：cpu使用率监控图；classCount：加载类数监控图；threadPicture：线程图
+                     * @return RequiredPictures 查询的监控图列表，以返回值属性名作为入参，可选值：
+heapMemory：堆内存监控图；nonHeapMemory：非堆内存监控图；edenSpace：伊甸区监控图；survivorSpace：幸存者区监控图；oldSpace：老年代监控图；metaSpace：元空间监控图；youngGC：youngGC增量监控图；fullGC：fullGC增量监控图；cpuUsage：cpu使用率监控图；classCount：加载类数监控图；threadPicture：线程图
+                     * 
+                     */
+                    std::vector<std::string> GetRequiredPictures() const;
+
+                    /**
+                     * 设置查询的监控图列表，以返回值属性名作为入参，可选值：
+heapMemory：堆内存监控图；nonHeapMemory：非堆内存监控图；edenSpace：伊甸区监控图；survivorSpace：幸存者区监控图；oldSpace：老年代监控图；metaSpace：元空间监控图；youngGC：youngGC增量监控图；fullGC：fullGC增量监控图；cpuUsage：cpu使用率监控图；classCount：加载类数监控图；threadPicture：线程图
+                     * @param _requiredPictures 查询的监控图列表，以返回值属性名作为入参，可选值：
+heapMemory：堆内存监控图；nonHeapMemory：非堆内存监控图；edenSpace：伊甸区监控图；survivorSpace：幸存者区监控图；oldSpace：老年代监控图；metaSpace：元空间监控图；youngGC：youngGC增量监控图；fullGC：fullGC增量监控图；cpuUsage：cpu使用率监控图；classCount：加载类数监控图；threadPicture：线程图
+                     * 
+                     */
+                    void SetRequiredPictures(const std::vector<std::string>& _requiredPictures);
+
+                    /**
+                     * 判断参数 RequiredPictures 是否已赋值
+                     * @return RequiredPictures 是否已赋值
+                     * 
+                     */
+                    bool RequiredPicturesHasBeenSet() const;
+
+                    /**
+                     * 获取扩展字段
+                     * @return Tag 扩展字段
+                     * 
+                     */
+                    std::string GetTag() const;
+
+                    /**
+                     * 设置扩展字段
+                     * @param _tag 扩展字段
+                     * 
+                     */
+                    void SetTag(const std::string& _tag);
+
+                    /**
+                     * 判断参数 Tag 是否已赋值
+                     * @return Tag 是否已赋值
+                     * 
+                     */
+                    bool TagHasBeenSet() const;
+
+                private:
+
+                    /**
+                     * 查询的实例ID
+可通过调用[DescribeClusterInstances](https://cloud.tencent.com/document/product/649/36048)查询已导入的实例列表或登录[控制台](https://console.cloud.tencent.com/tsf/resource?rid=1&tab=instance)进行查询。实例ID例如：ins-6decplwk
+                     */
+                    std::string m_instanceId;
+                    bool m_instanceIdHasBeenSet;
+
+                    /**
+                     * 实例所属应用ID
+可通过调用[DescribeApplications](https://cloud.tencent.com/document/product/649/36090)查询已经存在的应用列表或登录[控制台](https://console.cloud.tencent.com/tsf/app?rid=1)查看。应用ID例如：application-v378ewna
+                     */
+                    std::string m_applicationId;
+                    bool m_applicationIdHasBeenSet;
+
+                    /**
+                     * 时间粒度,单位:秒
+                     */
+                    int64_t m_timeGranularity;
+                    bool m_timeGranularityHasBeenSet;
+
+                    /**
+                     * 查询数据起始时间格式(yyyy-MM-dd HH:mm:ss)
+                     */
+                    std::string m_from;
+                    bool m_fromHasBeenSet;
+
+                    /**
+                     * 查询数据结束时间格式(yyyy-MM-dd HH:mm:ss)
+                     */
+                    std::string m_to;
+                    bool m_toHasBeenSet;
+
+                    /**
+                     * 查询的监控图列表，以返回值属性名作为入参，可选值：
+heapMemory：堆内存监控图；nonHeapMemory：非堆内存监控图；edenSpace：伊甸区监控图；survivorSpace：幸存者区监控图；oldSpace：老年代监控图；metaSpace：元空间监控图；youngGC：youngGC增量监控图；fullGC：fullGC增量监控图；cpuUsage：cpu使用率监控图；classCount：加载类数监控图；threadPicture：线程图
+                     */
+                    std::vector<std::string> m_requiredPictures;
+                    bool m_requiredPicturesHasBeenSet;
+
+                    /**
+                     * 扩展字段
+                     */
+                    std::string m_tag;
+                    bool m_tagHasBeenSet;
+
+                };
+            }
+        }
+    }
+}
+
+#endif // !TENCENTCLOUD_TSF_V20180326_MODEL_DESCRIBEJVMMONITORREQUEST_H_

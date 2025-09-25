@@ -1,0 +1,207 @@
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef TENCENTCLOUD_HUNYUAN_V20230901_MODEL_SEARCHRESULT_H_
+#define TENCENTCLOUD_HUNYUAN_V20230901_MODEL_SEARCHRESULT_H_
+
+#include <string>
+#include <vector>
+#include <map>
+#include <tencentcloud/core/utils/rapidjson/document.h>
+#include <tencentcloud/core/utils/rapidjson/writer.h>
+#include <tencentcloud/core/utils/rapidjson/stringbuffer.h>
+#include <tencentcloud/core/AbstractModel.h>
+
+
+namespace TencentCloud
+{
+    namespace Hunyuan
+    {
+        namespace V20230901
+        {
+            namespace Model
+            {
+                /**
+                * 搜索引文信息
+                */
+                class SearchResult : public AbstractModel
+                {
+                public:
+                    SearchResult();
+                    ~SearchResult() = default;
+                    void ToJsonObject(rapidjson::Value &value, rapidjson::Document::AllocatorType& allocator) const;
+                    CoreInternalOutcome Deserialize(const rapidjson::Value &value);
+
+
+                    /**
+                     * 获取搜索引文序号
+注意：此字段可能返回 null，表示取不到有效值。
+                     * @return Index 搜索引文序号
+注意：此字段可能返回 null，表示取不到有效值。
+                     * 
+                     */
+                    int64_t GetIndex() const;
+
+                    /**
+                     * 设置搜索引文序号
+注意：此字段可能返回 null，表示取不到有效值。
+                     * @param _index 搜索引文序号
+注意：此字段可能返回 null，表示取不到有效值。
+                     * 
+                     */
+                    void SetIndex(const int64_t& _index);
+
+                    /**
+                     * 判断参数 Index 是否已赋值
+                     * @return Index 是否已赋值
+                     * 
+                     */
+                    bool IndexHasBeenSet() const;
+
+                    /**
+                     * 获取搜索引文标题
+注意：此字段可能返回 null，表示取不到有效值。
+                     * @return Title 搜索引文标题
+注意：此字段可能返回 null，表示取不到有效值。
+                     * 
+                     */
+                    std::string GetTitle() const;
+
+                    /**
+                     * 设置搜索引文标题
+注意：此字段可能返回 null，表示取不到有效值。
+                     * @param _title 搜索引文标题
+注意：此字段可能返回 null，表示取不到有效值。
+                     * 
+                     */
+                    void SetTitle(const std::string& _title);
+
+                    /**
+                     * 判断参数 Title 是否已赋值
+                     * @return Title 是否已赋值
+                     * 
+                     */
+                    bool TitleHasBeenSet() const;
+
+                    /**
+                     * 获取搜索引文链接
+注意：此字段可能返回 null，表示取不到有效值。
+                     * @return Url 搜索引文链接
+注意：此字段可能返回 null，表示取不到有效值。
+                     * 
+                     */
+                    std::string GetUrl() const;
+
+                    /**
+                     * 设置搜索引文链接
+注意：此字段可能返回 null，表示取不到有效值。
+                     * @param _url 搜索引文链接
+注意：此字段可能返回 null，表示取不到有效值。
+                     * 
+                     */
+                    void SetUrl(const std::string& _url);
+
+                    /**
+                     * 判断参数 Url 是否已赋值
+                     * @return Url 是否已赋值
+                     * 
+                     */
+                    bool UrlHasBeenSet() const;
+
+                    /**
+                     * 获取搜索引文站点名
+                     * @return Text 搜索引文站点名
+                     * 
+                     */
+                    std::string GetText() const;
+
+                    /**
+                     * 设置搜索引文站点名
+                     * @param _text 搜索引文站点名
+                     * 
+                     */
+                    void SetText(const std::string& _text);
+
+                    /**
+                     * 判断参数 Text 是否已赋值
+                     * @return Text 是否已赋值
+                     * 
+                     */
+                    bool TextHasBeenSet() const;
+
+                    /**
+                     * 获取搜索引文图标
+                     * @return Icon 搜索引文图标
+                     * 
+                     */
+                    std::string GetIcon() const;
+
+                    /**
+                     * 设置搜索引文图标
+                     * @param _icon 搜索引文图标
+                     * 
+                     */
+                    void SetIcon(const std::string& _icon);
+
+                    /**
+                     * 判断参数 Icon 是否已赋值
+                     * @return Icon 是否已赋值
+                     * 
+                     */
+                    bool IconHasBeenSet() const;
+
+                private:
+
+                    /**
+                     * 搜索引文序号
+注意：此字段可能返回 null，表示取不到有效值。
+                     */
+                    int64_t m_index;
+                    bool m_indexHasBeenSet;
+
+                    /**
+                     * 搜索引文标题
+注意：此字段可能返回 null，表示取不到有效值。
+                     */
+                    std::string m_title;
+                    bool m_titleHasBeenSet;
+
+                    /**
+                     * 搜索引文链接
+注意：此字段可能返回 null，表示取不到有效值。
+                     */
+                    std::string m_url;
+                    bool m_urlHasBeenSet;
+
+                    /**
+                     * 搜索引文站点名
+                     */
+                    std::string m_text;
+                    bool m_textHasBeenSet;
+
+                    /**
+                     * 搜索引文图标
+                     */
+                    std::string m_icon;
+                    bool m_iconHasBeenSet;
+
+                };
+            }
+        }
+    }
+}
+
+#endif // !TENCENTCLOUD_HUNYUAN_V20230901_MODEL_SEARCHRESULT_H_

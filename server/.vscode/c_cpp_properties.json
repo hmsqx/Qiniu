@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "${workspaceFolder}/tencentcloud-sdk-cpp-master/ai3d/include",
+                "${workspaceFolder}/tencentcloud-sdk-cpp-master/core/include",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

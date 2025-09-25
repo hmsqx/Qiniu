@@ -1,0 +1,1196 @@
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef TENCENTCLOUD_DBBRAIN_V20210527_DBBRAINCLIENT_H_
+#define TENCENTCLOUD_DBBRAIN_V20210527_DBBRAINCLIENT_H_
+
+#include <functional>
+#include <future>
+#include <tencentcloud/core/AbstractClient.h>
+#include <tencentcloud/core/Credential.h>
+#include <tencentcloud/core/profile/ClientProfile.h>
+#include <tencentcloud/core/AsyncCallerContext.h>
+#include <tencentcloud/dbbrain/v20210527/model/AddUserContactRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/AddUserContactResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelDBAutonomyActionRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelDBAutonomyActionResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelDBAutonomyEventRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelDBAutonomyEventResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelKillTaskRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelKillTaskResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelRedisBigKeyAnalysisTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CancelRedisBigKeyAnalysisTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CloseAuditServiceRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CloseAuditServiceResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateAuditLogFileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateAuditLogFileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateDBDiagReportTaskRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateDBDiagReportTaskResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateDBDiagReportUrlRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateDBDiagReportUrlResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateKillTaskRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateKillTaskResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateMailProfileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateMailProfileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateProxySessionKillTaskRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateProxySessionKillTaskResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateRedisBigKeyAnalysisTaskRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateRedisBigKeyAnalysisTaskResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateSchedulerMailProfileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateSchedulerMailProfileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateSecurityAuditLogExportTaskRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateSecurityAuditLogExportTaskResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateSqlFilterRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateSqlFilterResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateUserAutonomyProfileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/CreateUserAutonomyProfileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteAuditLogFileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteAuditLogFileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteDBDiagReportTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteDBDiagReportTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteRedisBigKeyAnalysisTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteRedisBigKeyAnalysisTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteSecurityAuditLogExportTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteSecurityAuditLogExportTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteSqlFiltersRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DeleteSqlFiltersResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAlarmTemplateRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAlarmTemplateResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAllUserContactRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAllUserContactResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAllUserGroupRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAllUserGroupResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAuditInstanceListRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAuditInstanceListResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAuditLogFilesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeAuditLogFilesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBAutonomyActionRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBAutonomyActionResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBAutonomyActionsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBAutonomyActionsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBAutonomyEventsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBAutonomyEventsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagEventRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagEventResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagEventsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagEventsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagHistoryRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagHistoryResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagReportContentRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagReportContentResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagReportTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBDiagReportTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBPerfTimeSeriesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBPerfTimeSeriesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBSpaceStatusRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDBSpaceStatusResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDiagDBInstancesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeDiagDBInstancesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeHealthScoreRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeHealthScoreResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeHealthScoreTimeSeriesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeHealthScoreTimeSeriesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeIndexRecommendAggregationSlowLogsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeIndexRecommendAggregationSlowLogsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeIndexRecommendInfoRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeIndexRecommendInfoResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeMailProfileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeMailProfileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeMySqlProcessListRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeMySqlProcessListResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeNoPrimaryKeyTablesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeNoPrimaryKeyTablesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeProxyProcessStatisticsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeProxyProcessStatisticsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeProxySessionKillTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeProxySessionKillTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisBigKeyAnalysisTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisBigKeyAnalysisTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisCmdPerfTimeSeriesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisCmdPerfTimeSeriesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisCommandCostStatisticsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisCommandCostStatisticsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisCommandOverviewRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisCommandOverviewResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisProcessListRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisProcessListResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisSlowLogTopSqlsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisSlowLogTopSqlsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopBigKeysRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopBigKeysResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopCostCommandsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopCostCommandsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopHotKeysRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopHotKeysResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopKeyPrefixListRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeRedisTopKeyPrefixListResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSecurityAuditLogDownloadUrlsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSecurityAuditLogDownloadUrlsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSecurityAuditLogExportTasksRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSecurityAuditLogExportTasksResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogQueryTimeStatsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogQueryTimeStatsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogTimeSeriesStatsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogTimeSeriesStatsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogTopSqlsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogTopSqlsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogUserHostStatsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogUserHostStatsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSlowLogsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSqlFiltersRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSqlFiltersResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSqlTemplateRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeSqlTemplateResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceSchemaTimeSeriesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceSchemaTimeSeriesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceSchemasRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceSchemasResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceTableTimeSeriesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceTableTimeSeriesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceTablesRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeTopSpaceTablesResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeUserAutonomyProfileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeUserAutonomyProfileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeUserSqlAdviceRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/DescribeUserSqlAdviceResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/KillMySqlThreadsRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/KillMySqlThreadsResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyAlarmPolicyRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyAlarmPolicyResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyAuditServiceRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyAuditServiceResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyDiagDBInstanceConfRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyDiagDBInstanceConfResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifySqlFiltersRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifySqlFiltersResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyUserAutonomyProfileRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/ModifyUserAutonomyProfileResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/OpenAuditServiceRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/OpenAuditServiceResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/UpdateAgentSwitchRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/UpdateAgentSwitchResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/UpdateMonitorSwitchRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/UpdateMonitorSwitchResponse.h>
+#include <tencentcloud/dbbrain/v20210527/model/VerifyUserAccountRequest.h>
+#include <tencentcloud/dbbrain/v20210527/model/VerifyUserAccountResponse.h>
+
+
+namespace TencentCloud
+{
+    namespace Dbbrain
+    {
+        namespace V20210527
+        {
+            class DbbrainClient : public AbstractClient
+            {
+            public:
+                DbbrainClient(const Credential &credential, const std::string &region);
+                DbbrainClient(const Credential &credential, const std::string &region, const ClientProfile &profile);
+
+                typedef Outcome<Core::Error, Model::AddUserContactResponse> AddUserContactOutcome;
+                typedef std::future<AddUserContactOutcome> AddUserContactOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::AddUserContactRequest&, AddUserContactOutcome, const std::shared_ptr<const AsyncCallerContext>&)> AddUserContactAsyncHandler;
+                typedef Outcome<Core::Error, Model::CancelDBAutonomyActionResponse> CancelDBAutonomyActionOutcome;
+                typedef std::future<CancelDBAutonomyActionOutcome> CancelDBAutonomyActionOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CancelDBAutonomyActionRequest&, CancelDBAutonomyActionOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CancelDBAutonomyActionAsyncHandler;
+                typedef Outcome<Core::Error, Model::CancelDBAutonomyEventResponse> CancelDBAutonomyEventOutcome;
+                typedef std::future<CancelDBAutonomyEventOutcome> CancelDBAutonomyEventOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CancelDBAutonomyEventRequest&, CancelDBAutonomyEventOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CancelDBAutonomyEventAsyncHandler;
+                typedef Outcome<Core::Error, Model::CancelKillTaskResponse> CancelKillTaskOutcome;
+                typedef std::future<CancelKillTaskOutcome> CancelKillTaskOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CancelKillTaskRequest&, CancelKillTaskOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CancelKillTaskAsyncHandler;
+                typedef Outcome<Core::Error, Model::CancelRedisBigKeyAnalysisTasksResponse> CancelRedisBigKeyAnalysisTasksOutcome;
+                typedef std::future<CancelRedisBigKeyAnalysisTasksOutcome> CancelRedisBigKeyAnalysisTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CancelRedisBigKeyAnalysisTasksRequest&, CancelRedisBigKeyAnalysisTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CancelRedisBigKeyAnalysisTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::CloseAuditServiceResponse> CloseAuditServiceOutcome;
+                typedef std::future<CloseAuditServiceOutcome> CloseAuditServiceOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CloseAuditServiceRequest&, CloseAuditServiceOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CloseAuditServiceAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateAuditLogFileResponse> CreateAuditLogFileOutcome;
+                typedef std::future<CreateAuditLogFileOutcome> CreateAuditLogFileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateAuditLogFileRequest&, CreateAuditLogFileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateAuditLogFileAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateDBDiagReportTaskResponse> CreateDBDiagReportTaskOutcome;
+                typedef std::future<CreateDBDiagReportTaskOutcome> CreateDBDiagReportTaskOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateDBDiagReportTaskRequest&, CreateDBDiagReportTaskOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateDBDiagReportTaskAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateDBDiagReportUrlResponse> CreateDBDiagReportUrlOutcome;
+                typedef std::future<CreateDBDiagReportUrlOutcome> CreateDBDiagReportUrlOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateDBDiagReportUrlRequest&, CreateDBDiagReportUrlOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateDBDiagReportUrlAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateKillTaskResponse> CreateKillTaskOutcome;
+                typedef std::future<CreateKillTaskOutcome> CreateKillTaskOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateKillTaskRequest&, CreateKillTaskOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateKillTaskAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateMailProfileResponse> CreateMailProfileOutcome;
+                typedef std::future<CreateMailProfileOutcome> CreateMailProfileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateMailProfileRequest&, CreateMailProfileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateMailProfileAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateProxySessionKillTaskResponse> CreateProxySessionKillTaskOutcome;
+                typedef std::future<CreateProxySessionKillTaskOutcome> CreateProxySessionKillTaskOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateProxySessionKillTaskRequest&, CreateProxySessionKillTaskOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateProxySessionKillTaskAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateRedisBigKeyAnalysisTaskResponse> CreateRedisBigKeyAnalysisTaskOutcome;
+                typedef std::future<CreateRedisBigKeyAnalysisTaskOutcome> CreateRedisBigKeyAnalysisTaskOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateRedisBigKeyAnalysisTaskRequest&, CreateRedisBigKeyAnalysisTaskOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateRedisBigKeyAnalysisTaskAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateSchedulerMailProfileResponse> CreateSchedulerMailProfileOutcome;
+                typedef std::future<CreateSchedulerMailProfileOutcome> CreateSchedulerMailProfileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateSchedulerMailProfileRequest&, CreateSchedulerMailProfileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateSchedulerMailProfileAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateSecurityAuditLogExportTaskResponse> CreateSecurityAuditLogExportTaskOutcome;
+                typedef std::future<CreateSecurityAuditLogExportTaskOutcome> CreateSecurityAuditLogExportTaskOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateSecurityAuditLogExportTaskRequest&, CreateSecurityAuditLogExportTaskOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateSecurityAuditLogExportTaskAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateSqlFilterResponse> CreateSqlFilterOutcome;
+                typedef std::future<CreateSqlFilterOutcome> CreateSqlFilterOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateSqlFilterRequest&, CreateSqlFilterOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateSqlFilterAsyncHandler;
+                typedef Outcome<Core::Error, Model::CreateUserAutonomyProfileResponse> CreateUserAutonomyProfileOutcome;
+                typedef std::future<CreateUserAutonomyProfileOutcome> CreateUserAutonomyProfileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::CreateUserAutonomyProfileRequest&, CreateUserAutonomyProfileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> CreateUserAutonomyProfileAsyncHandler;
+                typedef Outcome<Core::Error, Model::DeleteAuditLogFileResponse> DeleteAuditLogFileOutcome;
+                typedef std::future<DeleteAuditLogFileOutcome> DeleteAuditLogFileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DeleteAuditLogFileRequest&, DeleteAuditLogFileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DeleteAuditLogFileAsyncHandler;
+                typedef Outcome<Core::Error, Model::DeleteDBDiagReportTasksResponse> DeleteDBDiagReportTasksOutcome;
+                typedef std::future<DeleteDBDiagReportTasksOutcome> DeleteDBDiagReportTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DeleteDBDiagReportTasksRequest&, DeleteDBDiagReportTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DeleteDBDiagReportTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DeleteRedisBigKeyAnalysisTasksResponse> DeleteRedisBigKeyAnalysisTasksOutcome;
+                typedef std::future<DeleteRedisBigKeyAnalysisTasksOutcome> DeleteRedisBigKeyAnalysisTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DeleteRedisBigKeyAnalysisTasksRequest&, DeleteRedisBigKeyAnalysisTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DeleteRedisBigKeyAnalysisTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DeleteSecurityAuditLogExportTasksResponse> DeleteSecurityAuditLogExportTasksOutcome;
+                typedef std::future<DeleteSecurityAuditLogExportTasksOutcome> DeleteSecurityAuditLogExportTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DeleteSecurityAuditLogExportTasksRequest&, DeleteSecurityAuditLogExportTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DeleteSecurityAuditLogExportTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DeleteSqlFiltersResponse> DeleteSqlFiltersOutcome;
+                typedef std::future<DeleteSqlFiltersOutcome> DeleteSqlFiltersOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DeleteSqlFiltersRequest&, DeleteSqlFiltersOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DeleteSqlFiltersAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeAlarmTemplateResponse> DescribeAlarmTemplateOutcome;
+                typedef std::future<DescribeAlarmTemplateOutcome> DescribeAlarmTemplateOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeAlarmTemplateRequest&, DescribeAlarmTemplateOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeAlarmTemplateAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeAllUserContactResponse> DescribeAllUserContactOutcome;
+                typedef std::future<DescribeAllUserContactOutcome> DescribeAllUserContactOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeAllUserContactRequest&, DescribeAllUserContactOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeAllUserContactAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeAllUserGroupResponse> DescribeAllUserGroupOutcome;
+                typedef std::future<DescribeAllUserGroupOutcome> DescribeAllUserGroupOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeAllUserGroupRequest&, DescribeAllUserGroupOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeAllUserGroupAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeAuditInstanceListResponse> DescribeAuditInstanceListOutcome;
+                typedef std::future<DescribeAuditInstanceListOutcome> DescribeAuditInstanceListOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeAuditInstanceListRequest&, DescribeAuditInstanceListOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeAuditInstanceListAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeAuditLogFilesResponse> DescribeAuditLogFilesOutcome;
+                typedef std::future<DescribeAuditLogFilesOutcome> DescribeAuditLogFilesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeAuditLogFilesRequest&, DescribeAuditLogFilesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeAuditLogFilesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBAutonomyActionResponse> DescribeDBAutonomyActionOutcome;
+                typedef std::future<DescribeDBAutonomyActionOutcome> DescribeDBAutonomyActionOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBAutonomyActionRequest&, DescribeDBAutonomyActionOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBAutonomyActionAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBAutonomyActionsResponse> DescribeDBAutonomyActionsOutcome;
+                typedef std::future<DescribeDBAutonomyActionsOutcome> DescribeDBAutonomyActionsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBAutonomyActionsRequest&, DescribeDBAutonomyActionsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBAutonomyActionsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBAutonomyEventsResponse> DescribeDBAutonomyEventsOutcome;
+                typedef std::future<DescribeDBAutonomyEventsOutcome> DescribeDBAutonomyEventsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBAutonomyEventsRequest&, DescribeDBAutonomyEventsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBAutonomyEventsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBDiagEventResponse> DescribeDBDiagEventOutcome;
+                typedef std::future<DescribeDBDiagEventOutcome> DescribeDBDiagEventOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBDiagEventRequest&, DescribeDBDiagEventOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBDiagEventAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBDiagEventsResponse> DescribeDBDiagEventsOutcome;
+                typedef std::future<DescribeDBDiagEventsOutcome> DescribeDBDiagEventsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBDiagEventsRequest&, DescribeDBDiagEventsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBDiagEventsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBDiagHistoryResponse> DescribeDBDiagHistoryOutcome;
+                typedef std::future<DescribeDBDiagHistoryOutcome> DescribeDBDiagHistoryOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBDiagHistoryRequest&, DescribeDBDiagHistoryOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBDiagHistoryAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBDiagReportContentResponse> DescribeDBDiagReportContentOutcome;
+                typedef std::future<DescribeDBDiagReportContentOutcome> DescribeDBDiagReportContentOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBDiagReportContentRequest&, DescribeDBDiagReportContentOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBDiagReportContentAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBDiagReportTasksResponse> DescribeDBDiagReportTasksOutcome;
+                typedef std::future<DescribeDBDiagReportTasksOutcome> DescribeDBDiagReportTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBDiagReportTasksRequest&, DescribeDBDiagReportTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBDiagReportTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBPerfTimeSeriesResponse> DescribeDBPerfTimeSeriesOutcome;
+                typedef std::future<DescribeDBPerfTimeSeriesOutcome> DescribeDBPerfTimeSeriesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBPerfTimeSeriesRequest&, DescribeDBPerfTimeSeriesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBPerfTimeSeriesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDBSpaceStatusResponse> DescribeDBSpaceStatusOutcome;
+                typedef std::future<DescribeDBSpaceStatusOutcome> DescribeDBSpaceStatusOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDBSpaceStatusRequest&, DescribeDBSpaceStatusOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDBSpaceStatusAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeDiagDBInstancesResponse> DescribeDiagDBInstancesOutcome;
+                typedef std::future<DescribeDiagDBInstancesOutcome> DescribeDiagDBInstancesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeDiagDBInstancesRequest&, DescribeDiagDBInstancesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeDiagDBInstancesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeHealthScoreResponse> DescribeHealthScoreOutcome;
+                typedef std::future<DescribeHealthScoreOutcome> DescribeHealthScoreOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeHealthScoreRequest&, DescribeHealthScoreOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeHealthScoreAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeHealthScoreTimeSeriesResponse> DescribeHealthScoreTimeSeriesOutcome;
+                typedef std::future<DescribeHealthScoreTimeSeriesOutcome> DescribeHealthScoreTimeSeriesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeHealthScoreTimeSeriesRequest&, DescribeHealthScoreTimeSeriesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeHealthScoreTimeSeriesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeIndexRecommendAggregationSlowLogsResponse> DescribeIndexRecommendAggregationSlowLogsOutcome;
+                typedef std::future<DescribeIndexRecommendAggregationSlowLogsOutcome> DescribeIndexRecommendAggregationSlowLogsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeIndexRecommendAggregationSlowLogsRequest&, DescribeIndexRecommendAggregationSlowLogsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeIndexRecommendAggregationSlowLogsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeIndexRecommendInfoResponse> DescribeIndexRecommendInfoOutcome;
+                typedef std::future<DescribeIndexRecommendInfoOutcome> DescribeIndexRecommendInfoOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeIndexRecommendInfoRequest&, DescribeIndexRecommendInfoOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeIndexRecommendInfoAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeMailProfileResponse> DescribeMailProfileOutcome;
+                typedef std::future<DescribeMailProfileOutcome> DescribeMailProfileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeMailProfileRequest&, DescribeMailProfileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeMailProfileAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeMySqlProcessListResponse> DescribeMySqlProcessListOutcome;
+                typedef std::future<DescribeMySqlProcessListOutcome> DescribeMySqlProcessListOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeMySqlProcessListRequest&, DescribeMySqlProcessListOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeMySqlProcessListAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeNoPrimaryKeyTablesResponse> DescribeNoPrimaryKeyTablesOutcome;
+                typedef std::future<DescribeNoPrimaryKeyTablesOutcome> DescribeNoPrimaryKeyTablesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeNoPrimaryKeyTablesRequest&, DescribeNoPrimaryKeyTablesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeNoPrimaryKeyTablesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeProxyProcessStatisticsResponse> DescribeProxyProcessStatisticsOutcome;
+                typedef std::future<DescribeProxyProcessStatisticsOutcome> DescribeProxyProcessStatisticsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeProxyProcessStatisticsRequest&, DescribeProxyProcessStatisticsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeProxyProcessStatisticsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeProxySessionKillTasksResponse> DescribeProxySessionKillTasksOutcome;
+                typedef std::future<DescribeProxySessionKillTasksOutcome> DescribeProxySessionKillTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeProxySessionKillTasksRequest&, DescribeProxySessionKillTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeProxySessionKillTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisBigKeyAnalysisTasksResponse> DescribeRedisBigKeyAnalysisTasksOutcome;
+                typedef std::future<DescribeRedisBigKeyAnalysisTasksOutcome> DescribeRedisBigKeyAnalysisTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisBigKeyAnalysisTasksRequest&, DescribeRedisBigKeyAnalysisTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisBigKeyAnalysisTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisCmdPerfTimeSeriesResponse> DescribeRedisCmdPerfTimeSeriesOutcome;
+                typedef std::future<DescribeRedisCmdPerfTimeSeriesOutcome> DescribeRedisCmdPerfTimeSeriesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisCmdPerfTimeSeriesRequest&, DescribeRedisCmdPerfTimeSeriesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisCmdPerfTimeSeriesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisCommandCostStatisticsResponse> DescribeRedisCommandCostStatisticsOutcome;
+                typedef std::future<DescribeRedisCommandCostStatisticsOutcome> DescribeRedisCommandCostStatisticsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisCommandCostStatisticsRequest&, DescribeRedisCommandCostStatisticsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisCommandCostStatisticsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisCommandOverviewResponse> DescribeRedisCommandOverviewOutcome;
+                typedef std::future<DescribeRedisCommandOverviewOutcome> DescribeRedisCommandOverviewOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisCommandOverviewRequest&, DescribeRedisCommandOverviewOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisCommandOverviewAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisProcessListResponse> DescribeRedisProcessListOutcome;
+                typedef std::future<DescribeRedisProcessListOutcome> DescribeRedisProcessListOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisProcessListRequest&, DescribeRedisProcessListOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisProcessListAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisSlowLogTopSqlsResponse> DescribeRedisSlowLogTopSqlsOutcome;
+                typedef std::future<DescribeRedisSlowLogTopSqlsOutcome> DescribeRedisSlowLogTopSqlsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisSlowLogTopSqlsRequest&, DescribeRedisSlowLogTopSqlsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisSlowLogTopSqlsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisTopBigKeysResponse> DescribeRedisTopBigKeysOutcome;
+                typedef std::future<DescribeRedisTopBigKeysOutcome> DescribeRedisTopBigKeysOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisTopBigKeysRequest&, DescribeRedisTopBigKeysOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisTopBigKeysAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisTopCostCommandsResponse> DescribeRedisTopCostCommandsOutcome;
+                typedef std::future<DescribeRedisTopCostCommandsOutcome> DescribeRedisTopCostCommandsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisTopCostCommandsRequest&, DescribeRedisTopCostCommandsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisTopCostCommandsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisTopHotKeysResponse> DescribeRedisTopHotKeysOutcome;
+                typedef std::future<DescribeRedisTopHotKeysOutcome> DescribeRedisTopHotKeysOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisTopHotKeysRequest&, DescribeRedisTopHotKeysOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisTopHotKeysAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeRedisTopKeyPrefixListResponse> DescribeRedisTopKeyPrefixListOutcome;
+                typedef std::future<DescribeRedisTopKeyPrefixListOutcome> DescribeRedisTopKeyPrefixListOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeRedisTopKeyPrefixListRequest&, DescribeRedisTopKeyPrefixListOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeRedisTopKeyPrefixListAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSecurityAuditLogDownloadUrlsResponse> DescribeSecurityAuditLogDownloadUrlsOutcome;
+                typedef std::future<DescribeSecurityAuditLogDownloadUrlsOutcome> DescribeSecurityAuditLogDownloadUrlsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSecurityAuditLogDownloadUrlsRequest&, DescribeSecurityAuditLogDownloadUrlsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSecurityAuditLogDownloadUrlsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSecurityAuditLogExportTasksResponse> DescribeSecurityAuditLogExportTasksOutcome;
+                typedef std::future<DescribeSecurityAuditLogExportTasksOutcome> DescribeSecurityAuditLogExportTasksOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSecurityAuditLogExportTasksRequest&, DescribeSecurityAuditLogExportTasksOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSecurityAuditLogExportTasksAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSlowLogQueryTimeStatsResponse> DescribeSlowLogQueryTimeStatsOutcome;
+                typedef std::future<DescribeSlowLogQueryTimeStatsOutcome> DescribeSlowLogQueryTimeStatsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSlowLogQueryTimeStatsRequest&, DescribeSlowLogQueryTimeStatsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSlowLogQueryTimeStatsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSlowLogTimeSeriesStatsResponse> DescribeSlowLogTimeSeriesStatsOutcome;
+                typedef std::future<DescribeSlowLogTimeSeriesStatsOutcome> DescribeSlowLogTimeSeriesStatsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSlowLogTimeSeriesStatsRequest&, DescribeSlowLogTimeSeriesStatsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSlowLogTimeSeriesStatsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSlowLogTopSqlsResponse> DescribeSlowLogTopSqlsOutcome;
+                typedef std::future<DescribeSlowLogTopSqlsOutcome> DescribeSlowLogTopSqlsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSlowLogTopSqlsRequest&, DescribeSlowLogTopSqlsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSlowLogTopSqlsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSlowLogUserHostStatsResponse> DescribeSlowLogUserHostStatsOutcome;
+                typedef std::future<DescribeSlowLogUserHostStatsOutcome> DescribeSlowLogUserHostStatsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSlowLogUserHostStatsRequest&, DescribeSlowLogUserHostStatsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSlowLogUserHostStatsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSlowLogsResponse> DescribeSlowLogsOutcome;
+                typedef std::future<DescribeSlowLogsOutcome> DescribeSlowLogsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSlowLogsRequest&, DescribeSlowLogsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSlowLogsAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSqlFiltersResponse> DescribeSqlFiltersOutcome;
+                typedef std::future<DescribeSqlFiltersOutcome> DescribeSqlFiltersOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSqlFiltersRequest&, DescribeSqlFiltersOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSqlFiltersAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeSqlTemplateResponse> DescribeSqlTemplateOutcome;
+                typedef std::future<DescribeSqlTemplateOutcome> DescribeSqlTemplateOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeSqlTemplateRequest&, DescribeSqlTemplateOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeSqlTemplateAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeTopSpaceSchemaTimeSeriesResponse> DescribeTopSpaceSchemaTimeSeriesOutcome;
+                typedef std::future<DescribeTopSpaceSchemaTimeSeriesOutcome> DescribeTopSpaceSchemaTimeSeriesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeTopSpaceSchemaTimeSeriesRequest&, DescribeTopSpaceSchemaTimeSeriesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeTopSpaceSchemaTimeSeriesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeTopSpaceSchemasResponse> DescribeTopSpaceSchemasOutcome;
+                typedef std::future<DescribeTopSpaceSchemasOutcome> DescribeTopSpaceSchemasOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeTopSpaceSchemasRequest&, DescribeTopSpaceSchemasOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeTopSpaceSchemasAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeTopSpaceTableTimeSeriesResponse> DescribeTopSpaceTableTimeSeriesOutcome;
+                typedef std::future<DescribeTopSpaceTableTimeSeriesOutcome> DescribeTopSpaceTableTimeSeriesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeTopSpaceTableTimeSeriesRequest&, DescribeTopSpaceTableTimeSeriesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeTopSpaceTableTimeSeriesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeTopSpaceTablesResponse> DescribeTopSpaceTablesOutcome;
+                typedef std::future<DescribeTopSpaceTablesOutcome> DescribeTopSpaceTablesOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeTopSpaceTablesRequest&, DescribeTopSpaceTablesOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeTopSpaceTablesAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeUserAutonomyProfileResponse> DescribeUserAutonomyProfileOutcome;
+                typedef std::future<DescribeUserAutonomyProfileOutcome> DescribeUserAutonomyProfileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeUserAutonomyProfileRequest&, DescribeUserAutonomyProfileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeUserAutonomyProfileAsyncHandler;
+                typedef Outcome<Core::Error, Model::DescribeUserSqlAdviceResponse> DescribeUserSqlAdviceOutcome;
+                typedef std::future<DescribeUserSqlAdviceOutcome> DescribeUserSqlAdviceOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::DescribeUserSqlAdviceRequest&, DescribeUserSqlAdviceOutcome, const std::shared_ptr<const AsyncCallerContext>&)> DescribeUserSqlAdviceAsyncHandler;
+                typedef Outcome<Core::Error, Model::KillMySqlThreadsResponse> KillMySqlThreadsOutcome;
+                typedef std::future<KillMySqlThreadsOutcome> KillMySqlThreadsOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::KillMySqlThreadsRequest&, KillMySqlThreadsOutcome, const std::shared_ptr<const AsyncCallerContext>&)> KillMySqlThreadsAsyncHandler;
+                typedef Outcome<Core::Error, Model::ModifyAlarmPolicyResponse> ModifyAlarmPolicyOutcome;
+                typedef std::future<ModifyAlarmPolicyOutcome> ModifyAlarmPolicyOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::ModifyAlarmPolicyRequest&, ModifyAlarmPolicyOutcome, const std::shared_ptr<const AsyncCallerContext>&)> ModifyAlarmPolicyAsyncHandler;
+                typedef Outcome<Core::Error, Model::ModifyAuditServiceResponse> ModifyAuditServiceOutcome;
+                typedef std::future<ModifyAuditServiceOutcome> ModifyAuditServiceOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::ModifyAuditServiceRequest&, ModifyAuditServiceOutcome, const std::shared_ptr<const AsyncCallerContext>&)> ModifyAuditServiceAsyncHandler;
+                typedef Outcome<Core::Error, Model::ModifyDiagDBInstanceConfResponse> ModifyDiagDBInstanceConfOutcome;
+                typedef std::future<ModifyDiagDBInstanceConfOutcome> ModifyDiagDBInstanceConfOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::ModifyDiagDBInstanceConfRequest&, ModifyDiagDBInstanceConfOutcome, const std::shared_ptr<const AsyncCallerContext>&)> ModifyDiagDBInstanceConfAsyncHandler;
+                typedef Outcome<Core::Error, Model::ModifySqlFiltersResponse> ModifySqlFiltersOutcome;
+                typedef std::future<ModifySqlFiltersOutcome> ModifySqlFiltersOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::ModifySqlFiltersRequest&, ModifySqlFiltersOutcome, const std::shared_ptr<const AsyncCallerContext>&)> ModifySqlFiltersAsyncHandler;
+                typedef Outcome<Core::Error, Model::ModifyUserAutonomyProfileResponse> ModifyUserAutonomyProfileOutcome;
+                typedef std::future<ModifyUserAutonomyProfileOutcome> ModifyUserAutonomyProfileOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::ModifyUserAutonomyProfileRequest&, ModifyUserAutonomyProfileOutcome, const std::shared_ptr<const AsyncCallerContext>&)> ModifyUserAutonomyProfileAsyncHandler;
+                typedef Outcome<Core::Error, Model::OpenAuditServiceResponse> OpenAuditServiceOutcome;
+                typedef std::future<OpenAuditServiceOutcome> OpenAuditServiceOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::OpenAuditServiceRequest&, OpenAuditServiceOutcome, const std::shared_ptr<const AsyncCallerContext>&)> OpenAuditServiceAsyncHandler;
+                typedef Outcome<Core::Error, Model::UpdateAgentSwitchResponse> UpdateAgentSwitchOutcome;
+                typedef std::future<UpdateAgentSwitchOutcome> UpdateAgentSwitchOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::UpdateAgentSwitchRequest&, UpdateAgentSwitchOutcome, const std::shared_ptr<const AsyncCallerContext>&)> UpdateAgentSwitchAsyncHandler;
+                typedef Outcome<Core::Error, Model::UpdateMonitorSwitchResponse> UpdateMonitorSwitchOutcome;
+                typedef std::future<UpdateMonitorSwitchOutcome> UpdateMonitorSwitchOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::UpdateMonitorSwitchRequest&, UpdateMonitorSwitchOutcome, const std::shared_ptr<const AsyncCallerContext>&)> UpdateMonitorSwitchAsyncHandler;
+                typedef Outcome<Core::Error, Model::VerifyUserAccountResponse> VerifyUserAccountOutcome;
+                typedef std::future<VerifyUserAccountOutcome> VerifyUserAccountOutcomeCallable;
+                typedef std::function<void(const DbbrainClient*, const Model::VerifyUserAccountRequest&, VerifyUserAccountOutcome, const std::shared_ptr<const AsyncCallerContext>&)> VerifyUserAccountAsyncHandler;
+
+
+
+                /**
+                 *添加邮件接收联系人的姓名， 邮件地址，返回值为添加成功的联系人id。
+                 * @param req AddUserContactRequest
+                 * @return AddUserContactOutcome
+                 */
+                AddUserContactOutcome AddUserContact(const Model::AddUserContactRequest &request);
+                void AddUserContactAsync(const Model::AddUserContactRequest& request, const AddUserContactAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                AddUserContactOutcomeCallable AddUserContactCallable(const Model::AddUserContactRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）
+                 * @param req CancelDBAutonomyActionRequest
+                 * @return CancelDBAutonomyActionOutcome
+                 */
+                CancelDBAutonomyActionOutcome CancelDBAutonomyAction(const Model::CancelDBAutonomyActionRequest &request);
+                void CancelDBAutonomyActionAsync(const Model::CancelDBAutonomyActionRequest& request, const CancelDBAutonomyActionAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CancelDBAutonomyActionOutcomeCallable CancelDBAutonomyActionCallable(const Model::CancelDBAutonomyActionRequest& request);
+
+                /**
+                 *自治中心-终止自治事件
+                 * @param req CancelDBAutonomyEventRequest
+                 * @return CancelDBAutonomyEventOutcome
+                 */
+                CancelDBAutonomyEventOutcome CancelDBAutonomyEvent(const Model::CancelDBAutonomyEventRequest &request);
+                void CancelDBAutonomyEventAsync(const Model::CancelDBAutonomyEventRequest& request, const CancelDBAutonomyEventAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CancelDBAutonomyEventOutcomeCallable CancelDBAutonomyEventCallable(const Model::CancelDBAutonomyEventRequest& request);
+
+                /**
+                 *终止中断会话任务。
+                 * @param req CancelKillTaskRequest
+                 * @return CancelKillTaskOutcome
+                 */
+                CancelKillTaskOutcome CancelKillTask(const Model::CancelKillTaskRequest &request);
+                void CancelKillTaskAsync(const Model::CancelKillTaskRequest& request, const CancelKillTaskAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CancelKillTaskOutcomeCallable CancelKillTaskCallable(const Model::CancelKillTaskRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）
+                 * @param req CancelRedisBigKeyAnalysisTasksRequest
+                 * @return CancelRedisBigKeyAnalysisTasksOutcome
+                 */
+                CancelRedisBigKeyAnalysisTasksOutcome CancelRedisBigKeyAnalysisTasks(const Model::CancelRedisBigKeyAnalysisTasksRequest &request);
+                void CancelRedisBigKeyAnalysisTasksAsync(const Model::CancelRedisBigKeyAnalysisTasksRequest& request, const CancelRedisBigKeyAnalysisTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CancelRedisBigKeyAnalysisTasksOutcomeCallable CancelRedisBigKeyAnalysisTasksCallable(const Model::CancelRedisBigKeyAnalysisTasksRequest& request);
+
+                /**
+                 *不用审计日志时，关闭数据库审计
+                 * @param req CloseAuditServiceRequest
+                 * @return CloseAuditServiceOutcome
+                 */
+                CloseAuditServiceOutcome CloseAuditService(const Model::CloseAuditServiceRequest &request);
+                void CloseAuditServiceAsync(const Model::CloseAuditServiceRequest& request, const CloseAuditServiceAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CloseAuditServiceOutcomeCallable CloseAuditServiceCallable(const Model::CloseAuditServiceRequest& request);
+
+                /**
+                 *用于创建云数据库实例的审计日志文件，最多下载600w审计日志。
+                 * @param req CreateAuditLogFileRequest
+                 * @return CreateAuditLogFileOutcome
+                 */
+                CreateAuditLogFileOutcome CreateAuditLogFile(const Model::CreateAuditLogFileRequest &request);
+                void CreateAuditLogFileAsync(const Model::CreateAuditLogFileRequest& request, const CreateAuditLogFileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateAuditLogFileOutcomeCallable CreateAuditLogFileCallable(const Model::CreateAuditLogFileRequest& request);
+
+                /**
+                 *创建健康报告，并可以选择是否发送邮件。
+                 * @param req CreateDBDiagReportTaskRequest
+                 * @return CreateDBDiagReportTaskOutcome
+                 */
+                CreateDBDiagReportTaskOutcome CreateDBDiagReportTask(const Model::CreateDBDiagReportTaskRequest &request);
+                void CreateDBDiagReportTaskAsync(const Model::CreateDBDiagReportTaskRequest& request, const CreateDBDiagReportTaskAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateDBDiagReportTaskOutcomeCallable CreateDBDiagReportTaskCallable(const Model::CreateDBDiagReportTaskRequest& request);
+
+                /**
+                 *创建健康报告的浏览地址。
+                 * @param req CreateDBDiagReportUrlRequest
+                 * @return CreateDBDiagReportUrlOutcome
+                 */
+                CreateDBDiagReportUrlOutcome CreateDBDiagReportUrl(const Model::CreateDBDiagReportUrlRequest &request);
+                void CreateDBDiagReportUrlAsync(const Model::CreateDBDiagReportUrlRequest& request, const CreateDBDiagReportUrlAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateDBDiagReportUrlOutcomeCallable CreateDBDiagReportUrlCallable(const Model::CreateDBDiagReportUrlRequest& request);
+
+                /**
+                 *创建中断会话的任务。
+                 * @param req CreateKillTaskRequest
+                 * @return CreateKillTaskOutcome
+                 */
+                CreateKillTaskOutcome CreateKillTask(const Model::CreateKillTaskRequest &request);
+                void CreateKillTaskAsync(const Model::CreateKillTaskRequest& request, const CreateKillTaskAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateKillTaskOutcomeCallable CreateKillTaskCallable(const Model::CreateKillTaskRequest& request);
+
+                /**
+                 *创建邮件配置。其中入参ProfileType表示所创建配置的类型，ProfileType 取值包括：dbScan_mail_configuration（数据库巡检邮件配置）、scheduler_mail_configuration（定期生成健康报告的邮件发送配置）。Region统一选择广州，和实例所属地域无关。
+                 * @param req CreateMailProfileRequest
+                 * @return CreateMailProfileOutcome
+                 */
+                CreateMailProfileOutcome CreateMailProfile(const Model::CreateMailProfileRequest &request);
+                void CreateMailProfileAsync(const Model::CreateMailProfileRequest& request, const CreateMailProfileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateMailProfileOutcomeCallable CreateMailProfileCallable(const Model::CreateMailProfileRequest& request);
+
+                /**
+                 *创建中止所有代理节点连接会话的异步任务。当前仅支持 Redis。得到的返回值为异步任务 id，可以作为参数传入接口 DescribeProxySessionKillTasks 查询kill会话任务执行状态。
+                 * @param req CreateProxySessionKillTaskRequest
+                 * @return CreateProxySessionKillTaskOutcome
+                 */
+                CreateProxySessionKillTaskOutcome CreateProxySessionKillTask(const Model::CreateProxySessionKillTaskRequest &request);
+                void CreateProxySessionKillTaskAsync(const Model::CreateProxySessionKillTaskRequest& request, const CreateProxySessionKillTaskAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateProxySessionKillTaskOutcomeCallable CreateProxySessionKillTaskCallable(const Model::CreateProxySessionKillTaskRequest& request);
+
+                /**
+                 *即时创建redis实例大key分析任务，限制正在运行的即时分析任务数量默认为5。
+                 * @param req CreateRedisBigKeyAnalysisTaskRequest
+                 * @return CreateRedisBigKeyAnalysisTaskOutcome
+                 */
+                CreateRedisBigKeyAnalysisTaskOutcome CreateRedisBigKeyAnalysisTask(const Model::CreateRedisBigKeyAnalysisTaskRequest &request);
+                void CreateRedisBigKeyAnalysisTaskAsync(const Model::CreateRedisBigKeyAnalysisTaskRequest& request, const CreateRedisBigKeyAnalysisTaskAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateRedisBigKeyAnalysisTaskOutcomeCallable CreateRedisBigKeyAnalysisTaskCallable(const Model::CreateRedisBigKeyAnalysisTaskRequest& request);
+
+                /**
+                 *该接口用于创建定期生成健康报告并邮件发送的配置，将健康报告的定期生成时间作为参数传入（周一至周日），用于设置健康报告的定期生成时间，同时保存相应的定期邮件发送的配置。
+                 * @param req CreateSchedulerMailProfileRequest
+                 * @return CreateSchedulerMailProfileOutcome
+                 */
+                CreateSchedulerMailProfileOutcome CreateSchedulerMailProfile(const Model::CreateSchedulerMailProfileRequest &request);
+                void CreateSchedulerMailProfileAsync(const Model::CreateSchedulerMailProfileRequest& request, const CreateSchedulerMailProfileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateSchedulerMailProfileOutcomeCallable CreateSchedulerMailProfileCallable(const Model::CreateSchedulerMailProfileRequest& request);
+
+                /**
+                 *创建安全审计日志导出任务。
+                 * @param req CreateSecurityAuditLogExportTaskRequest
+                 * @return CreateSecurityAuditLogExportTaskOutcome
+                 */
+                CreateSecurityAuditLogExportTaskOutcome CreateSecurityAuditLogExportTask(const Model::CreateSecurityAuditLogExportTaskRequest &request);
+                void CreateSecurityAuditLogExportTaskAsync(const Model::CreateSecurityAuditLogExportTaskRequest& request, const CreateSecurityAuditLogExportTaskAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateSecurityAuditLogExportTaskOutcomeCallable CreateSecurityAuditLogExportTaskCallable(const Model::CreateSecurityAuditLogExportTaskRequest& request);
+
+                /**
+                 *创建实例SQL限流任务。
+                 * @param req CreateSqlFilterRequest
+                 * @return CreateSqlFilterOutcome
+                 */
+                CreateSqlFilterOutcome CreateSqlFilter(const Model::CreateSqlFilterRequest &request);
+                void CreateSqlFilterAsync(const Model::CreateSqlFilterRequest& request, const CreateSqlFilterAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateSqlFilterOutcomeCallable CreateSqlFilterCallable(const Model::CreateSqlFilterRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）；注意：接口需要加白名单。
+                 * @param req CreateUserAutonomyProfileRequest
+                 * @return CreateUserAutonomyProfileOutcome
+                 */
+                CreateUserAutonomyProfileOutcome CreateUserAutonomyProfile(const Model::CreateUserAutonomyProfileRequest &request);
+                void CreateUserAutonomyProfileAsync(const Model::CreateUserAutonomyProfileRequest& request, const CreateUserAutonomyProfileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                CreateUserAutonomyProfileOutcomeCallable CreateUserAutonomyProfileCallable(const Model::CreateUserAutonomyProfileRequest& request);
+
+                /**
+                 *用于删除云数据库实例的审计日志文件。
+                 * @param req DeleteAuditLogFileRequest
+                 * @return DeleteAuditLogFileOutcome
+                 */
+                DeleteAuditLogFileOutcome DeleteAuditLogFile(const Model::DeleteAuditLogFileRequest &request);
+                void DeleteAuditLogFileAsync(const Model::DeleteAuditLogFileRequest& request, const DeleteAuditLogFileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DeleteAuditLogFileOutcomeCallable DeleteAuditLogFileCallable(const Model::DeleteAuditLogFileRequest& request);
+
+                /**
+                 *根据任务id删除健康报告生成任务
+                 * @param req DeleteDBDiagReportTasksRequest
+                 * @return DeleteDBDiagReportTasksOutcome
+                 */
+                DeleteDBDiagReportTasksOutcome DeleteDBDiagReportTasks(const Model::DeleteDBDiagReportTasksRequest &request);
+                void DeleteDBDiagReportTasksAsync(const Model::DeleteDBDiagReportTasksRequest& request, const DeleteDBDiagReportTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DeleteDBDiagReportTasksOutcomeCallable DeleteDBDiagReportTasksCallable(const Model::DeleteDBDiagReportTasksRequest& request);
+
+                /**
+                 *删除Redis实例的大key分析任务。
+                 * @param req DeleteRedisBigKeyAnalysisTasksRequest
+                 * @return DeleteRedisBigKeyAnalysisTasksOutcome
+                 */
+                DeleteRedisBigKeyAnalysisTasksOutcome DeleteRedisBigKeyAnalysisTasks(const Model::DeleteRedisBigKeyAnalysisTasksRequest &request);
+                void DeleteRedisBigKeyAnalysisTasksAsync(const Model::DeleteRedisBigKeyAnalysisTasksRequest& request, const DeleteRedisBigKeyAnalysisTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DeleteRedisBigKeyAnalysisTasksOutcomeCallable DeleteRedisBigKeyAnalysisTasksCallable(const Model::DeleteRedisBigKeyAnalysisTasksRequest& request);
+
+                /**
+                 *删除安全审计日志导出任务。
+                 * @param req DeleteSecurityAuditLogExportTasksRequest
+                 * @return DeleteSecurityAuditLogExportTasksOutcome
+                 */
+                DeleteSecurityAuditLogExportTasksOutcome DeleteSecurityAuditLogExportTasks(const Model::DeleteSecurityAuditLogExportTasksRequest &request);
+                void DeleteSecurityAuditLogExportTasksAsync(const Model::DeleteSecurityAuditLogExportTasksRequest& request, const DeleteSecurityAuditLogExportTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DeleteSecurityAuditLogExportTasksOutcomeCallable DeleteSecurityAuditLogExportTasksCallable(const Model::DeleteSecurityAuditLogExportTasksRequest& request);
+
+                /**
+                 *删除实例SQL限流任务。
+                 * @param req DeleteSqlFiltersRequest
+                 * @return DeleteSqlFiltersOutcome
+                 */
+                DeleteSqlFiltersOutcome DeleteSqlFilters(const Model::DeleteSqlFiltersRequest &request);
+                void DeleteSqlFiltersAsync(const Model::DeleteSqlFiltersRequest& request, const DeleteSqlFiltersAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DeleteSqlFiltersOutcomeCallable DeleteSqlFiltersCallable(const Model::DeleteSqlFiltersRequest& request);
+
+                /**
+                 *通知模板查询
+                 * @param req DescribeAlarmTemplateRequest
+                 * @return DescribeAlarmTemplateOutcome
+                 */
+                DescribeAlarmTemplateOutcome DescribeAlarmTemplate(const Model::DescribeAlarmTemplateRequest &request);
+                void DescribeAlarmTemplateAsync(const Model::DescribeAlarmTemplateRequest& request, const DescribeAlarmTemplateAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeAlarmTemplateOutcomeCallable DescribeAlarmTemplateCallable(const Model::DescribeAlarmTemplateRequest& request);
+
+                /**
+                 *获取邮件发送中联系人的相关信息。
+                 * @param req DescribeAllUserContactRequest
+                 * @return DescribeAllUserContactOutcome
+                 */
+                DescribeAllUserContactOutcome DescribeAllUserContact(const Model::DescribeAllUserContactRequest &request);
+                void DescribeAllUserContactAsync(const Model::DescribeAllUserContactRequest& request, const DescribeAllUserContactAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeAllUserContactOutcomeCallable DescribeAllUserContactCallable(const Model::DescribeAllUserContactRequest& request);
+
+                /**
+                 *获取邮件发送联系组的相关信息。
+                 * @param req DescribeAllUserGroupRequest
+                 * @return DescribeAllUserGroupOutcome
+                 */
+                DescribeAllUserGroupOutcome DescribeAllUserGroup(const Model::DescribeAllUserGroupRequest &request);
+                void DescribeAllUserGroupAsync(const Model::DescribeAllUserGroupRequest& request, const DescribeAllUserGroupAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeAllUserGroupOutcomeCallable DescribeAllUserGroupCallable(const Model::DescribeAllUserGroupRequest& request);
+
+                /**
+                 *查询实例列表
+                 * @param req DescribeAuditInstanceListRequest
+                 * @return DescribeAuditInstanceListOutcome
+                 */
+                DescribeAuditInstanceListOutcome DescribeAuditInstanceList(const Model::DescribeAuditInstanceListRequest &request);
+                void DescribeAuditInstanceListAsync(const Model::DescribeAuditInstanceListRequest& request, const DescribeAuditInstanceListAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeAuditInstanceListOutcomeCallable DescribeAuditInstanceListCallable(const Model::DescribeAuditInstanceListRequest& request);
+
+                /**
+                 *用于创建云数据库实例的审计日志文件
+                 * @param req DescribeAuditLogFilesRequest
+                 * @return DescribeAuditLogFilesOutcome
+                 */
+                DescribeAuditLogFilesOutcome DescribeAuditLogFiles(const Model::DescribeAuditLogFilesRequest &request);
+                void DescribeAuditLogFilesAsync(const Model::DescribeAuditLogFilesRequest& request, const DescribeAuditLogFilesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeAuditLogFilesOutcomeCallable DescribeAuditLogFilesCallable(const Model::DescribeAuditLogFilesRequest& request);
+
+                /**
+                 *自治中心-查询自治事件任务详情。
+                 * @param req DescribeDBAutonomyActionRequest
+                 * @return DescribeDBAutonomyActionOutcome
+                 */
+                DescribeDBAutonomyActionOutcome DescribeDBAutonomyAction(const Model::DescribeDBAutonomyActionRequest &request);
+                void DescribeDBAutonomyActionAsync(const Model::DescribeDBAutonomyActionRequest& request, const DescribeDBAutonomyActionAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBAutonomyActionOutcomeCallable DescribeDBAutonomyActionCallable(const Model::DescribeDBAutonomyActionRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）
+                 * @param req DescribeDBAutonomyActionsRequest
+                 * @return DescribeDBAutonomyActionsOutcome
+                 */
+                DescribeDBAutonomyActionsOutcome DescribeDBAutonomyActions(const Model::DescribeDBAutonomyActionsRequest &request);
+                void DescribeDBAutonomyActionsAsync(const Model::DescribeDBAutonomyActionsRequest& request, const DescribeDBAutonomyActionsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBAutonomyActionsOutcomeCallable DescribeDBAutonomyActionsCallable(const Model::DescribeDBAutonomyActionsRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）
+                 * @param req DescribeDBAutonomyEventsRequest
+                 * @return DescribeDBAutonomyEventsOutcome
+                 */
+                DescribeDBAutonomyEventsOutcome DescribeDBAutonomyEvents(const Model::DescribeDBAutonomyEventsRequest &request);
+                void DescribeDBAutonomyEventsAsync(const Model::DescribeDBAutonomyEventsRequest& request, const DescribeDBAutonomyEventsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBAutonomyEventsOutcomeCallable DescribeDBAutonomyEventsCallable(const Model::DescribeDBAutonomyEventsRequest& request);
+
+                /**
+                 *获取实例异常诊断事件的详情信息。
+                 * @param req DescribeDBDiagEventRequest
+                 * @return DescribeDBDiagEventOutcome
+                 */
+                DescribeDBDiagEventOutcome DescribeDBDiagEvent(const Model::DescribeDBDiagEventRequest &request);
+                void DescribeDBDiagEventAsync(const Model::DescribeDBDiagEventRequest& request, const DescribeDBDiagEventAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBDiagEventOutcomeCallable DescribeDBDiagEventCallable(const Model::DescribeDBDiagEventRequest& request);
+
+                /**
+                 *获取指定时间段内的诊断事件列表，支持依据风险等级、实例ID等条件过滤。
+                 * @param req DescribeDBDiagEventsRequest
+                 * @return DescribeDBDiagEventsOutcome
+                 */
+                DescribeDBDiagEventsOutcome DescribeDBDiagEvents(const Model::DescribeDBDiagEventsRequest &request);
+                void DescribeDBDiagEventsAsync(const Model::DescribeDBDiagEventsRequest& request, const DescribeDBDiagEventsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBDiagEventsOutcomeCallable DescribeDBDiagEventsCallable(const Model::DescribeDBDiagEventsRequest& request);
+
+                /**
+                 *获取实例诊断事件的列表。
+                 * @param req DescribeDBDiagHistoryRequest
+                 * @return DescribeDBDiagHistoryOutcome
+                 */
+                DescribeDBDiagHistoryOutcome DescribeDBDiagHistory(const Model::DescribeDBDiagHistoryRequest &request);
+                void DescribeDBDiagHistoryAsync(const Model::DescribeDBDiagHistoryRequest& request, const DescribeDBDiagHistoryAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBDiagHistoryOutcomeCallable DescribeDBDiagHistoryCallable(const Model::DescribeDBDiagHistoryRequest& request);
+
+                /**
+                 *健康报告内容。
+                 * @param req DescribeDBDiagReportContentRequest
+                 * @return DescribeDBDiagReportContentOutcome
+                 */
+                DescribeDBDiagReportContentOutcome DescribeDBDiagReportContent(const Model::DescribeDBDiagReportContentRequest &request);
+                void DescribeDBDiagReportContentAsync(const Model::DescribeDBDiagReportContentRequest& request, const DescribeDBDiagReportContentAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBDiagReportContentOutcomeCallable DescribeDBDiagReportContentCallable(const Model::DescribeDBDiagReportContentRequest& request);
+
+                /**
+                 *查询健康报告生成任务列表。
+                 * @param req DescribeDBDiagReportTasksRequest
+                 * @return DescribeDBDiagReportTasksOutcome
+                 */
+                DescribeDBDiagReportTasksOutcome DescribeDBDiagReportTasks(const Model::DescribeDBDiagReportTasksRequest &request);
+                void DescribeDBDiagReportTasksAsync(const Model::DescribeDBDiagReportTasksRequest& request, const DescribeDBDiagReportTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBDiagReportTasksOutcomeCallable DescribeDBDiagReportTasksCallable(const Model::DescribeDBDiagReportTasksRequest& request);
+
+                /**
+                 *根据实例ID获取指定时间段的性能趋势。
+                 * @param req DescribeDBPerfTimeSeriesRequest
+                 * @return DescribeDBPerfTimeSeriesOutcome
+                 */
+                DescribeDBPerfTimeSeriesOutcome DescribeDBPerfTimeSeries(const Model::DescribeDBPerfTimeSeriesRequest &request);
+                void DescribeDBPerfTimeSeriesAsync(const Model::DescribeDBPerfTimeSeriesRequest& request, const DescribeDBPerfTimeSeriesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBPerfTimeSeriesOutcomeCallable DescribeDBPerfTimeSeriesCallable(const Model::DescribeDBPerfTimeSeriesRequest& request);
+
+                /**
+                 *获取指定时间段内的实例空间使用概览，包括磁盘增长量(MB)、磁盘剩余(MB)、磁盘总量(MB)及预计可用天数。
+                 * @param req DescribeDBSpaceStatusRequest
+                 * @return DescribeDBSpaceStatusOutcome
+                 */
+                DescribeDBSpaceStatusOutcome DescribeDBSpaceStatus(const Model::DescribeDBSpaceStatusRequest &request);
+                void DescribeDBSpaceStatusAsync(const Model::DescribeDBSpaceStatusRequest& request, const DescribeDBSpaceStatusAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDBSpaceStatusOutcomeCallable DescribeDBSpaceStatusCallable(const Model::DescribeDBSpaceStatusRequest& request);
+
+                /**
+                 *获取实例信息列表。Region统一选择广州。
+                 * @param req DescribeDiagDBInstancesRequest
+                 * @return DescribeDiagDBInstancesOutcome
+                 */
+                DescribeDiagDBInstancesOutcome DescribeDiagDBInstances(const Model::DescribeDiagDBInstancesRequest &request);
+                void DescribeDiagDBInstancesAsync(const Model::DescribeDiagDBInstancesRequest& request, const DescribeDiagDBInstancesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeDiagDBInstancesOutcomeCallable DescribeDiagDBInstancesCallable(const Model::DescribeDiagDBInstancesRequest& request);
+
+                /**
+                 *根据实例ID获取指定时间段（30分钟）的健康得分，以及异常扣分项。
+                 * @param req DescribeHealthScoreRequest
+                 * @return DescribeHealthScoreOutcome
+                 */
+                DescribeHealthScoreOutcome DescribeHealthScore(const Model::DescribeHealthScoreRequest &request);
+                void DescribeHealthScoreAsync(const Model::DescribeHealthScoreRequest& request, const DescribeHealthScoreAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeHealthScoreOutcomeCallable DescribeHealthScoreCallable(const Model::DescribeHealthScoreRequest& request);
+
+                /**
+                 *获取指定时间段内的健康得分趋势
+                 * @param req DescribeHealthScoreTimeSeriesRequest
+                 * @return DescribeHealthScoreTimeSeriesOutcome
+                 */
+                DescribeHealthScoreTimeSeriesOutcome DescribeHealthScoreTimeSeries(const Model::DescribeHealthScoreTimeSeriesRequest &request);
+                void DescribeHealthScoreTimeSeriesAsync(const Model::DescribeHealthScoreTimeSeriesRequest& request, const DescribeHealthScoreTimeSeriesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeHealthScoreTimeSeriesOutcomeCallable DescribeHealthScoreTimeSeriesCallable(const Model::DescribeHealthScoreTimeSeriesRequest& request);
+
+                /**
+                 *查询某张表的慢查模板概览，这个接口是对用户点击对应的推荐索引后，展示慢日志用的
+                 * @param req DescribeIndexRecommendAggregationSlowLogsRequest
+                 * @return DescribeIndexRecommendAggregationSlowLogsOutcome
+                 */
+                DescribeIndexRecommendAggregationSlowLogsOutcome DescribeIndexRecommendAggregationSlowLogs(const Model::DescribeIndexRecommendAggregationSlowLogsRequest &request);
+                void DescribeIndexRecommendAggregationSlowLogsAsync(const Model::DescribeIndexRecommendAggregationSlowLogsRequest& request, const DescribeIndexRecommendAggregationSlowLogsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeIndexRecommendAggregationSlowLogsOutcomeCallable DescribeIndexRecommendAggregationSlowLogsCallable(const Model::DescribeIndexRecommendAggregationSlowLogsRequest& request);
+
+                /**
+                 *查询实例的索引推荐信息，包括索引统计相关信息，推荐索引列表，无效索引列表等。
+                 * @param req DescribeIndexRecommendInfoRequest
+                 * @return DescribeIndexRecommendInfoOutcome
+                 */
+                DescribeIndexRecommendInfoOutcome DescribeIndexRecommendInfo(const Model::DescribeIndexRecommendInfoRequest &request);
+                void DescribeIndexRecommendInfoAsync(const Model::DescribeIndexRecommendInfoRequest& request, const DescribeIndexRecommendInfoAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeIndexRecommendInfoOutcomeCallable DescribeIndexRecommendInfoCallable(const Model::DescribeIndexRecommendInfoRequest& request);
+
+                /**
+                 *获取发送邮件的配置， 包括数据库巡检的邮件配置以及定期生成健康报告的邮件发送配置。
+                 * @param req DescribeMailProfileRequest
+                 * @return DescribeMailProfileOutcome
+                 */
+                DescribeMailProfileOutcome DescribeMailProfile(const Model::DescribeMailProfileRequest &request);
+                void DescribeMailProfileAsync(const Model::DescribeMailProfileRequest& request, const DescribeMailProfileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeMailProfileOutcomeCallable DescribeMailProfileCallable(const Model::DescribeMailProfileRequest& request);
+
+                /**
+                 *查询关系型数据库的实时线程列表。
+                 * @param req DescribeMySqlProcessListRequest
+                 * @return DescribeMySqlProcessListOutcome
+                 */
+                DescribeMySqlProcessListOutcome DescribeMySqlProcessList(const Model::DescribeMySqlProcessListRequest &request);
+                void DescribeMySqlProcessListAsync(const Model::DescribeMySqlProcessListRequest& request, const DescribeMySqlProcessListAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeMySqlProcessListOutcomeCallable DescribeMySqlProcessListCallable(const Model::DescribeMySqlProcessListRequest& request);
+
+                /**
+                 *查询实例无主键表。
+                 * @param req DescribeNoPrimaryKeyTablesRequest
+                 * @return DescribeNoPrimaryKeyTablesOutcome
+                 */
+                DescribeNoPrimaryKeyTablesOutcome DescribeNoPrimaryKeyTables(const Model::DescribeNoPrimaryKeyTablesRequest &request);
+                void DescribeNoPrimaryKeyTablesAsync(const Model::DescribeNoPrimaryKeyTablesRequest& request, const DescribeNoPrimaryKeyTablesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeNoPrimaryKeyTablesOutcomeCallable DescribeNoPrimaryKeyTablesCallable(const Model::DescribeNoPrimaryKeyTablesRequest& request);
+
+                /**
+                 *获取当前实例下的单个proxy的会话统计详情信息， 返回数据为单个 proxy 的会话统计信息。【注意】该接口仅限部分环境调用。
+                 * @param req DescribeProxyProcessStatisticsRequest
+                 * @return DescribeProxyProcessStatisticsOutcome
+                 */
+                DescribeProxyProcessStatisticsOutcome DescribeProxyProcessStatistics(const Model::DescribeProxyProcessStatisticsRequest &request);
+                void DescribeProxyProcessStatisticsAsync(const Model::DescribeProxyProcessStatisticsRequest& request, const DescribeProxyProcessStatisticsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeProxyProcessStatisticsOutcomeCallable DescribeProxyProcessStatisticsCallable(const Model::DescribeProxyProcessStatisticsRequest& request);
+
+                /**
+                 *用于查询 redis 执行 kill 会话任务后代理节点的执行结果，入参异步任务 ID 从接口 CreateProxySessionKillTask 调用成功后取得。当前 product 只支持：redis。
+                 * @param req DescribeProxySessionKillTasksRequest
+                 * @return DescribeProxySessionKillTasksOutcome
+                 */
+                DescribeProxySessionKillTasksOutcome DescribeProxySessionKillTasks(const Model::DescribeProxySessionKillTasksRequest &request);
+                void DescribeProxySessionKillTasksAsync(const Model::DescribeProxySessionKillTasksRequest& request, const DescribeProxySessionKillTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeProxySessionKillTasksOutcomeCallable DescribeProxySessionKillTasksCallable(const Model::DescribeProxySessionKillTasksRequest& request);
+
+                /**
+                 *查询redis大key分析任务列表。
+                 * @param req DescribeRedisBigKeyAnalysisTasksRequest
+                 * @return DescribeRedisBigKeyAnalysisTasksOutcome
+                 */
+                DescribeRedisBigKeyAnalysisTasksOutcome DescribeRedisBigKeyAnalysisTasks(const Model::DescribeRedisBigKeyAnalysisTasksRequest &request);
+                void DescribeRedisBigKeyAnalysisTasksAsync(const Model::DescribeRedisBigKeyAnalysisTasksRequest& request, const DescribeRedisBigKeyAnalysisTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisBigKeyAnalysisTasksOutcomeCallable DescribeRedisBigKeyAnalysisTasksCallable(const Model::DescribeRedisBigKeyAnalysisTasksRequest& request);
+
+                /**
+                 *延迟分析-命令字分析-查询命令延迟趋势
+                 * @param req DescribeRedisCmdPerfTimeSeriesRequest
+                 * @return DescribeRedisCmdPerfTimeSeriesOutcome
+                 */
+                DescribeRedisCmdPerfTimeSeriesOutcome DescribeRedisCmdPerfTimeSeries(const Model::DescribeRedisCmdPerfTimeSeriesRequest &request);
+                void DescribeRedisCmdPerfTimeSeriesAsync(const Model::DescribeRedisCmdPerfTimeSeriesRequest& request, const DescribeRedisCmdPerfTimeSeriesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisCmdPerfTimeSeriesOutcomeCallable DescribeRedisCmdPerfTimeSeriesCallable(const Model::DescribeRedisCmdPerfTimeSeriesRequest& request);
+
+                /**
+                 *延迟分析-查询命令延迟分布
+                 * @param req DescribeRedisCommandCostStatisticsRequest
+                 * @return DescribeRedisCommandCostStatisticsOutcome
+                 */
+                DescribeRedisCommandCostStatisticsOutcome DescribeRedisCommandCostStatistics(const Model::DescribeRedisCommandCostStatisticsRequest &request);
+                void DescribeRedisCommandCostStatisticsAsync(const Model::DescribeRedisCommandCostStatisticsRequest& request, const DescribeRedisCommandCostStatisticsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisCommandCostStatisticsOutcomeCallable DescribeRedisCommandCostStatisticsCallable(const Model::DescribeRedisCommandCostStatisticsRequest& request);
+
+                /**
+                 *延迟分析-查询实例访问命令统计
+                 * @param req DescribeRedisCommandOverviewRequest
+                 * @return DescribeRedisCommandOverviewOutcome
+                 */
+                DescribeRedisCommandOverviewOutcome DescribeRedisCommandOverview(const Model::DescribeRedisCommandOverviewRequest &request);
+                void DescribeRedisCommandOverviewAsync(const Model::DescribeRedisCommandOverviewRequest& request, const DescribeRedisCommandOverviewAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisCommandOverviewOutcomeCallable DescribeRedisCommandOverviewCallable(const Model::DescribeRedisCommandOverviewRequest& request);
+
+                /**
+                 *获取 Redis 实例所有 proxy 节点的实时会话详情列表。
+                 * @param req DescribeRedisProcessListRequest
+                 * @return DescribeRedisProcessListOutcome
+                 */
+                DescribeRedisProcessListOutcome DescribeRedisProcessList(const Model::DescribeRedisProcessListRequest &request);
+                void DescribeRedisProcessListAsync(const Model::DescribeRedisProcessListRequest& request, const DescribeRedisProcessListAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisProcessListOutcomeCallable DescribeRedisProcessListCallable(const Model::DescribeRedisProcessListRequest& request);
+
+                /**
+                 *统计排序指定时间段内的top慢sql。
+                 * @param req DescribeRedisSlowLogTopSqlsRequest
+                 * @return DescribeRedisSlowLogTopSqlsOutcome
+                 */
+                DescribeRedisSlowLogTopSqlsOutcome DescribeRedisSlowLogTopSqls(const Model::DescribeRedisSlowLogTopSqlsRequest &request);
+                void DescribeRedisSlowLogTopSqlsAsync(const Model::DescribeRedisSlowLogTopSqlsRequest& request, const DescribeRedisSlowLogTopSqlsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisSlowLogTopSqlsOutcomeCallable DescribeRedisSlowLogTopSqlsCallable(const Model::DescribeRedisSlowLogTopSqlsRequest& request);
+
+                /**
+                 *查询redis实例大key列表。
+                 * @param req DescribeRedisTopBigKeysRequest
+                 * @return DescribeRedisTopBigKeysOutcome
+                 */
+                DescribeRedisTopBigKeysOutcome DescribeRedisTopBigKeys(const Model::DescribeRedisTopBigKeysRequest &request);
+                void DescribeRedisTopBigKeysAsync(const Model::DescribeRedisTopBigKeysRequest& request, const DescribeRedisTopBigKeysAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisTopBigKeysOutcomeCallable DescribeRedisTopBigKeysCallable(const Model::DescribeRedisTopBigKeysRequest& request);
+
+                /**
+                 *获取指定时间段内Redis 访问命令 cost top N
+                 * @param req DescribeRedisTopCostCommandsRequest
+                 * @return DescribeRedisTopCostCommandsOutcome
+                 */
+                DescribeRedisTopCostCommandsOutcome DescribeRedisTopCostCommands(const Model::DescribeRedisTopCostCommandsRequest &request);
+                void DescribeRedisTopCostCommandsAsync(const Model::DescribeRedisTopCostCommandsRequest& request, const DescribeRedisTopCostCommandsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisTopCostCommandsOutcomeCallable DescribeRedisTopCostCommandsCallable(const Model::DescribeRedisTopCostCommandsRequest& request);
+
+                /**
+                 *热Key分析
+                 * @param req DescribeRedisTopHotKeysRequest
+                 * @return DescribeRedisTopHotKeysOutcome
+                 */
+                DescribeRedisTopHotKeysOutcome DescribeRedisTopHotKeys(const Model::DescribeRedisTopHotKeysRequest &request);
+                void DescribeRedisTopHotKeysAsync(const Model::DescribeRedisTopHotKeysRequest& request, const DescribeRedisTopHotKeysAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisTopHotKeysOutcomeCallable DescribeRedisTopHotKeysCallable(const Model::DescribeRedisTopHotKeysRequest& request);
+
+                /**
+                 *查询redis实例top key前缀列表。
+                 * @param req DescribeRedisTopKeyPrefixListRequest
+                 * @return DescribeRedisTopKeyPrefixListOutcome
+                 */
+                DescribeRedisTopKeyPrefixListOutcome DescribeRedisTopKeyPrefixList(const Model::DescribeRedisTopKeyPrefixListRequest &request);
+                void DescribeRedisTopKeyPrefixListAsync(const Model::DescribeRedisTopKeyPrefixListRequest& request, const DescribeRedisTopKeyPrefixListAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeRedisTopKeyPrefixListOutcomeCallable DescribeRedisTopKeyPrefixListCallable(const Model::DescribeRedisTopKeyPrefixListRequest& request);
+
+                /**
+                 *查询安全审计日志导出文件下载链接。目前日志文件下载仅提供腾讯云内网地址，请通过广州地域的腾讯云服务器进行下载。
+                 * @param req DescribeSecurityAuditLogDownloadUrlsRequest
+                 * @return DescribeSecurityAuditLogDownloadUrlsOutcome
+                 */
+                DescribeSecurityAuditLogDownloadUrlsOutcome DescribeSecurityAuditLogDownloadUrls(const Model::DescribeSecurityAuditLogDownloadUrlsRequest &request);
+                void DescribeSecurityAuditLogDownloadUrlsAsync(const Model::DescribeSecurityAuditLogDownloadUrlsRequest& request, const DescribeSecurityAuditLogDownloadUrlsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSecurityAuditLogDownloadUrlsOutcomeCallable DescribeSecurityAuditLogDownloadUrlsCallable(const Model::DescribeSecurityAuditLogDownloadUrlsRequest& request);
+
+                /**
+                 *查询安全审计日志导出任务列表。
+                 * @param req DescribeSecurityAuditLogExportTasksRequest
+                 * @return DescribeSecurityAuditLogExportTasksOutcome
+                 */
+                DescribeSecurityAuditLogExportTasksOutcome DescribeSecurityAuditLogExportTasks(const Model::DescribeSecurityAuditLogExportTasksRequest &request);
+                void DescribeSecurityAuditLogExportTasksAsync(const Model::DescribeSecurityAuditLogExportTasksRequest& request, const DescribeSecurityAuditLogExportTasksAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSecurityAuditLogExportTasksOutcomeCallable DescribeSecurityAuditLogExportTasksCallable(const Model::DescribeSecurityAuditLogExportTasksRequest& request);
+
+                /**
+                 *统计排序指定时间段内的top慢sql。
+                 * @param req DescribeSlowLogQueryTimeStatsRequest
+                 * @return DescribeSlowLogQueryTimeStatsOutcome
+                 */
+                DescribeSlowLogQueryTimeStatsOutcome DescribeSlowLogQueryTimeStats(const Model::DescribeSlowLogQueryTimeStatsRequest &request);
+                void DescribeSlowLogQueryTimeStatsAsync(const Model::DescribeSlowLogQueryTimeStatsRequest& request, const DescribeSlowLogQueryTimeStatsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSlowLogQueryTimeStatsOutcomeCallable DescribeSlowLogQueryTimeStatsCallable(const Model::DescribeSlowLogQueryTimeStatsRequest& request);
+
+                /**
+                 *获取慢日志统计柱状图。
+                 * @param req DescribeSlowLogTimeSeriesStatsRequest
+                 * @return DescribeSlowLogTimeSeriesStatsOutcome
+                 */
+                DescribeSlowLogTimeSeriesStatsOutcome DescribeSlowLogTimeSeriesStats(const Model::DescribeSlowLogTimeSeriesStatsRequest &request);
+                void DescribeSlowLogTimeSeriesStatsAsync(const Model::DescribeSlowLogTimeSeriesStatsRequest& request, const DescribeSlowLogTimeSeriesStatsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSlowLogTimeSeriesStatsOutcomeCallable DescribeSlowLogTimeSeriesStatsCallable(const Model::DescribeSlowLogTimeSeriesStatsRequest& request);
+
+                /**
+                 *按照Sql模板+schema的聚合方式，统计排序指定时间段内的top慢sql。
+                 * @param req DescribeSlowLogTopSqlsRequest
+                 * @return DescribeSlowLogTopSqlsOutcome
+                 */
+                DescribeSlowLogTopSqlsOutcome DescribeSlowLogTopSqls(const Model::DescribeSlowLogTopSqlsRequest &request);
+                void DescribeSlowLogTopSqlsAsync(const Model::DescribeSlowLogTopSqlsRequest& request, const DescribeSlowLogTopSqlsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSlowLogTopSqlsOutcomeCallable DescribeSlowLogTopSqlsCallable(const Model::DescribeSlowLogTopSqlsRequest& request);
+
+                /**
+                 *获取慢日志来源地址统计分布图。
+                 * @param req DescribeSlowLogUserHostStatsRequest
+                 * @return DescribeSlowLogUserHostStatsOutcome
+                 */
+                DescribeSlowLogUserHostStatsOutcome DescribeSlowLogUserHostStats(const Model::DescribeSlowLogUserHostStatsRequest &request);
+                void DescribeSlowLogUserHostStatsAsync(const Model::DescribeSlowLogUserHostStatsRequest& request, const DescribeSlowLogUserHostStatsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSlowLogUserHostStatsOutcomeCallable DescribeSlowLogUserHostStatsCallable(const Model::DescribeSlowLogUserHostStatsRequest& request);
+
+                /**
+                 *获取指定时间内某个sql模板的慢日志明细
+                 * @param req DescribeSlowLogsRequest
+                 * @return DescribeSlowLogsOutcome
+                 */
+                DescribeSlowLogsOutcome DescribeSlowLogs(const Model::DescribeSlowLogsRequest &request);
+                void DescribeSlowLogsAsync(const Model::DescribeSlowLogsRequest& request, const DescribeSlowLogsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSlowLogsOutcomeCallable DescribeSlowLogsCallable(const Model::DescribeSlowLogsRequest& request);
+
+                /**
+                 *查询实例SQL限流任务列表。
+                 * @param req DescribeSqlFiltersRequest
+                 * @return DescribeSqlFiltersOutcome
+                 */
+                DescribeSqlFiltersOutcome DescribeSqlFilters(const Model::DescribeSqlFiltersRequest &request);
+                void DescribeSqlFiltersAsync(const Model::DescribeSqlFiltersRequest& request, const DescribeSqlFiltersAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSqlFiltersOutcomeCallable DescribeSqlFiltersCallable(const Model::DescribeSqlFiltersRequest& request);
+
+                /**
+                 *查询SQL模板。
+                 * @param req DescribeSqlTemplateRequest
+                 * @return DescribeSqlTemplateOutcome
+                 */
+                DescribeSqlTemplateOutcome DescribeSqlTemplate(const Model::DescribeSqlTemplateRequest &request);
+                void DescribeSqlTemplateAsync(const Model::DescribeSqlTemplateRequest& request, const DescribeSqlTemplateAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeSqlTemplateOutcomeCallable DescribeSqlTemplateCallable(const Model::DescribeSqlTemplateRequest& request);
+
+                /**
+                 *获取实例占用空间最大的前几个库在指定时间段内的每日由DBbrain定时采集的空间数据，默认返回按大小排序。
+                 * @param req DescribeTopSpaceSchemaTimeSeriesRequest
+                 * @return DescribeTopSpaceSchemaTimeSeriesOutcome
+                 */
+                DescribeTopSpaceSchemaTimeSeriesOutcome DescribeTopSpaceSchemaTimeSeries(const Model::DescribeTopSpaceSchemaTimeSeriesRequest &request);
+                void DescribeTopSpaceSchemaTimeSeriesAsync(const Model::DescribeTopSpaceSchemaTimeSeriesRequest& request, const DescribeTopSpaceSchemaTimeSeriesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeTopSpaceSchemaTimeSeriesOutcomeCallable DescribeTopSpaceSchemaTimeSeriesCallable(const Model::DescribeTopSpaceSchemaTimeSeriesRequest& request);
+
+                /**
+                 *获取实例Top库的实时空间统计信息，默认返回按大小排序。
+                 * @param req DescribeTopSpaceSchemasRequest
+                 * @return DescribeTopSpaceSchemasOutcome
+                 */
+                DescribeTopSpaceSchemasOutcome DescribeTopSpaceSchemas(const Model::DescribeTopSpaceSchemasRequest &request);
+                void DescribeTopSpaceSchemasAsync(const Model::DescribeTopSpaceSchemasRequest& request, const DescribeTopSpaceSchemasAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeTopSpaceSchemasOutcomeCallable DescribeTopSpaceSchemasCallable(const Model::DescribeTopSpaceSchemasRequest& request);
+
+                /**
+                 *获取实例占用空间最大的前几张表在指定时间段内的每日由DBbrain定时采集的空间数据，默认返回按大小排序。
+                 * @param req DescribeTopSpaceTableTimeSeriesRequest
+                 * @return DescribeTopSpaceTableTimeSeriesOutcome
+                 */
+                DescribeTopSpaceTableTimeSeriesOutcome DescribeTopSpaceTableTimeSeries(const Model::DescribeTopSpaceTableTimeSeriesRequest &request);
+                void DescribeTopSpaceTableTimeSeriesAsync(const Model::DescribeTopSpaceTableTimeSeriesRequest& request, const DescribeTopSpaceTableTimeSeriesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeTopSpaceTableTimeSeriesOutcomeCallable DescribeTopSpaceTableTimeSeriesCallable(const Model::DescribeTopSpaceTableTimeSeriesRequest& request);
+
+                /**
+                 *获取实例Top表的实时空间统计信息，默认返回按大小排序。
+                 * @param req DescribeTopSpaceTablesRequest
+                 * @return DescribeTopSpaceTablesOutcome
+                 */
+                DescribeTopSpaceTablesOutcome DescribeTopSpaceTables(const Model::DescribeTopSpaceTablesRequest &request);
+                void DescribeTopSpaceTablesAsync(const Model::DescribeTopSpaceTablesRequest& request, const DescribeTopSpaceTablesAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeTopSpaceTablesOutcomeCallable DescribeTopSpaceTablesCallable(const Model::DescribeTopSpaceTablesRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）；注意： 接口调用需要加白名单。
+                 * @param req DescribeUserAutonomyProfileRequest
+                 * @return DescribeUserAutonomyProfileOutcome
+                 */
+                DescribeUserAutonomyProfileOutcome DescribeUserAutonomyProfile(const Model::DescribeUserAutonomyProfileRequest &request);
+                void DescribeUserAutonomyProfileAsync(const Model::DescribeUserAutonomyProfileRequest& request, const DescribeUserAutonomyProfileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeUserAutonomyProfileOutcomeCallable DescribeUserAutonomyProfileCallable(const Model::DescribeUserAutonomyProfileRequest& request);
+
+                /**
+                 *获取SQL优化建议。【产品用户回馈，此接口限免开放，后续将并入dbbrain专业版】
+                 * @param req DescribeUserSqlAdviceRequest
+                 * @return DescribeUserSqlAdviceOutcome
+                 */
+                DescribeUserSqlAdviceOutcome DescribeUserSqlAdvice(const Model::DescribeUserSqlAdviceRequest &request);
+                void DescribeUserSqlAdviceAsync(const Model::DescribeUserSqlAdviceRequest& request, const DescribeUserSqlAdviceAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                DescribeUserSqlAdviceOutcomeCallable DescribeUserSqlAdviceCallable(const Model::DescribeUserSqlAdviceRequest& request);
+
+                /**
+                 *根据会话ID中断当前会话，该接口分为两次提交：第一次为预提交阶段，Stage为"Prepare"，得到的返回值包含SqlExecId；第二次为确认提交， Stage为"Commit"， 将SqlExecId的值作为参数传入，最终终止会话进程。
+                 * @param req KillMySqlThreadsRequest
+                 * @return KillMySqlThreadsOutcome
+                 */
+                KillMySqlThreadsOutcome KillMySqlThreads(const Model::KillMySqlThreadsRequest &request);
+                void KillMySqlThreadsAsync(const Model::KillMySqlThreadsRequest& request, const KillMySqlThreadsAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                KillMySqlThreadsOutcomeCallable KillMySqlThreadsCallable(const Model::KillMySqlThreadsRequest& request);
+
+                /**
+                 *修改告警策略
+                 * @param req ModifyAlarmPolicyRequest
+                 * @return ModifyAlarmPolicyOutcome
+                 */
+                ModifyAlarmPolicyOutcome ModifyAlarmPolicy(const Model::ModifyAlarmPolicyRequest &request);
+                void ModifyAlarmPolicyAsync(const Model::ModifyAlarmPolicyRequest& request, const ModifyAlarmPolicyAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                ModifyAlarmPolicyOutcomeCallable ModifyAlarmPolicyCallable(const Model::ModifyAlarmPolicyRequest& request);
+
+                /**
+                 *修改审计配置相关信息，如高频存储时长等
+                 * @param req ModifyAuditServiceRequest
+                 * @return ModifyAuditServiceOutcome
+                 */
+                ModifyAuditServiceOutcome ModifyAuditService(const Model::ModifyAuditServiceRequest &request);
+                void ModifyAuditServiceAsync(const Model::ModifyAuditServiceRequest& request, const ModifyAuditServiceAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                ModifyAuditServiceOutcomeCallable ModifyAuditServiceCallable(const Model::ModifyAuditServiceRequest& request);
+
+                /**
+                 *修改实例的配置信息。
+                 * @param req ModifyDiagDBInstanceConfRequest
+                 * @return ModifyDiagDBInstanceConfOutcome
+                 */
+                ModifyDiagDBInstanceConfOutcome ModifyDiagDBInstanceConf(const Model::ModifyDiagDBInstanceConfRequest &request);
+                void ModifyDiagDBInstanceConfAsync(const Model::ModifyDiagDBInstanceConfRequest& request, const ModifyDiagDBInstanceConfAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                ModifyDiagDBInstanceConfOutcomeCallable ModifyDiagDBInstanceConfCallable(const Model::ModifyDiagDBInstanceConfRequest& request);
+
+                /**
+                 *更改实例限流任务状态，目前仅用于终止限流。
+                 * @param req ModifySqlFiltersRequest
+                 * @return ModifySqlFiltersOutcome
+                 */
+                ModifySqlFiltersOutcome ModifySqlFilters(const Model::ModifySqlFiltersRequest &request);
+                void ModifySqlFiltersAsync(const Model::ModifySqlFiltersRequest& request, const ModifySqlFiltersAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                ModifySqlFiltersOutcomeCallable ModifySqlFiltersCallable(const Model::ModifySqlFiltersRequest& request);
+
+                /**
+                 *自治中心-终止自治任务（单次）；注意：接口需要加白名单。
+                 * @param req ModifyUserAutonomyProfileRequest
+                 * @return ModifyUserAutonomyProfileOutcome
+                 */
+                ModifyUserAutonomyProfileOutcome ModifyUserAutonomyProfile(const Model::ModifyUserAutonomyProfileRequest &request);
+                void ModifyUserAutonomyProfileAsync(const Model::ModifyUserAutonomyProfileRequest& request, const ModifyUserAutonomyProfileAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                ModifyUserAutonomyProfileOutcomeCallable ModifyUserAutonomyProfileCallable(const Model::ModifyUserAutonomyProfileRequest& request);
+
+                /**
+                 *开启数据库审计服务
+                 * @param req OpenAuditServiceRequest
+                 * @return OpenAuditServiceOutcome
+                 */
+                OpenAuditServiceOutcome OpenAuditService(const Model::OpenAuditServiceRequest &request);
+                void OpenAuditServiceAsync(const Model::OpenAuditServiceRequest& request, const OpenAuditServiceAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                OpenAuditServiceOutcomeCallable OpenAuditServiceCallable(const Model::OpenAuditServiceRequest& request);
+
+                /**
+                 *更新agent状态（停止或重连Agent）
+                 * @param req UpdateAgentSwitchRequest
+                 * @return UpdateAgentSwitchOutcome
+                 */
+                UpdateAgentSwitchOutcome UpdateAgentSwitch(const Model::UpdateAgentSwitchRequest &request);
+                void UpdateAgentSwitchAsync(const Model::UpdateAgentSwitchRequest& request, const UpdateAgentSwitchAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                UpdateAgentSwitchOutcomeCallable UpdateAgentSwitchCallable(const Model::UpdateAgentSwitchRequest& request);
+
+                /**
+                 *更新Agent实例状态（停止或重连实例）
+                 * @param req UpdateMonitorSwitchRequest
+                 * @return UpdateMonitorSwitchOutcome
+                 */
+                UpdateMonitorSwitchOutcome UpdateMonitorSwitch(const Model::UpdateMonitorSwitchRequest &request);
+                void UpdateMonitorSwitchAsync(const Model::UpdateMonitorSwitchRequest& request, const UpdateMonitorSwitchAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                UpdateMonitorSwitchOutcomeCallable UpdateMonitorSwitchCallable(const Model::UpdateMonitorSwitchRequest& request);
+
+                /**
+                 *验证用户数据库账号权限，获取会话token。
+                 * @param req VerifyUserAccountRequest
+                 * @return VerifyUserAccountOutcome
+                 */
+                VerifyUserAccountOutcome VerifyUserAccount(const Model::VerifyUserAccountRequest &request);
+                void VerifyUserAccountAsync(const Model::VerifyUserAccountRequest& request, const VerifyUserAccountAsyncHandler& handler, const std::shared_ptr<const AsyncCallerContext>& context = nullptr);
+                VerifyUserAccountOutcomeCallable VerifyUserAccountCallable(const Model::VerifyUserAccountRequest& request);
+
+            };
+        }
+    }
+}
+
+#endif // !TENCENTCLOUD_DBBRAIN_V20210527_DBBRAINCLIENT_H_

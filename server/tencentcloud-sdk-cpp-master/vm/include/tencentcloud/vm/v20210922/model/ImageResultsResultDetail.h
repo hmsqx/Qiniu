@@ -1,0 +1,383 @@
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef TENCENTCLOUD_VM_V20210922_MODEL_IMAGERESULTSRESULTDETAIL_H_
+#define TENCENTCLOUD_VM_V20210922_MODEL_IMAGERESULTSRESULTDETAIL_H_
+
+#include <string>
+#include <vector>
+#include <map>
+#include <tencentcloud/core/utils/rapidjson/document.h>
+#include <tencentcloud/core/utils/rapidjson/writer.h>
+#include <tencentcloud/core/utils/rapidjson/stringbuffer.h>
+#include <tencentcloud/core/AbstractModel.h>
+#include <tencentcloud/vm/v20210922/model/ImageResultsResultDetailLocation.h>
+#include <tencentcloud/vm/v20210922/model/OcrHitInfo.h>
+
+
+namespace TencentCloud
+{
+    namespace Vm
+    {
+        namespace V20210922
+        {
+            namespace Model
+            {
+                /**
+                * 具体场景下的图片识别结果
+                */
+                class ImageResultsResultDetail : public AbstractModel
+                {
+                public:
+                    ImageResultsResultDetail();
+                    ~ImageResultsResultDetail() = default;
+                    void ToJsonObject(rapidjson::Value &value, rapidjson::Document::AllocatorType& allocator) const;
+                    CoreInternalOutcome Deserialize(const rapidjson::Value &value);
+
+
+                    /**
+                     * 获取任务名称
+                     * @return Name 任务名称
+                     * 
+                     */
+                    std::string GetName() const;
+
+                    /**
+                     * 设置任务名称
+                     * @param _name 任务名称
+                     * 
+                     */
+                    void SetName(const std::string& _name);
+
+                    /**
+                     * 判断参数 Name 是否已赋值
+                     * @return Name 是否已赋值
+                     * 
+                     */
+                    bool NameHasBeenSet() const;
+
+                    /**
+                     * 获取OCR识别文本
+                     * @return Text OCR识别文本
+                     * 
+                     */
+                    std::string GetText() const;
+
+                    /**
+                     * 设置OCR识别文本
+                     * @param _text OCR识别文本
+                     * 
+                     */
+                    void SetText(const std::string& _text);
+
+                    /**
+                     * 判断参数 Text 是否已赋值
+                     * @return Text 是否已赋值
+                     * 
+                     */
+                    bool TextHasBeenSet() const;
+
+                    /**
+                     * 获取位置信息
+                     * @return Location 位置信息
+                     * 
+                     */
+                    ImageResultsResultDetailLocation GetLocation() const;
+
+                    /**
+                     * 设置位置信息
+                     * @param _location 位置信息
+                     * 
+                     */
+                    void SetLocation(const ImageResultsResultDetailLocation& _location);
+
+                    /**
+                     * 判断参数 Location 是否已赋值
+                     * @return Location 是否已赋值
+                     * 
+                     */
+                    bool LocationHasBeenSet() const;
+
+                    /**
+                     * 获取标签
+                     * @return Label 标签
+                     * 
+                     */
+                    std::string GetLabel() const;
+
+                    /**
+                     * 设置标签
+                     * @param _label 标签
+                     * 
+                     */
+                    void SetLabel(const std::string& _label);
+
+                    /**
+                     * 判断参数 Label 是否已赋值
+                     * @return Label 是否已赋值
+                     * 
+                     */
+                    bool LabelHasBeenSet() const;
+
+                    /**
+                     * 获取库ID
+                     * @return LibId 库ID
+                     * 
+                     */
+                    std::string GetLibId() const;
+
+                    /**
+                     * 设置库ID
+                     * @param _libId 库ID
+                     * 
+                     */
+                    void SetLibId(const std::string& _libId);
+
+                    /**
+                     * 判断参数 LibId 是否已赋值
+                     * @return LibId 是否已赋值
+                     * 
+                     */
+                    bool LibIdHasBeenSet() const;
+
+                    /**
+                     * 获取库名称
+                     * @return LibName 库名称
+                     * 
+                     */
+                    std::string GetLibName() const;
+
+                    /**
+                     * 设置库名称
+                     * @param _libName 库名称
+                     * 
+                     */
+                    void SetLibName(const std::string& _libName);
+
+                    /**
+                     * 判断参数 LibName 是否已赋值
+                     * @return LibName 是否已赋值
+                     * 
+                     */
+                    bool LibNameHasBeenSet() const;
+
+                    /**
+                     * 获取命中的关键词
+                     * @return Keywords 命中的关键词
+                     * 
+                     */
+                    std::vector<std::string> GetKeywords() const;
+
+                    /**
+                     * 设置命中的关键词
+                     * @param _keywords 命中的关键词
+                     * 
+                     */
+                    void SetKeywords(const std::vector<std::string>& _keywords);
+
+                    /**
+                     * 判断参数 Keywords 是否已赋值
+                     * @return Keywords 是否已赋值
+                     * 
+                     */
+                    bool KeywordsHasBeenSet() const;
+
+                    /**
+                     * 获取建议
+                     * @return Suggestion 建议
+                     * 
+                     */
+                    std::string GetSuggestion() const;
+
+                    /**
+                     * 设置建议
+                     * @param _suggestion 建议
+                     * 
+                     */
+                    void SetSuggestion(const std::string& _suggestion);
+
+                    /**
+                     * 判断参数 Suggestion 是否已赋值
+                     * @return Suggestion 是否已赋值
+                     * 
+                     */
+                    bool SuggestionHasBeenSet() const;
+
+                    /**
+                     * 获取得分
+                     * @return Score 得分
+                     * 
+                     */
+                    int64_t GetScore() const;
+
+                    /**
+                     * 设置得分
+                     * @param _score 得分
+                     * 
+                     */
+                    void SetScore(const int64_t& _score);
+
+                    /**
+                     * 判断参数 Score 是否已赋值
+                     * @return Score 是否已赋值
+                     * 
+                     */
+                    bool ScoreHasBeenSet() const;
+
+                    /**
+                     * 获取子标签码
+                     * @return SubLabelCode 子标签码
+                     * 
+                     */
+                    std::string GetSubLabelCode() const;
+
+                    /**
+                     * 设置子标签码
+                     * @param _subLabelCode 子标签码
+                     * 
+                     */
+                    void SetSubLabelCode(const std::string& _subLabelCode);
+
+                    /**
+                     * 判断参数 SubLabelCode 是否已赋值
+                     * @return SubLabelCode 是否已赋值
+                     * 
+                     */
+                    bool SubLabelCodeHasBeenSet() const;
+
+                    /**
+                     * 获取子标签
+                     * @return SubLabel 子标签
+                     * 
+                     */
+                    std::string GetSubLabel() const;
+
+                    /**
+                     * 设置子标签
+                     * @param _subLabel 子标签
+                     * 
+                     */
+                    void SetSubLabel(const std::string& _subLabel);
+
+                    /**
+                     * 判断参数 SubLabel 是否已赋值
+                     * @return SubLabel 是否已赋值
+                     * 
+                     */
+                    bool SubLabelHasBeenSet() const;
+
+                    /**
+                     * 获取Ocr文本命中信息
+                     * @return OcrHitInfos Ocr文本命中信息
+                     * 
+                     */
+                    std::vector<OcrHitInfo> GetOcrHitInfos() const;
+
+                    /**
+                     * 设置Ocr文本命中信息
+                     * @param _ocrHitInfos Ocr文本命中信息
+                     * 
+                     */
+                    void SetOcrHitInfos(const std::vector<OcrHitInfo>& _ocrHitInfos);
+
+                    /**
+                     * 判断参数 OcrHitInfos 是否已赋值
+                     * @return OcrHitInfos 是否已赋值
+                     * 
+                     */
+                    bool OcrHitInfosHasBeenSet() const;
+
+                private:
+
+                    /**
+                     * 任务名称
+                     */
+                    std::string m_name;
+                    bool m_nameHasBeenSet;
+
+                    /**
+                     * OCR识别文本
+                     */
+                    std::string m_text;
+                    bool m_textHasBeenSet;
+
+                    /**
+                     * 位置信息
+                     */
+                    ImageResultsResultDetailLocation m_location;
+                    bool m_locationHasBeenSet;
+
+                    /**
+                     * 标签
+                     */
+                    std::string m_label;
+                    bool m_labelHasBeenSet;
+
+                    /**
+                     * 库ID
+                     */
+                    std::string m_libId;
+                    bool m_libIdHasBeenSet;
+
+                    /**
+                     * 库名称
+                     */
+                    std::string m_libName;
+                    bool m_libNameHasBeenSet;
+
+                    /**
+                     * 命中的关键词
+                     */
+                    std::vector<std::string> m_keywords;
+                    bool m_keywordsHasBeenSet;
+
+                    /**
+                     * 建议
+                     */
+                    std::string m_suggestion;
+                    bool m_suggestionHasBeenSet;
+
+                    /**
+                     * 得分
+                     */
+                    int64_t m_score;
+                    bool m_scoreHasBeenSet;
+
+                    /**
+                     * 子标签码
+                     */
+                    std::string m_subLabelCode;
+                    bool m_subLabelCodeHasBeenSet;
+
+                    /**
+                     * 子标签
+                     */
+                    std::string m_subLabel;
+                    bool m_subLabelHasBeenSet;
+
+                    /**
+                     * Ocr文本命中信息
+                     */
+                    std::vector<OcrHitInfo> m_ocrHitInfos;
+                    bool m_ocrHitInfosHasBeenSet;
+
+                };
+            }
+        }
+    }
+}
+
+#endif // !TENCENTCLOUD_VM_V20210922_MODEL_IMAGERESULTSRESULTDETAIL_H_
