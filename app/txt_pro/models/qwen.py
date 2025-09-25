@@ -1,17 +1,15 @@
 from fastapi import HTTPException
 import logging
 from openai import OpenAI
-from uitils import load_env
-import os
 
-env = load_env(os.path.join(os.path.dirname(__file__), "api.env"))
+
 # 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 class QwenLLMClient:
     """千问大模型客户端封装类"""
     
-    def __init__(self, api_key: str = None, model: str = "qwen-plus"):
+    def __init__(self, api_key: str = None, model: str = "qwen-plus", env=None):
         """
         初始化千问客户端
         
