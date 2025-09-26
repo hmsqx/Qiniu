@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 from pydantic import BaseModel
 from typing import Optional, List
-
+from contextlib import asynccontextmanager
 import sys
 from pathlib import Path
 
@@ -46,20 +46,14 @@ class Text3DOptimizationResponse(BaseModel):
 
 
 
-app = FastAPI(
-    title="创意模式",
-    description="文生3D提示词优化API",
-    version="1.0.0"
-)
-
 
 
 # 全局变量：初始化服务
 qwen_client = None
 text_3d_optimizer = None
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """应用启动时初始化服务"""
     global qwen_client, text_3d_optimizer
     
@@ -76,6 +70,18 @@ async def startup_event():
     except Exception as e:
         logger.error(f"服务启动失败: {str(e)}")
         raise
+    print("启动文生3D提示词优化服务...")
+    yield  # yield之后是服务运行中，yield之前是startup，之后是shutdown
+
+
+
+app = FastAPI(
+    title="创意模式",
+    description="文生3D提示词优化API",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
 
 @app.get("/")
 async def root():
@@ -298,7 +304,7 @@ if __name__ == "__main__":
     
     print("启动文生3D提示词优化服务...")
     uvicorn.run(
-        "main:app",
+        "main_txt:app",
         host="0.0.0.0",
         port=8090,
         reload=True,
