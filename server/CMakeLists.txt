@@ -16,9 +16,13 @@ include_directories(include)
 include_directories(.)
 
 # 确保包含新的数据库连接管理文件
-set(SERVER_SOURCES ${SERVER_SOURCES} src/db_connection.cc)
+set(SERVER_SOURCES ${SERVER_SOURCES} )
 
+# 完整版本（包含所有性能优化功能）
 add_executable(tencent_cloud_cpp_sample main.cc ${SERVER_SOURCES})
+
+# 简化版本（基础功能）
+# add_executable(tencent_cloud_cpp_sample_simple simple_main.cc src/handlers.cc src/auth.cc src/tx_ai3d.cc src/db_utils.cc src/model_downloader.cc src/db_connection.cc)
 
 # 线程库
 find_package(Threads REQUIRED)
@@ -46,3 +50,13 @@ target_link_libraries(tencent_cloud_cpp_sample
     Threads::Threads
     CURL::libcurl
 )
+
+#target_link_libraries(tencent_cloud_cpp_sample_simple 
+#    tencentcloud-sdk-cpp-ai3d 
+ #   tencentcloud-sdk-cpp-core 
+ #   jsoncpp_lib
+#    ${MYSQLCLIENT_LIB}
+#    OpenSSL::Crypto
+#    Threads::Threads
+#    CURL::libcurl
+#)

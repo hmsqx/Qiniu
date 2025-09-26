@@ -1,3 +1,38 @@
+## 管理员端新增接口
+
+本次新增了管理员统计与查询接口（需 `Session-Token` 对应用户 `role=admin`）。
+
+### 1) 管理员概览 `/api/admin/overview` [GET]
+- 功能：一次返回四类数据
+  - downloadedModels / totalModels → 下载率（被至少下载过一次的模型比例）
+  - likedModels / totalModels → 点赞率（被至少点赞过一次的模型比例）
+  - totalUsers → 当前用户总数
+  - userGrowthRate → 用户增长率（昨日新增 vs 前日新增）
+- 响应：
+  - data.totalModels, data.downloadedModels, data.likedModels
+  - data.downloadRate, data.likeRate
+  - data.totalUsers
+  - data.yesterdayNewUsers, data.dayBeforeNewUsers, data.userGrowthRate
+
+### 2) 管理员用户查询 `/api/admin/users` [GET]
+- 参数（均可选，支持分页）：
+  - username: 模糊匹配
+  - email: 模糊匹配
+  - role: 精确匹配
+  - PageNum, PageSize
+- 响应：分页信息 + 用户列表（userId, username, email, role, token_count, create_time）
+
+### 3) 管理员模型查询 `/api/admin/models` [GET]
+- 参数（均可选，支持分页）：
+  - minLike, maxLike
+  - minDownload, maxDownload
+  - isPrivate: 0/1 或 true/false
+  - PageNum, PageSize
+- 响应：分页信息 + 模型列表（jobId, userId, like, downloadCount, Isprivate, status, resultFormat, version, create_time, prompt）
+
+### 鉴权
+- 以上接口均需请求头 `Session-Token`，且该 token 所属用户需具备 `role=admin`。
+
 # API更新总结
 
 ## 主要更新内容

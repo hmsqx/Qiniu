@@ -2,38 +2,87 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include <thread>
+#include <chrono>
 #include "comm/httplib.h"
 
 #include "include/handlers.h"
+#include "include/security_middleware.h"
+#include "include/server_config.h"
+#include "concurrent_downloader.h"
+#include "config.h"
 
 namespace fs = std::filesystem;
 
 int main()
 {
+    // 初始化服务器组件
+    if (!ServerInitializer::initialize(ServerInitializer::getDefaultConfig())) {
+        std::cerr << "服务器初始化失败" << std::endl;
+        return -1;
+    }
+    // 初始化并发下载器（可根据配置调整并发数）
+    initializeConcurrentDownloader(4);
+    
     httplib::Server server;
-    server.Post("/api/get_model", handleGetModel);
-    server.Get("/api/query", handleQueryJobsByPage);
-    server.Post("/api/register", handleRegister);
-    server.Post("/api/login", handleLogin);
-    server.Get("/api/auth/me", handleMe);
-    server.Post("/api/downloadModel", handleDownloadModel);
-    server.Post("/api/like", handleLikeModel);
-    server.Get("/api/showModel", handleShowModel);
+    
+    // 添加错误处理器
+    server.set_error_handler([](const httplib::Request& req, httplib::Response& res) {
+        // 获取客户端IP进行安全检查
+        std::string clientIP = getAPISecurityManager().getClientIP(
+            req.get_header_value("X-Forwarded-For"),
+            req.get_header_value("X-Real-IP")
+        );
+        
+        // 记录错误请求
+        getAPISecurityManager().recordRequest(clientIP, req.path, false);
+        
+        // 仅当业务侧未设置响应体时，才填充默认错误JSON，避免覆盖详细错误信息
+        if (res.body.empty()) {
+            if (res.status == 404) {
+                res.set_content("{\"error\":\"接口不存在\"}", "application/json");
+            } else if (res.status == 500) {
+                res.set_content("{\"error\":\"服务器内部错误\"}", "application/json");
+            }
+        }
+    });
+    
+    // 使用安全中间件包装所有API端点
+    SECURE_POST(server, "/api/get_model", handleGetModel);
+    SECURE_GET(server, "/api/query", handleQueryJobsByPageAsync);
+    SECURE_POST(server, "/api/register", handleRegister);
+    SECURE_POST(server, "/api/login", handleLogin);
+    SECURE_GET(server, "/api/auth/me", handleMe);
+    SECURE_POST(server, "/api/downloadModel", handleDownloadModel);
+    SECURE_POST(server, "/api/like", handleLikeModel);
+    SECURE_GET(server, "/api/showModel", handleShowModel);
+    SECURE_POST(server, "/api/IncrTokenCount", handleIncrTokenCount);
+    SECURE_POST(server, "/api/toggleJobIsPrivate", handleToggleJobIsPrivate);
+    SECURE_GET(server, "/api/getTaskFiles", handleGetTaskFiles);
+    SECURE_POST(server, "/api/getTaskFiles", handleGetTaskFiles);
+    SECURE_POST(server, "/api/like/get", handleGetUserLike);
+    SECURE_POST(server, "/api/like/toggle", handleToggleUserLike);
+    SECURE_POST(server, "/api/view", handleViewModel);
+    SECURE_POST(server, "/api/likeRate", handleGetLikeRate);
+    SECURE_POST(server, "/api/downloadRate", handleGetDownloadRate);
+    SECURE_GET(server, "/api/userGrowth", handleGetUserGrowth);
+    // 管理员端
+    SECURE_GET(server, "/api/admin/overview", handleAdminOverview);
+    SECURE_GET(server, "/api/admin/users", handleAdminQueryUsers);
+    SECURE_GET(server, "/api/admin/models", handleAdminQueryModels);
+    
+    // 健康检查端点（不需要安全中间件）
     server.Get("/health", [](const httplib::Request &, httplib::Response &res)
               { res.set_content("服务正常运行", "text/plain"); });
-    server.Post("/api/IncrTokenCount", handleIncrTokenCount);
-    server.Post("/api/toggleJobIsPrivate", handleToggleJobIsPrivate);
-    server.Get("/api/getTaskFiles", handleGetTaskFiles);
-    server.Post("/api/getTaskFiles", handleGetTaskFiles);
 
-    // 添加静态文件服务，用于访问下载的模型文件
+    // 添加静态文件服务（如由Nginx托管，此段可作为后备）
     // 添加专门的下载接口
     server.Get("/download/(.*)", [](const httplib::Request &req, httplib::Response &res) {
         std::string file_name = req.matches[1];
-        std::string full_file_path = "/root/Qiniu/server/model/" + file_name; 
+        std::string full_file_path = std::string(MODEL_FS_BASE_DIR) + "/" + file_name; 
         
         // 安全检查：确保路径在允许的目录内
-        if (full_file_path.find("/root/Qiniu/server/model/") != 0) {
+        if (full_file_path.find(std::string(MODEL_FS_BASE_DIR) + "/") != 0) {
             res.status = 403;
             res.set_content("访问被拒绝", "text/plain");
             return;
@@ -78,11 +127,11 @@ int main()
         }
     });
 
-    server.Get("/model/.*", [](const httplib::Request &req, httplib::Response &res) {
-        std::string filePath = "/root/Qiniu/server" + req.path;
+    server.Get((std::string(MODEL_URL_BASE_PATH) + "/.*").c_str(), [](const httplib::Request &req, httplib::Response &res) {
+        std::string filePath = std::string(MODEL_FS_BASE_DIR) + req.path.substr(std::string(MODEL_URL_BASE_PATH).size());
         
         // 安全检查：确保路径在允许的目录内
-        if (filePath.find("/root/Qiniu/server/model/") != 0) {
+        if (filePath.find(std::string(MODEL_FS_BASE_DIR) + "/") != 0) {
             res.status = 403;
             res.set_content("访问被拒绝", "text/plain");
             return;

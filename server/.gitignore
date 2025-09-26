@@ -1,1 +1,13 @@
 /build
+/model
+# API_UPDATE_SUMMARY.md
+# database_migration.sql
+# DUPLICATE_DOWNLOAD_FIX.md
+# FILE_STRUCTURE_UPDATE.md
+# MODEL_DOWNLOAD_README.md
+# REFACTOR_SUMMARY.md
+# static_file_server.md
+# test_api_updates.sh
+# test_download_structure.sh
+# test_duplicate_download_fix.sh
+# test_file_structure.md

@@ -1,6 +1,6 @@
 #include "auth.h"
 #include "config.h"
-#include "db_connection.h"
+#include "connection_pool.h"
 
 #include <openssl/sha.h>
 #include <openssl/rand.h>
@@ -37,8 +37,8 @@ Json::Value registerUser(const std::string &username,
                          const std::string &plainPassword)
 {
     Json::Value resp;
-    auto conn = createDatabaseConnection();
-    if (!conn || !conn->isConnected()) {
+    ScopedConnection conn;
+    if (!conn.isValid()) {
         resp["status"] = "error";
         resp["code"] = 500;
         resp["message"] = "数据库连接失败";
@@ -47,13 +47,13 @@ Json::Value registerUser(const std::string &username,
 
     // 检查唯一性
     {
-        std::string eUsername = conn->escapeString(username);
-        std::string eEmail = conn->escapeString(email);
+        std::string eUsername = conn.escapeString(username);
+        std::string eEmail = conn.escapeString(email);
         
         std::ostringstream query;
         query << "SELECT id FROM users WHERE username='" << eUsername << "' OR email='" << eEmail << "' LIMIT 1";
         
-        auto res = conn->executeQuery(query.str());
+        auto res = conn.executeQuery(query.str());
         if (res) {
             MYSQL_ROW row = mysql_fetch_row(res.get());
             if (row != nullptr) {
@@ -78,16 +78,16 @@ Json::Value registerUser(const std::string &username,
 
     // 写入数据库
     {
-        std::string eUsername = conn->escapeString(username);
-        std::string eEmail = conn->escapeString(email);
-        std::string eHash = conn->escapeString(hashHex);
-        std::string eSalt = conn->escapeString(saltHex);
+        std::string eUsername = conn.escapeString(username);
+        std::string eEmail = conn.escapeString(email);
+        std::string eHash = conn.escapeString(hashHex);
+        std::string eSalt = conn.escapeString(saltHex);
 
         std::ostringstream insert;
         insert << "INSERT INTO users (user_id, username, email, password_hash, password_salt, status, create_time, update_time, token_count, role) VALUES ("
                << "UUID(), '" << eUsername << "', '" << eEmail << "', '" << eHash << "', '" << eSalt << "', 1, NOW(), NOW(), 20, 'user')";
         
-        if (!conn->executeUpdate(insert.str())) {
+        if (!conn.executeUpdate(insert.str())) {
             resp["status"] = "error";
             resp["code"] = 500;
             resp["message"] = "注册失败";
@@ -105,21 +105,21 @@ Json::Value loginUser(const std::string &usernameOrEmail,
                       const std::string &plainPassword)
 {
     Json::Value resp;
-    auto conn = createDatabaseConnection();
-    if (!conn || !conn->isConnected()) {
+    ScopedConnection conn;
+    if (!conn.isValid()) {
         resp["status"] = "error";
         resp["code"] = 500;
         resp["message"] = "数据库连接失败";
         return resp;
     }
 
-    std::string eInput = conn->escapeString(usernameOrEmail);
+    std::string eInput = conn.escapeString(usernameOrEmail);
 
     std::ostringstream query;
     query << "SELECT user_id, password_hash, password_salt, status FROM users WHERE username='" << eInput 
           << "' OR email='" << eInput << "' LIMIT 1";
     
-    auto res = conn->executeQuery(query.str());
+    auto res = conn.executeQuery(query.str());
     if (!res) {
         resp["status"] = "error";
         resp["code"] = 500;
@@ -162,7 +162,7 @@ Json::Value loginUser(const std::string &usernameOrEmail,
         q << "SELECT session_token FROM user_sessions WHERE user_id='" << userId
           << "' AND revoked=0 AND expire_time > NOW() ORDER BY create_time DESC LIMIT 1";
         
-        auto sres = conn->executeQuery(q.str());
+        auto sres = conn.executeQuery(q.str());
         if (sres) {
             MYSQL_ROW srow = mysql_fetch_row(sres.get());
             if (srow && srow[0]) {
@@ -182,13 +182,13 @@ Json::Value loginUser(const std::string &usernameOrEmail,
         }
         tokenHex = bytesToHex(tokenBytes, sizeof(tokenBytes));
 
-        std::string eToken = conn->escapeString(tokenHex);
+        std::string eToken = conn.escapeString(tokenHex);
 
         std::ostringstream insert;
         insert << "INSERT INTO user_sessions (user_id, session_token, expire_time, create_time, revoked) VALUES ('"
                << userId << "', '" << eToken << "', FROM_UNIXTIME(UNIX_TIMESTAMP() + " << SESSION_TTL_SECONDS << "), NOW(), 0)";
         
-        if (!conn->executeUpdate(insert.str())) {
+        if (!conn.executeUpdate(insert.str())) {
             resp["status"] = "error";
             resp["code"] = 500;
             resp["message"] = "创建会话失败";
@@ -207,15 +207,15 @@ Json::Value loginUser(const std::string &usernameOrEmail,
 
 bool updateUserTokenCount(const std::string& userId, int delta)
 {
-    auto conn = createDatabaseConnection();
-    if (!conn || !conn->isConnected()) {
+    ScopedConnection conn;
+    if (!conn.isValid()) {
         return false;
     }
     
-    std::string eUserId = conn->escapeString(userId);
+    std::string eUserId = conn.escapeString(userId);
     
     std::ostringstream sql;
     sql << "UPDATE users SET token_count = token_count + " << delta << ", update_time = NOW() WHERE user_id='" << eUserId << "'";
     
-    return conn->executeUpdate(sql.str());
+    return conn.executeUpdate(sql.str());
 }

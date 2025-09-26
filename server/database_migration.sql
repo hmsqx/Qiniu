@@ -11,6 +11,10 @@ ALTER TABLE ai3d_tasks ADD COLUMN previewImages TEXT COMMENT '本地预览图片
 CREATE INDEX idx_ai3d_tasks_fileurl ON ai3d_tasks(fileurl(255));
 CREATE INDEX idx_ai3d_tasks_preview ON ai3d_tasks(previewImages(255));
 
+-- 添加viewCount字段，用于统计浏览量（用于计算点赞率/下载率）
+ALTER TABLE ai3d_tasks ADD COLUMN viewCount INT NULL DEFAULT 0 COMMENT '浏览量';
+CREATE INDEX idx_ai3d_tasks_viewcount ON ai3d_tasks(viewCount);
+
 -- 注意：预览图片现在与模型文件放在同一目录下，文件名相同但后缀不同
 -- 例如：/model/glb/123456_7890.glb 和 /model/glb/123456_7890.jpg
 

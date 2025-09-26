@@ -47,3 +47,20 @@
 #ifndef AI3D_POLL_TIMEOUT_SECONDS
 #define AI3D_POLL_TIMEOUT_SECONDS 900 // 15 分钟
 #endif 
+
+// ---------------- Model Storage & Serving ----------------
+#ifndef MODEL_FS_BASE_DIR
+#define MODEL_FS_BASE_DIR "/var/www/models" // 模型文件物理存储根目录（绝对路径）
+#endif
+
+#ifndef MODEL_URL_BASE_PATH
+#define MODEL_URL_BASE_PATH "/models" // 对外访问的URL前缀（由Nginx或本服务提供）
+#endif
+
+#ifndef MAX_CONCURRENT_MODEL_DOWNLOADS
+#define MAX_CONCURRENT_MODEL_DOWNLOADS 4 // 并发下载线程数
+#endif
+
+#ifndef MODEL_DOWNLOAD_TIMEOUT_SECONDS
+#define MODEL_DOWNLOAD_TIMEOUT_SECONDS 300 // 单个文件下载超时（秒）
+#endif
