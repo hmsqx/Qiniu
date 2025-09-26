@@ -1,16 +1,20 @@
 import { FloatingImageZoom } from "./FloatingImageZoom";
 import { InspirationCard } from "./InspirationCard";
 import { SectionHeader } from "./SectionHeader";
-import { useInfinitePublicModels } from "./hooks/useInfinitePublicModels";
+import { useInfinitePublicModels } from "../hooks/useInfinitePublicModels";
 
 const heroImage = "/homePage.jpg";
 
-export default function HomePage() {
+export interface HomePageProps {
+  scrollRoot?: Element | null;
+}
+
+export default function HomePage({ scrollRoot }: HomePageProps) {
   const { items, loading, loadingMore, hasMore, observerRef } =
-    useInfinitePublicModels({ pageSize: 24 });
+    useInfinitePublicModels({ pageSize: 24, root: scrollRoot });
 
   return (
-    <main className="min-h-screen ">
+    <main className=" mt-1">
       <div className="mx-auto">
         <div className="flex px-2 gap-2 ">
           <FloatingImageZoom
@@ -22,9 +26,9 @@ export default function HomePage() {
             className="hidden h-[260px] md:block md:h-[360px]"
           />
         </div>
-        <section className="mt-8 lg:mt-12">
+        <section>
           <SectionHeader title="灵感广场" />
-          <div className="grid grid-cols-2 gap-x-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 contain-paint">
             {items.map((item, idx) => (
               <InspirationCard key={idx} item={item} />
             ))}
@@ -33,18 +37,19 @@ export default function HomePage() {
               Array.from({ length: 12 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-[16/11] animate-pulse rounded-xl bg-slate-200/40 dark:bg-slate-700/40"
+                  className="aspect-square animate-pulse rounded-xl bg-slate-200/40 dark:bg-slate-700/40"
                 />
               ))}
           </div>
-          <div ref={observerRef as any} className="h-6" />
+          {/* Sentinel for infinite scroll. Add margin to avoid being hidden behind bottom UI */}
+          <div ref={observerRef as any} className="h-4 mt-2" />
           {loadingMore && (
-            <div className="mt-4 text-center text-xs text-slate-500">
+            <div className="mt-2 text-center text-xs text-slate-500">
               加载中...
             </div>
           )}
           {!hasMore && items.length > 0 && (
-            <div className="mt-6 text-center text-xs text-slate-400">
+            <div className="mt-3 text-center text-xs text-slate-400">
               没有更多了
             </div>
           )}

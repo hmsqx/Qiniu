@@ -8,7 +8,7 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, icon }: SectionHeaderProps) {
   return (
-    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className=" flex flex-wrap items-center justify-between">
       <div className="flex items-center">
         {icon ?? <Sparkles className="mr-2 h-5 w-5 text-violet-500" />}
         <h2 className="text-2xl font-semibold tracking-tight text-slate-200">

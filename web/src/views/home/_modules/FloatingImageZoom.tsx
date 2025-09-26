@@ -47,6 +47,8 @@ export function FloatingImageZoom({
           transform: `scale(${hover ? scale : 1})`,
         }}
         className="relative z-10 h-full w-full rounded-[22px] object-cover transition-transform duration-200 ease-out will-change-transform"
+        decoding="async"
+        fetchPriority="high"
       />
       <div className="pointer-events-none absolute right-8 top-6 z-10 h-24 w-24 rounded-full bg-white/20 blur-3xl" />
     </div>

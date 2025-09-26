@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { queryPublicModels } from "@/api/public";
 import type { QueryPublicModelsResult } from "@/api/public";
-import type { Inspiration } from "../type";
+import type { Inspiration } from "../data/type";
 
 export interface UseInfinitePublicModelsOptions {
   pageSize?: number;
   enabled?: boolean;
+  /** Optional scroll container to observe; defaults to viewport */
+  root?: Element | null;
+  /** Fallback scroll distance (px) from bottom to trigger loadMore when using custom root */
+  fallbackScrollDistancePx?: number;
 }
 
 export interface UseInfinitePublicModelsResult {
@@ -43,7 +47,12 @@ function mapToInspiration(item: any): Inspiration {
 export function useInfinitePublicModels(
   opts: UseInfinitePublicModelsOptions = {}
 ): UseInfinitePublicModelsResult {
-  const { pageSize = 24, enabled = true } = opts;
+  const {
+    pageSize = 24,
+    enabled = true,
+    root = null,
+    fallbackScrollDistancePx = 300,
+  } = opts;
   const [pageNum, setPageNum] = useState(1);
   const [items, setItems] = useState<Inspiration[]>([]);
   const [loading, setLoading] = useState(false);
@@ -80,7 +89,6 @@ export function useInfinitePublicModels(
         setHasMore(more);
       } catch (e: any) {
         setError(e?.message || "加载失败");
-        // [修改] 关键修复：失败时停止后续的自动加载，防止无限循环
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -109,20 +117,18 @@ export function useInfinitePublicModels(
     fetchPage(1, false);
   }, [fetchPage]);
 
-  // [新增] 创建一个专门的 retry 函数
   const retry = useCallback(() => {
     if (loading || loadingMore) return;
     setError(null);
-    setHasMore(true); // 重新允许加载
-    // 重新请求当前失败的页面
-    // `items.length > 0` 判断是重试第一页还是后续页
+    setHasMore(true);
     fetchPage(pageNum, items.length > 0);
   }, [fetchPage, loading, loadingMore, pageNum, items.length]);
 
-  // IntersectionObserver sentinel
   const observer = useRef<IntersectionObserver | null>(null);
+  const observedEl = useRef<HTMLElement | null>(null);
   const observerRef = useCallback(
     (el: HTMLElement | null) => {
+      observedEl.current = el;
       if (observer.current) observer.current.disconnect();
       if (!el) return;
       observer.current = new IntersectionObserver(
@@ -132,12 +138,48 @@ export function useInfinitePublicModels(
             if (!hasMore) observer.current?.disconnect();
           }
         },
-        { rootMargin: "200px 0px 0px 0px" }
+        { root: root ?? null, rootMargin: "400px 0px 200px 0px", threshold: 0 }
       );
       observer.current.observe(el);
     },
-    [loadMore, hasMore]
+    [loadMore, hasMore, root]
   );
+
+  // Reconnect observer when root changes
+  useEffect(() => {
+    if (observedEl.current) {
+      observerRef(observedEl.current);
+    }
+  }, [observerRef, root]);
+
+  // Cleanup on unmount or re-init
+  useEffect(() => {
+    return () => observer.current?.disconnect();
+  }, []);
+
+  // Fallback: when a custom root is used, also monitor its scroll position to trigger loadMore near bottom
+  useEffect(() => {
+    const el = root instanceof Element ? (root as HTMLElement) : null;
+    if (!el) return;
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        const { scrollTop, clientHeight, scrollHeight } = el;
+        const nearBottom =
+          scrollTop + clientHeight >= scrollHeight - fallbackScrollDistancePx;
+        if (nearBottom && hasMore && !loading && !loadingMore) {
+          loadMore();
+        }
+      });
+    };
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [root, fallbackScrollDistancePx, hasMore, loading, loadingMore, loadMore]);
 
   return {
     items,
@@ -147,7 +189,7 @@ export function useInfinitePublicModels(
     hasMore,
     loadMore,
     reset,
-    retry, // [新增] 导出 retry 函数
+    retry,
     observerRef,
   };
 }

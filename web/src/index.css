@@ -101,12 +101,10 @@
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
-  /* 提升一些文字可读性 (之前 0.705 ) */
   --muted-foreground: oklch(0.74 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  /* 稍微提高描边/输入背景的可见度 (10%->14%,15%->18%) */
   --border: oklch(1 0 0 / 14%);
   --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.541 0.281 293.009);
@@ -219,4 +217,15 @@
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* Performance utilities */
+.contain-paint {
+  contain: content;
+  content-visibility: auto;
+}
+
+/* Do not force global smooth scrolling; rely on default for better wheel perf */
+html {
+  scroll-behavior: auto;
 }

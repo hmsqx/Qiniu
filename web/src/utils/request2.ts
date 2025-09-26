@@ -2,7 +2,7 @@ import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const VITE_API_BASE =
-  (import.meta.env as Record<string, any>).VITE_API_BASE || "/";
+  (import.meta.env as Record<string, any>).VITE_API_BASE2 || "/";
 
 const instance: AxiosInstance = axios.create({
   baseURL: VITE_API_BASE,

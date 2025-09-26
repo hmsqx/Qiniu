@@ -1,13 +1,9 @@
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react";
 import { GenerationOptions } from "./GenerationOptions";
-import { Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useToast } from "@/components/ui/use-toast";
+import { optimize3DPrompt } from "@/api/prompt";
+import PromptTextarea from "./text-to-3d/PromptTextarea";
+import PolishDialog from "./text-to-3d/PolishDialog";
 
 type Props = {
   value: string;
@@ -26,35 +22,66 @@ export const TextTo3DTab = ({
   format,
   onFormatChange,
 }: Props) => {
+  const [polishOpen, setPolishOpen] = useState(false);
+  const [sourceText, setSourceText] = useState<string>(value ?? "");
+  const [polishedText, setPolishedText] = useState<string>(value ?? "");
+  const { toast, updateToast } = useToast();
+  const [optimizing, setOptimizing] = useState(false);
+
+  const openPolish = () => {
+    setSourceText(value ?? "");
+    setPolishedText(value ?? "");
+    setPolishOpen(true);
+  };
+
+  const applyPolish = () => {
+    onChange(polishedText);
+    setPolishOpen(false);
+  };
+
+  const handleOptimize = async () => {
+    const text = (sourceText || "").trim();
+    if (!text) {
+      toast({ title: "请先输入原文", variant: "error" });
+      return;
+    }
+    if (optimizing) return;
+    setOptimizing(true);
+    const id = toast({ title: "润色中...", variant: "loading" });
+    try {
+      const res = await optimize3DPrompt({ text });
+      setPolishedText(res.text);
+      updateToast(id, { title: "润色完成", variant: "success" });
+    } catch (err: any) {
+      updateToast(id, {
+        title: "润色失败",
+        description: err?.message || "请求失败，请稍后重试",
+        variant: "error",
+      });
+    } finally {
+      setOptimizing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="relative">
-        <Textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="例如：一只戴着宇航员头盔的柯基犬，低多边形风格"
-          className="min-h-[140px] text-base bg-slate-50 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary resize-none pr-10 pb-10"
-          rows={5}
-        />
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                aria-label={value.trim() ? "润色内容" : "随机生成文本"}
-                className="absolute left-1.5 bottom-1.5 size-7 p-0 hover:text-primary text-primary/80"
-              >
-                <Star className="size-3.5" fill="currentColor" stroke="none" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="px-2 py-1 text-[10px]">
-              {value.trim() ? "润色内容" : "随机生成文本"}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+      <PromptTextarea
+        value={value}
+        onChange={onChange}
+        onOpenPolish={openPolish}
+      />
+      <PolishDialog
+        open={polishOpen}
+        onOpenChange={setPolishOpen}
+        sourceText={sourceText}
+        setSourceText={setSourceText}
+        polishedText={polishedText}
+        setPolishedText={setPolishedText}
+        optimizing={optimizing}
+        onOptimize={handleOptimize}
+        onApply={applyPolish}
+        toast={toast}
+      />
       <GenerationOptions
         action={action}
         onActionChange={onActionChange}

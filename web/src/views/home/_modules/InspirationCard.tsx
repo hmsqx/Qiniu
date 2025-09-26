@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Heart, Eye, Download, Loader2 } from "lucide-react";
-import type { Inspiration } from "./type";
+import type { Inspiration } from "../data/type";
 import { formatNumber } from "@/lib/utils";
 
 interface InspirationCardProps {
@@ -35,13 +35,19 @@ export function InspirationCard({ item }: InspirationCardProps) {
   const hasImage = !!item.image;
 
   return (
-    <Card className="group overflow-hidden rounded-xl border-none bg-transparent shadow-none transition">
-      <div className="relative aspect-[16/11] overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
+    <Card
+      className="group overflow-hidden rounded-xl border-none bg-transparent shadow-none transition"
+      style={{ contentVisibility: "auto", contain: "content" }}
+    >
+      <div className="relative aspect-square overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
         {hasImage ? (
           <img
             src={item.image}
             alt={item.title}
+            loading="lazy"
+            decoding="async"
             className="block h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02]"
+            style={{ willChange: "transform" }}
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-xs text-slate-400">
@@ -51,7 +57,6 @@ export function InspirationCard({ item }: InspirationCardProps) {
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-black/0 to-transparent opacity-0 transition group-hover:opacity-100" />
 
-        {/* Status Badge */}
         {item.status && (
           <div className="absolute left-3 top-3 z-20 flex items-center gap-1">
             <span
@@ -62,15 +67,13 @@ export function InspirationCard({ item }: InspirationCardProps) {
           </div>
         )}
 
-        {/* Views */}
-        <div className="absolute bottom-3 left-3 z-20 flex translate-y-1 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 opacity-0 shadow-sm ring-1 ring-slate-200 backdrop-blur transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="absolute bottom-3 left-3 z-20 flex translate-y-1 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 opacity-0 shadow-sm ring-1 ring-slate-200 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:backdrop-blur">
           <Eye className="h-4 w-4 text-slate-500" />
           <span>{formatNumber(views)}</span>
         </div>
 
-        {/* Downloads & Likes */}
         <div className="absolute bottom-3 right-3 z-20 flex translate-y-1 items-center gap-2 opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-          <div className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 shadow-sm ring-1 ring-slate-200 backdrop-blur">
+          <div className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 shadow-sm ring-1 ring-slate-200 group-hover:backdrop-blur">
             <Download className="h-4 w-4 text-slate-500" />
             <span>{formatNumber(item.downloadCount || 0)}</span>
           </div>

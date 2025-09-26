@@ -6,8 +6,8 @@ import { defineConfig, loadEnv } from "vite";
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd());
 
-  const proxyTarget = env.VITE_PROXY_TARGET || "http://8.155.35.99:8080";
-
+  const proxyTarget = env.VITE_PROXY_TARGET || "http://47.120.8.25:8080";
+  const proxyTarget2 = env.VITE_PROXY_TARGET2 || "http://8.155.35.99:8090";
   return defineConfig({
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -27,9 +27,13 @@ export default ({ mode }: { mode: string }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/model/, "models"),
         },
+        "/llm": {
+          target: proxyTarget2,
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/llm/, ""),
+        },
       },
     },
-
     define: {},
   });
 };
