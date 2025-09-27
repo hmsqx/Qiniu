@@ -33,3 +33,34 @@ export async function assessAndEnhanceImage(
 export default {
   assessAndEnhanceImage,
 };
+
+// ===== Pro/Admin: 多变体图片润色 =====
+export interface VipOptimizeParams {
+  image_base64: string; // 输入图片 base64（不含 data: 前缀）
+  num_variants?: number; // 生成变体数量，默认 1
+}
+
+export interface VipOptimizeImageItem {
+  variant_number: number;
+  image_base64: string; // 输出图片 base64（不含 data: 前缀）
+  success: boolean;
+  error?: string | null;
+}
+
+export interface VipOptimizeResponse {
+  success: boolean;
+  message?: string;
+  images: VipOptimizeImageItem[];
+  total_generated?: number;
+}
+
+/**
+ * Pro 专享：一次生成多张优化后的图片变体。
+ * POST /pro_pic/vip_optimize
+ */
+export async function vipOptimizeImages(
+  params: VipOptimizeParams
+): Promise<VipOptimizeResponse> {
+  const res = await post<VipOptimizeResponse>("/pro_pic/vip_optimize", params);
+  return res as VipOptimizeResponse;
+}

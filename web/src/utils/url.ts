@@ -25,8 +25,8 @@ export function toProxiedUrl(url?: string | null): string {
   if (!url) return "";
   try {
     const u = new URL(url, window.location.origin);
-    if (u.pathname.startsWith("/model/")) return u.pathname + (u.search || "");
-    return "/model" + u.pathname + (u.search || "");
+
+    return u.pathname + (u.search || "");
   } catch {
     return url || "";
   }

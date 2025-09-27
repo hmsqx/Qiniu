@@ -21,7 +21,7 @@ export default function HomePage({
   return (
     <main className=" mt-1">
       <div className="mx-auto">
-        <div className="flex px-2 gap-2 ">
+        <div className="flex px-4 gap-4 ">
           <FloatingImageZoom
             src={heroImage}
             className="h-[260px] md:h-[360px]"
@@ -32,9 +32,9 @@ export default function HomePage({
           />
         </div>
 
-        <section className="pt-4">
+        <section className="pt-4 pb-6 md:pb-8">
           <SectionHeader title="灵感广场" />
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 contain-paint">
+          <div className="px-4 grid grid-cols-2 gap-x-3  sm:gap-x-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 contain-paint">
             {items.map((item, idx) => (
               <InspirationCard key={`${item.jobId}-${idx}`} item={item} />
             ))}

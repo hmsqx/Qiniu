@@ -8,6 +8,7 @@ export default ({ mode }: { mode: string }) => {
 
   const proxyTarget = "http://47.120.8.25:8080";
   const proxyTarget2 = env.VITE_PROXY_TARGET2 || "http://47.120.8.25:8090";
+
   return defineConfig({
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -22,10 +23,9 @@ export default ({ mode }: { mode: string }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api/, ""),
         },
-        "/model": {
-          target: "http://8.155.35.99",
+        "/models": {
+          target: "http://47.120.8.25",
           changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/model/, "models"),
         },
         "/llm": {
           target: proxyTarget2,

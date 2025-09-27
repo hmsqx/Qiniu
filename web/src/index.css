@@ -230,7 +230,6 @@ html {
   scroll-behavior: auto;
 }
 
-/* Hide native number input spinners (utility class) */
 .input-no-spin::-webkit-outer-spin-button,
 .input-no-spin::-webkit-inner-spin-button {
   -webkit-appearance: none;

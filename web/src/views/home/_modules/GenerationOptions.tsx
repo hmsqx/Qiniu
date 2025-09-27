@@ -7,10 +7,6 @@ import {
 } from "@/components/ui/select";
 import { Info } from "lucide-react";
 
-export const ActionOptions = {
-  SubmitHunyuanTo3DJob: "2.5",
-} as const;
-
 type Props = {
   action: string;
   onActionChange: (v: string) => void;
@@ -26,7 +22,9 @@ export const GenerationOptions = ({
 }: Props) => {
   // Render label for current action
   const renderActionLabel = (a: string) => {
-    if (a === "SubmitHunyuanTo3DJob") return "3D生成-2.5";
+    if (a === "SubmitHunyuanTo3DRapidJob") return "小";
+    if (a === "SubmitHunyuanTo3DJob") return "标准";
+    if (a === "SubmitHunyuanTo3DProJob") return "专业";
     return a;
   };
 
@@ -37,7 +35,7 @@ export const GenerationOptions = ({
           选择模型
           <Info className="w-3 h-3 ml-1.5 text-muted-foreground" />
           <span className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-medium">
-            New
+            新
           </span>
         </label>
         <Select value={action} onValueChange={onActionChange}>
@@ -47,7 +45,9 @@ export const GenerationOptions = ({
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="SubmitHunyuanTo3DJob">3D生成-2.5</SelectItem>
+            <SelectItem value="SubmitHunyuanTo3DRapidJob">迷你</SelectItem>
+            <SelectItem value="SubmitHunyuanTo3DJob">标准</SelectItem>
+            <SelectItem value="SubmitHunyuanTo3DProJob">专业</SelectItem>
           </SelectContent>
         </Select>
       </div>

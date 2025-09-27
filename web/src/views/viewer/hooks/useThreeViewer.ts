@@ -49,7 +49,7 @@ export function useThreeViewer(
         if (/^(\.\.\/|\.\/|\/)/.test(inputUrl)) return inputUrl;
         const u = new URL(inputUrl, window.location.origin);
         if (u.hostname.endsWith("tencentcos.cn")) {
-          return "/model" + u.pathname + (u.search || "");
+          return u.pathname + (u.search || "");
         }
         return inputUrl;
       } catch {

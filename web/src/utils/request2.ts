@@ -6,7 +6,7 @@ const VITE_API_BASE =
 
 const instance: AxiosInstance = axios.create({
   baseURL: VITE_API_BASE,
-  timeout: 30000,
+  timeout: 180000,
   headers: {
     "Content-Type": "application/json",
   },
