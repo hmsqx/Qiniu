@@ -2,14 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { queryPublicModels } from "@/api/public";
 import type { QueryPublicModelsResult } from "@/api/public";
 import type { Inspiration } from "../data/type";
-import { buildAssetUrl } from "@/utils/asset";
 
 export interface UseInfinitePublicModelsOptions {
   pageSize?: number;
   enabled?: boolean;
-  /** Optional scroll container to observe; defaults to viewport */
   root?: Element | null;
-  /** Fallback scroll distance (px) from bottom to trigger loadMore when using custom root */
   fallbackScrollDistancePx?: number;
 }
 
@@ -25,35 +22,8 @@ export interface UseInfinitePublicModelsResult {
   observerRef: (el: HTMLElement | null) => void;
 }
 
-function mapToInspiration(item: any): Inspiration {
-  const imageRaw = item.imgUrl || item.previewImages || item.coverUrl || "";
-  const image = buildAssetUrl(imageRaw) || imageRaw || "";
-  const id = String(item.modelId || item.jobId || item.id || "");
-  const title = item.prompt || item.modelId || item.jobId || "模型";
-  const author =
-    item.username ||
-    (item.userId ? `User-${String(item.userId).slice(0, 6)}` : "Public");
-  return {
-    id,
-    title,
-    author,
-    tags: [item.resultFormat || "Model"],
-    image,
-    views:
-      typeof item.viewCount === "number"
-        ? item.viewCount
-        : Math.floor(2000 + Math.random() * 20000),
-    status: item.status,
-    downloadCount: item.downloadCount,
-    like: item.like,
-    resultFormat: item.resultFormat,
-    createTime: item.create_time,
-    userId: item.userId,
-    version: item.version,
-    isPrivate: item.Isprivate ?? item.isPrivate,
-    isLiked: !!item.islike,
-  };
-}
+// Backend already returns the desired shape; no transform necessary
+const mapToInspiration = (item: any): Inspiration => item as Inspiration;
 
 export function useInfinitePublicModels(
   opts: UseInfinitePublicModelsOptions = {}

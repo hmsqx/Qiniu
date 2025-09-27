@@ -2,15 +2,20 @@ import { FloatingImageZoom } from "./FloatingImageZoom";
 import { InspirationCard } from "./InspirationCard";
 import { SectionHeader } from "./SectionHeader";
 import { useInfinitePublicModels } from "../hooks/useInfinitePublicModels";
+import { EmptyState } from "../../workspace/_modules/workspace-gallery/components/Grid";
 
 const heroImage = "/homePage.jpg";
 
 export interface HomePageProps {
   scrollRoot?: Element | null;
+  emptyStateSize?: "normal" | "tall";
 }
 
-export default function HomePage({ scrollRoot }: HomePageProps) {
-  const { items, loading, loadingMore, hasMore, observerRef, error } =
+export default function HomePage({
+  scrollRoot,
+  emptyStateSize = "normal",
+}: HomePageProps) {
+  const { items, loading, loadingMore, hasMore, observerRef } =
     useInfinitePublicModels({ pageSize: 24, root: scrollRoot });
 
   return (
@@ -29,14 +34,9 @@ export default function HomePage({ scrollRoot }: HomePageProps) {
 
         <section className="pt-4">
           <SectionHeader title="灵感广场" />
-          {!!items.length && (
-            <div className="px-1 pb-2 text-xs text-slate-500">
-              共 {items.length} 个模型{loadingMore ? "，加载中…" : ""}
-            </div>
-          )}
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 contain-paint">
             {items.map((item, idx) => (
-              <InspirationCard key={`${item.id}-${idx}`} item={item} />
+              <InspirationCard key={`${item.jobId}-${idx}`} item={item} />
             ))}
             {loading &&
               items.length === 0 &&
@@ -48,16 +48,7 @@ export default function HomePage({ scrollRoot }: HomePageProps) {
               ))}
           </div>
           {!loading && items.length === 0 && (
-            <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl bg-slate-50 py-10 text-sm text-slate-500 dark:bg-slate-800/30">
-              {error ? (
-                <>
-                  <span>加载失败：{error}</span>
-                  <span className="text-xs text-slate-400">请稍后重试</span>
-                </>
-              ) : (
-                <span>暂无数据，去生成一些作品吧～</span>
-              )}
-            </div>
+            <EmptyState size={emptyStateSize} />
           )}
           <div ref={observerRef as any} className="h-4 mt-2" />
           {loadingMore && (

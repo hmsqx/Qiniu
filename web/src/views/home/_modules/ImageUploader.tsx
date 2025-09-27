@@ -92,48 +92,49 @@ export const ImageUploader = ({ onChange, onRegisterOpen }: Props) => {
       <div
         {...getRootProps()}
         className={cn(
-          "relative flex flex-col items-center justify-center w-full h-48",
-          "border-2 border-dashed rounded-xl cursor-pointer",
-          "bg-muted hover:bg-muted/80 transition-colors duration-200",
-          "group",
+          "relative flex flex-col items-center justify-center w-full h-44",
+          "border border-dashed rounded-2xl cursor-pointer",
+          "bg-muted/60 hover:bg-muted/70 transition-colors duration-200",
+          "shadow-sm hover:shadow-md ring-1 ring-border/50",
+          "transform transition-transform group",
           isDragActive || isDragOver
-            ? "border-primary bg-primary/10"
-            : "border-border hover:border-input"
+            ? "border-primary/60 bg-primary/[0.08] ring-primary/40"
+            : "border-border/70 hover:border-input"
         )}
       >
         <input {...getInputProps()} />
 
         <div
           className={cn(
-            "mb-3 p-3 rounded-full transition-all duration-200",
-            "bg-background border group-hover:border-input",
+            "mb-2.5 p-2 rounded-full transition-all duration-200",
+            "bg-background/80 backdrop-blur-sm border group-hover:border-input",
             isDragActive || isDragOver
-              ? "border-primary/30 bg-primary/10"
-              : "border-border"
+              ? "border-primary/40 bg-primary/10"
+              : "border-border/60"
           )}
         >
           <UploadCloud
             className={cn(
-              "h-8 w-8 transition-colors duration-200",
+              "h-6 w-6 transition-colors duration-200",
               isDragActive || isDragOver
                 ? "text-primary"
-                : "text-muted-foreground"
+                : "text-muted-foreground/80"
             )}
           />
         </div>
 
         {/* 文字内容 */}
-        <div className="text-center space-y-1">
+        <div className="text-center space-y-1.5">
           <p
             className={cn(
-              "font-medium transition-colors duration-200",
+              "font-medium text-sm transition-colors duration-200",
               isDragActive || isDragOver ? "text-primary" : "text-foreground"
             )}
           >
             {isDragActive ? "释放文件上传" : "拖拽或点击上传"}
           </p>
 
-          <div className="text-sm text-muted-foreground space-y-0.5">
+          <div className="text-xs text-muted-foreground/80 space-y-0.5">
             <p>支持 PNG / JPG / JPEG / WEBP 格式</p>
             <p>文件大小不超过 8MB（建议不超过6MB）</p>
             <p>单边分辨率要求：最小 128，最大 5000</p>
@@ -141,7 +142,7 @@ export const ImageUploader = ({ onChange, onRegisterOpen }: Props) => {
         </div>
       </div>
 
-      {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="mt-2 text-xs text-red-600/90">{error}</p> : null}
     </div>
   );
 };

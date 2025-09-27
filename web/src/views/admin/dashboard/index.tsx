@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
       <Card className="panel">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
           <div className="ml-8">
-            <CardTitle className="text-base">总访问量</CardTitle>
+            <CardTitle className="text-base">总使用量</CardTitle>
             <p className="text-xs text-muted-foreground">
               最近 {range === "14d" ? "14 天" : "7 天"}
             </p>

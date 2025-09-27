@@ -56,10 +56,10 @@ function StatePanel({
   );
 }
 
-export function EmptyState() {
+export function EmptyState({ size = "tall" }: { size?: "normal" | "tall" }) {
   return (
     <StatePanel
-      size="tall"
+      size={size}
       icon={<ImageOff className="h-7 w-7 text-slate-400 dark:text-slate-500" />}
       title="暂无数据"
       description={<p>暂无可展示内容，调整筛选或稍后点击刷新。</p>}
@@ -67,10 +67,16 @@ export function EmptyState() {
   );
 }
 
-export function ErrorState({ message }: { message: string }) {
+export function ErrorState({
+  message,
+  size = "tall",
+}: {
+  message: string;
+  size?: "normal" | "tall";
+}) {
   return (
     <StatePanel
-      size="tall"
+      size={size}
       tone="error"
       icon={<AlertTriangle className="h-7 w-7" />}
       title="加载出错"

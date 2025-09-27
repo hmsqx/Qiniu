@@ -98,7 +98,7 @@ const Viewer: React.FC = () => {
   }
 
   return (
-    <div ref={containerRef} className="w-full h-[calc(100vh-64px)] relative">
+    <div ref={containerRef} className="w-full h-[calc(100%-64px)] relative">
       <div className="absolute left-4 top-2 text-slate-300 text-sm bg-black/30 px-2 py-1 rounded">
         旋转: 拖拽 缩放: 滚轮 平移: 右键
       </div>

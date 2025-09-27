@@ -1,13 +1,4 @@
 import { get } from "@/utils/request";
-import { buildAssetUrl } from "@/utils/asset";
-
-export interface PublicModelItem {
-  modelId: string;
-  imgUrl?: string | null;
-  modelUrl?: string | null;
-  isPrivate: false;
-  raw?: any;
-}
 
 export interface QueryPublicModelsParams {
   pageNum: number;
@@ -15,48 +6,18 @@ export interface QueryPublicModelsParams {
 }
 
 export interface QueryPublicModelsResult {
-  list: PublicModelItem[];
+  list: any[];
   total: number;
 }
 
 function normalizeShowModel(resp: any): QueryPublicModelsResult {
   const data = resp?.data ?? resp;
 
-  const rawList: any[] = Array.isArray(data?.taskList)
-    ? data.taskList
-    : Array.isArray(data?.list)
-    ? data.list
-    : Array.isArray(data?.models)
-    ? data.models
-    : [];
+  const rawList: any[] = Array.isArray(data?.list) ? data.list : [];
+  const list: any[] = rawList;
 
-  const list: PublicModelItem[] = rawList.map((t: any) => {
-    const id = t.modelId || t.jobId || t.id;
-    const modelFiles = Array.isArray(t.modelList)
-      ? t.modelList
-      : Array.isArray(t.files)
-      ? t.files
-      : [];
-    const firstFile = modelFiles[0];
-    return {
-      modelId: String(id ?? ""),
-      imgUrl: t.previewImages || t.imgUrl || t.coverUrl || null,
-      modelUrl: buildAssetUrl(
-        firstFile?.fileUrl || firstFile?.url || t.modelUrl || undefined
-      ),
-      isPrivate: false,
-      raw: t,
-    };
-  });
-
-  const total =
-    Number(
-      data?.pageInfo?.totalCount ??
-        data?.total ??
-        data?.totalCount ??
-        list.length
-    ) || list.length;
-
+  const total = Number(data?.pageInfo?.totalCount);
+  console.log(list, total);
   return { list, total };
 }
 

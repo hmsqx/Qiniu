@@ -30,7 +30,6 @@ const AdminUsers: React.FC = () => {
     email: string;
     role: string;
   }) => {
-    // 搜索或重置后也属于列表跳转，使用骨架屏
     setPaging(true);
     setUsername(s.username);
     setEmail(s.email);
@@ -39,7 +38,6 @@ const AdminUsers: React.FC = () => {
     setPage(1);
   };
 
-  // 当加载结束后，关闭分页中的骨架屏
   React.useEffect(() => {
     if (!loading && paging) setPaging(false);
   }, [loading, paging]);

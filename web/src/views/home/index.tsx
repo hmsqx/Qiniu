@@ -8,7 +8,7 @@ const Home = () => {
     setScrollRootEl(el);
   }, []);
   return (
-    <div className="flex gap-2 h-screen overflow-hidden pt-2">
+    <div className="flex gap-2 h-full overflow-hidden pt-2">
       <div className="flex-1 h-full overflow-hidden">
         <GeneratorTabs />
       </div>

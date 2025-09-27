@@ -188,7 +188,7 @@ export default function WorkspaceGallery() {
   }, [selectionMode]);
 
   return (
-    <div className="p-4 sm:p-6  text-white min-h-screen overflow-y-auto no-scrollbar">
+    <div className="p-4 sm:p-6  text-white min-h-full overflow-y-auto no-scrollbar">
       <Toolbar
         loading={loading || bulkLoading}
         onRefresh={refresh}
