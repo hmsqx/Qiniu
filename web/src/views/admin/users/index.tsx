@@ -1,6 +1,6 @@
 import React from "react";
 import { useUsers } from "./hooks/useUsers";
-import { Pagination } from "@/views/workspace/_modules/workspace-gallery/components/Pagination";
+import { Pagination } from "@/views/workspace/_modules/Pagination";
 import { Filters } from "./_modules/Filters";
 import { UsersTable } from "./_modules/UsersTable";
 

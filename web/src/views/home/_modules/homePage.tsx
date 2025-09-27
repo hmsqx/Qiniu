@@ -2,7 +2,7 @@ import { FloatingImageZoom } from "./FloatingImageZoom";
 import { InspirationCard } from "./InspirationCard";
 import { SectionHeader } from "./SectionHeader";
 import { useInfinitePublicModels } from "../hooks/useInfinitePublicModels";
-import { EmptyState } from "../../workspace/_modules/workspace-gallery/components/Grid";
+import { EmptyState } from "../../workspace/_modules/Grid";
 
 const heroImage = "/homePage.jpg";
 

@@ -11,6 +11,7 @@ import { Navigate } from "react-router-dom";
 const AdminLayout = lazy(() => import("@/layout/AdminLayout"));
 const Admin = lazy(() => import("@/views/admin/dashboard"));
 const AdminUsers = lazy(() => import("@/views/admin/users"));
+const AdminModels = lazy(() => import("@/views/admin/models"));
 const Workspace = lazy(() => import("@/views/workspace"));
 const Viewer = lazy(() => import("@/views/viewer"));
 
@@ -114,6 +115,17 @@ const router = createBrowserRouter([
                 <Suspense fallback={<LoadingSkeleton variant="panel" />}>
                   {" "}
                   <AdminUsers />{" "}
+                </Suspense>
+              </ErrorBoundary>
+            ),
+          },
+          {
+            path: "models",
+            element: (
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton variant="panel" />}>
+                  {" "}
+                  <AdminModels />{" "}
                 </Suspense>
               </ErrorBoundary>
             ),
