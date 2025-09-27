@@ -22,7 +22,7 @@ export const GenerationOptions = ({
 }: Props) => {
   // Render label for current action
   const renderActionLabel = (a: string) => {
-    if (a === "SubmitHunyuanTo3DRapidJob") return "小";
+    if (a === "SubmitHunyuanTo3DRapidJob") return "快速";
     if (a === "SubmitHunyuanTo3DJob") return "标准";
     if (a === "SubmitHunyuanTo3DProJob") return "专业";
     return a;
@@ -45,7 +45,7 @@ export const GenerationOptions = ({
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="SubmitHunyuanTo3DRapidJob">迷你</SelectItem>
+            <SelectItem value="SubmitHunyuanTo3DRapidJob">快速</SelectItem>
             <SelectItem value="SubmitHunyuanTo3DJob">标准</SelectItem>
             <SelectItem value="SubmitHunyuanTo3DProJob">专业</SelectItem>
           </SelectContent>

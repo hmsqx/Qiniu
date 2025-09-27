@@ -26,7 +26,7 @@ export function JobCard({
   toggling,
 }: JobCardProps) {
   const rawStatus = (item.status || "").toUpperCase();
-  const isDone = rawStatus === "DONE";
+  const isDone = rawStatus === "DONE" || rawStatus === "SUCCEED";
   const isProcessing =
     rawStatus === "RUN" || rawStatus === "WAITING" || rawStatus === "QUEUE";
   const hasPreview = !!item.imgUrl;

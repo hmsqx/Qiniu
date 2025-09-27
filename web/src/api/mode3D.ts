@@ -15,7 +15,6 @@ export interface JobItem {
   imgUrl?: string | null;
   modelUrl?: string | null;
   isPrivate?: boolean;
-  // 后端在某些失败状态下返回的错误信息（例如 QUERY_FAILED）
   errorMsg?: string;
 }
 
@@ -42,22 +41,14 @@ function normalize(resp: any): QueryJobsResult {
     const status = raw as RawJobStatus;
     return {
       jobId: String(t.jobId || t.jobId),
-      status,
+      status: raw === "DONE" || raw === "SUCCEED" ? "DONE" : status,
       imgUrl: t.previewImages,
       modelUrl: buildAssetUrl(
         Array.isArray(t.modelList) && t.modelList.length > 0
           ? t.modelList[0].fileUrl || t.modelList[0].fileUrl
           : undefined
       ),
-      // 兼容大小写不同的字段（后端示例返回为 Isprivate）
-      isPrivate:
-        typeof t.isPrivate === "boolean"
-          ? t.isPrivate
-          : typeof t.Isprivate === "boolean"
-          ? t.Isprivate
-          : typeof t.isprivate === "boolean"
-          ? t.isprivate
-          : undefined,
+      isPrivate: t.Isprivate,
       errorMsg: typeof t.errorMsg === "string" ? t.errorMsg : undefined,
     };
   });

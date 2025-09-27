@@ -103,7 +103,6 @@ export async function listAdminModels(
   if (typeof maxLike === "number") query.maxLike = maxLike;
   if (typeof minDownload === "number") query.minDownload = minDownload;
   if (typeof maxDownload === "number") query.maxDownload = maxDownload;
-  // model format filter removed as per requirements
 
   const resp = await get<any>(REAL_ENDPOINT, { params: query });
   return normalize(resp, page, pageSize);
