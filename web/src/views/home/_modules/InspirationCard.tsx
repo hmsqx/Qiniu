@@ -3,24 +3,41 @@ import { Card } from "@/components/ui/card";
 import { Heart, Eye, Download, Loader2 } from "lucide-react";
 import type { Inspiration } from "../data/type";
 import { formatNumber } from "@/lib/utils";
+import { likeModel } from "@/api/like";
+import { useToast } from "@/components/ui/use-toast";
 
 interface InspirationCardProps {
   item: Inspiration;
 }
 
 export function InspirationCard({ item }: InspirationCardProps) {
+  const { toast } = useToast();
   const [liked, setLiked] = useState(!!item.isLiked);
+  const [likeSubmitting, setLikeSubmitting] = useState(false);
   const [popping, setPopping] = useState(false);
-  const views = useMemo(
-    () => item.views ?? Math.floor(3000 + Math.random() * 20000),
-    [item.views]
-  );
 
-  const onLike = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const onLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setLiked((v) => !v);
+    if (likeSubmitting) return;
+    const nextLiked = !liked;
+    setLiked(nextLiked);
     setPopping(true);
     setTimeout(() => setPopping(false), 180);
+
+    try {
+      setLikeSubmitting(true);
+      const id = item.id;
+      await likeModel(id);
+    } catch (err: any) {
+      setLiked((v) => !v);
+      toast({
+        title: "操作失败",
+        description: err?.message || "点赞失败，请稍后重试",
+        variant: "error",
+      });
+    } finally {
+      setLikeSubmitting(false);
+    }
   };
 
   const hasImage = !!item.image;
@@ -47,19 +64,12 @@ export function InspirationCard({ item }: InspirationCardProps) {
           </div>
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-black/0 to-transparent opacity-0 transition group-hover:opacity-100" />
-
-        {/* status badge removed per request */}
-
         <div className="absolute bottom-3 left-3 z-20 flex translate-y-1 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 opacity-0 shadow-sm ring-1 ring-slate-200 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:backdrop-blur">
-          <Eye className="h-4 w-4 text-slate-500" />
-          <span>{formatNumber(views)}</span>
+          <Download className="h-4 w-4 text-slate-500" />
+          <span>{formatNumber(item.downloadCount || 0)}</span>
         </div>
 
         <div className="absolute bottom-3 right-3 z-20 flex translate-y-1 items-center gap-2 opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-          <div className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 shadow-sm ring-1 ring-slate-200 group-hover:backdrop-blur">
-            <Download className="h-4 w-4 text-slate-500" />
-            <span>{formatNumber(item.downloadCount || 0)}</span>
-          </div>
           <button
             type="button"
             aria-label={liked ? "取消点赞" : "点赞"}
@@ -73,9 +83,11 @@ export function InspirationCard({ item }: InspirationCardProps) {
               className="h-4 w-4 stroke-[2px] text-rose-500"
               style={{ fill: liked ? "currentColor" : "none" }}
             />
-            {!!item.like && (
+            {(item.like || liked) && (
               <span className="absolute -bottom-1 -right-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-medium text-white">
-                {formatNumber(item.like)}
+                {formatNumber(
+                  (item.like || 0) + (liked && !item.isLiked ? 1 : 0)
+                )}
               </span>
             )}
           </button>
