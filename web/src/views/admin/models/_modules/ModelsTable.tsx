@@ -38,9 +38,48 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
   baseIndex = 0,
 }) => {
   const skeletonRows = 10;
+  const renderPrivBadge = (val: boolean | undefined) => {
+    if (val === undefined)
+      return <span className="text-muted-foreground">-</span>;
+    const cls = val
+      ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+      : "bg-green-500/15 border-green-500/30 text-green-400";
+    return (
+      <span
+        className={
+          "inline-flex items-center rounded-full border px-2 py-0.5 text-xs " +
+          cls
+        }
+      >
+        {val ? "私有" : "公有"}
+      </span>
+    );
+  };
+
+  const renderStatusBadge = (status?: string) => {
+    if (!status) return <span className="text-muted-foreground">-</span>;
+    const t = String(status).toUpperCase();
+    let cls = "bg-muted/20 border-muted text-foreground";
+    if (["SUCCEED", "SUCCESS", "DONE", "COMPLETED"].includes(t))
+      cls = "bg-emerald-500/15 border-emerald-500/30 text-emerald-400";
+    else if (["FAILED", "ERROR", "CANCELED"].includes(t))
+      cls = "bg-rose-500/15 border-rose-500/30 text-rose-400";
+    else if (["RUNNING", "PROCESSING", "PENDING", "QUEUED"].includes(t))
+      cls = "bg-sky-500/15 border-sky-500/30 text-sky-400";
+    return (
+      <span
+        className={
+          "inline-flex items-center rounded-full border px-2 py-0.5 text-xs " +
+          cls
+        }
+      >
+        {status}
+      </span>
+    );
+  };
   return (
     <div
-      className="overflow-auto rounded-lg border relative min-h-[380px]"
+      className="overflow-auto rounded-lg border relative min-h-[460px]"
       aria-busy={loading}
       aria-live="polite"
     >
@@ -70,7 +109,7 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
                   <div className="h-4 w-40 rounded bg-muted/40 animate-pulse" />
                 </TableCell>
                 <TableCell>
-                  <div className="h-[64px] w-[64px] rounded bg-muted/40 animate-pulse" />
+                  <div className="h-[80px] w-[80px] rounded bg-muted/40 animate-pulse" />
                 </TableCell>
                 <TableCell>
                   <div className="h-4 w-12 rounded bg-muted/40 animate-pulse" />
@@ -113,29 +152,17 @@ export const ModelsTable: React.FC<ModelsTableProps> = ({
                   <img
                     src={m.previewImages}
                     alt={String(m.name)}
-                    className="h-[64px] w-[64px] object-cover rounded border"
+                    className="h-[80px] w-[80px] object-cover rounded border"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="h-[64px] w-[64px] rounded bg-muted" />
+                  <div className="h-[80px] w-[80px] rounded bg-muted" />
                 )}
               </TableCell>
               <TableCell className="text-xs">{m.like ?? 0}</TableCell>
               <TableCell className="text-xs">{m.downloadCount ?? 0}</TableCell>
-              <TableCell>
-                <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs">
-                  {m.isPrivate === undefined
-                    ? "-"
-                    : m.isPrivate
-                    ? "私有"
-                    : "公有"}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs">
-                  {m.status || "-"}
-                </span>
-              </TableCell>
+              <TableCell>{renderPrivBadge(m.isPrivate)}</TableCell>
+              <TableCell>{renderStatusBadge(m.status)}</TableCell>
               <TableCell className="text-xs text-muted-foreground">
                 {new Date(m.createdAt).toLocaleString()}
               </TableCell>

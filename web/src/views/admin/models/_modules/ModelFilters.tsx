@@ -65,7 +65,7 @@ export const ModelFilters: React.FC<ModelFiltersProps> = ({
                 placeholder="最小点赞"
                 value={minLike}
                 onChange={(e) => setMinLike(e.target.value)}
-                className="w-[120px]"
+                className="w-[120px] input-no-spin"
                 min={0}
               />
               <span className="text-muted-foreground">-</span>
@@ -74,7 +74,7 @@ export const ModelFilters: React.FC<ModelFiltersProps> = ({
                 placeholder="最大点赞"
                 value={maxLike}
                 onChange={(e) => setMaxLike(e.target.value)}
-                className="w-[120px]"
+                className="w-[120px] input-no-spin"
                 min={0}
               />
             </div>
@@ -84,7 +84,7 @@ export const ModelFilters: React.FC<ModelFiltersProps> = ({
                 placeholder="最小下载"
                 value={minDownload}
                 onChange={(e) => setMinDownload(e.target.value)}
-                className="w-[120px]"
+                className="w-[120px] input-no-spin"
                 min={0}
               />
               <span className="text-muted-foreground">-</span>
@@ -93,7 +93,7 @@ export const ModelFilters: React.FC<ModelFiltersProps> = ({
                 placeholder="最大下载"
                 value={maxDownload}
                 onChange={(e) => setMaxDownload(e.target.value)}
-                className="w-[120px]"
+                className="w-[120px] input-no-spin"
                 min={0}
               />
             </div>
