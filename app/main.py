@@ -1,84 +1,66 @@
 from fastapi import FastAPI, HTTPException
-from typing import List
 from datetime import datetime
 import os
-from pydantic import BaseModel
-from typing import Optional, List
 from contextlib import asynccontextmanager
 import sys
-from pathlib import Path
-
-# 获取当前文件（main.py）的绝对路径
-current_file = Path(__file__).resolve()
-project_root = current_file.parent.parent.parent  # 核心：调整到正确的根目录
+from typing import Dict
 
 # 将项目根目录添加到 Python 搜索路径
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if str(project_root) not in sys.path:
     sys.path.append(str(project_root))
 
-# 改用绝对导入（基于项目根目录）
+from app.body import Text3DOptimizationRequest, Text3DOptimizationResponse, \
+    ImageRequest, QualityResponse, ImageOptimizeRequest, ImageOptimizeResponse
+
 from app.txt_pro.models.qwen import QwenLLMClient, logger
 from app.txt_pro.models.txt_optimizer import Text3DPromptOptimizer
 from app.txt_pro.utils import load_env
+
+from app.img_pro.models.quality_assessor import ImageQualityAssessor
+from app.img_pro.models.image_enhancer import ImageEnhancer
+from app.img_pro.utils.image_utils import base64_to_image, image_to_base64, resize_image
+from app.img_pro.config import settings
+from app.img_pro.models.qwen_imge_editor import Qwen3DOptimizer
 env = load_env(os.path.join(os.path.dirname(__file__), "api.env"))
-
-# 请求数据模型
-class Text3DOptimizationRequest(BaseModel):
-    text: str  # 用户输入的原始文本（可能很简单或空白）
-    style: Optional[str] = "realistic"  # 3D风格：realistic, cartoon, abstract, sci-fi等
-    detail_level: Optional[str] = "medium"  # 细节程度：low, medium, high
-    scene_type: Optional[str] = "object"  # 场景类型：object, character, environment, architecture
-    max_tokens: Optional[int] = 800
-    temperature: Optional[float] = 0.9  # 创意度更高
-
-# 响应数据模型
-class Text3DOptimizationResponse(BaseModel):
-    original_text: str  # 原始输入文本
-    optimized_prompt: str  # 优化后的3D提示词
-    enhanced_prompt: str  # 增强版提示词（包含技术参数）
-    style: str  # 使用的风格
-    suggestions: List[str]  # 额外建议
-    technical_tags: List[str]  # 技术标签
-    timestamp: str
-    success: bool
-
-
-
-
 
 
 
 # 全局变量：初始化服务
 qwen_client = None
 text_3d_optimizer = None
+quality_assessor = None
+image_enhancer = None
+optimizer = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用启动时初始化服务"""
-    global qwen_client, text_3d_optimizer
-    
+    global qwen_client, text_3d_optimizer,quality_assessor, image_enhancer
+    global optimizer
     try:
-        # 初始化千问客户端
-        qwen_client = QwenLLMClient(model="qwen-plus", env=env)
         
-        # 初始化3D提示词优化器
-        text_3d_optimizer = Text3DPromptOptimizer(qwen_client)
-        
+        qwen_client = QwenLLMClient(model="qwen-plus", env=env)  # 初始化千问客户端
+        text_3d_optimizer = Text3DPromptOptimizer(qwen_client)  # 初始化3D提示词优化器
         logger.info("文生3D提示词优化服务启动成功！")
         logger.info(f"当前使用模型: {qwen_client.get_model_info()}")
+        quality_assessor = ImageQualityAssessor()
+        image_enhancer = ImageEnhancer()
+        logger.info("图片修复优化服务启动成功！")
+        optimizer = Qwen3DOptimizer(env["DASHSCOPE_API_KEY"])
+        logger.info("vip图片修复服务启动成功！")
         
     except Exception as e:
         logger.error(f"服务启动失败: {str(e)}")
         raise
-    print("启动文生3D提示词优化服务...")
     yield  # yield之后是服务运行中，yield之前是startup，之后是shutdown
 
 
 
 app = FastAPI(
-    title="创意模式",
-    description="文生3D提示词优化API",
-    version="1.0.0",
+    title="增强模式",
+    description="输入增强优化API",
+    version="5.0.0",
     lifespan=lifespan
 )
 
@@ -86,20 +68,9 @@ app = FastAPI(
 @app.get("/")
 async def root():
     """根路径，返回API信息"""
-    model_info = qwen_client.get_model_info() if qwen_client else {"model": "未初始化"}
-    
     return {
-        "message": "文生3D提示词优化API服务",
-        "version": "2.0.0",
-        "status": "running",
-        "description": "基于阿里云千问大模型的专业3D提示词优化服务",
-        "model_info": model_info,
-        "capabilities": [
-            "空白输入智能补全",
-            "简单描述专业增强", 
-            "多风格适配优化",
-            "技术参数自动添加"
-        ]
+        "message": "增强优化API服务",
+        "version": "5.0.0",
     }
 
 @app.post("/pro_txt/optimize-3d-prompt", response_model=Text3DOptimizationResponse)
@@ -134,8 +105,6 @@ async def optimize_3d_prompt(request: Text3DOptimizationRequest):
             optimized_prompt=optimization_result["optimized_prompt"],
             enhanced_prompt=optimization_result["enhanced_prompt"],
             style=request.style,
-            suggestions=optimization_result["suggestions"],
-            technical_tags=optimization_result["technical_tags"],
             timestamp=datetime.now().isoformat(),
             success=True
         )
@@ -292,19 +261,143 @@ async def quick_enhance_empty_prompt(
     except Exception as e:
         logger.error(f"快速增强失败: {str(e)}")
         raise HTTPException(status_code=500, detail=f"快速增强失败: {str(e)}")
+# <<<<
 
+@app.post("/pro_pic/assess_and_enhance", response_model=QualityResponse)
+async def assess_and_enhance_image(request: ImageRequest):
+    """
+    图像质量评估与优化主接口
+    """
+    try:
+        # 解码图像
+        image = base64_to_image(request.image)
+        
+        # 调整图像大小
+        image = resize_image(image, settings.MAX_IMAGE_SIZE)
+        
+        # 初始质量评估
+        quality_scores = quality_assessor.assess_quality(image)
+        overall_score = quality_scores['overall']
+        
+        logger.info(f"Initial quality score: {overall_score:.3f}")
+        
+        enhanced_image = None
+        iterations = 0
+        current_image = image.copy()
+        
+        # 如果质量不达标，进行优化
+        if overall_score < request.threshold:
+            logger.info(f"Quality below threshold {request.threshold}, starting enhancement...")
+            
+            for i in range(request.max_iterations):
+                iterations = i + 1
+                
+                # 图像增强
+                current_image = image_enhancer.enhance_image(current_image, quality_scores)
+                
+                # 重新评估质量
+                new_quality_scores = quality_assessor.assess_quality(current_image)
+                new_overall_score = new_quality_scores['overall']
+                
+                logger.info(f"Enhancement iteration {iterations}: score {new_overall_score:.3f}")
+                
+                # 如果质量达标或没有显著提升，停止优化
+                if new_overall_score >= request.threshold or \
+                   (new_overall_score - overall_score) < 0.05:
+                    quality_scores = new_quality_scores
+                    overall_score = new_overall_score
+                    break
+                
+                quality_scores = new_quality_scores
+                overall_score = new_overall_score
+            
+            # 转换增强后的图像为base64
+            enhanced_image = image_to_base64(current_image)
+        
+        return QualityResponse(
+            overall_score=overall_score,
+            detailed_scores=quality_scores,
+            needs_enhancement=overall_score < request.threshold,
+            enhanced_image=enhanced_image,
+            enhancement_iterations=iterations,
+            success=True,
+            message=f"Processing completed. Final score: {overall_score:.3f}"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error processing image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.post("/pro_pic/assess_only", response_model=Dict[str, float])
+async def assess_image_quality(request: ImageRequest):
+    """
+    仅进行图像质量评估
+    """
+    try:
+        # 解码图像
+        image = base64_to_image(request.image)
+        
+        # 调整图像大小
+        image = resize_image(image, settings.MAX_IMAGE_SIZE)
+        
+        # 质量评估
+        quality_scores = quality_assessor.assess_quality(image)
+        
+        return quality_scores
+        
+    except Exception as e:
+
+        logger.error(f"Error assessing image quality: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+# >>>>
+
+# <<< vip 图片优化接口
+@app.post("/pro_pic/vip_optimize", response_model=ImageOptimizeResponse)
+async def optimize_image_endpoint(request: ImageOptimizeRequest):
+    """图像优化接口 - 自动应用所有策略"""
+    if not optimizer:
+        raise HTTPException(status_code=500, detail="优化器未初始化")
+    
+    # 验证参数
+    if not request.image_base64:
+        raise HTTPException(status_code=400, detail="图像base64不能为空")
+    
+    if request.num_variants < 1 or request.num_variants > 10:
+        raise HTTPException(status_code=400, detail="变体数量必须在1-10之间")
+    
+    try:
+        # 执行优化
+        optimized_images = await optimizer.optimize_image(
+            image_base64=request.image_base64,
+            num_variants=request.num_variants
+        )
+        
+        # 统计成功数量
+        successful_count = len([img for img in optimized_images if img.success])
+        
+        return ImageOptimizeResponse(
+            success=successful_count > 0,
+            message=f"已自动应用所有3D优化策略，成功生成 {successful_count}/{request.num_variants} 个优化变体",
+            images=optimized_images,
+            total_generated=successful_count
+        )
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"优化失败: {str(e)}")
+# <<< 
 
 if __name__ == "__main__":
     import uvicorn
     
     # 确保环境变量设置提醒
-    if not os.getenv("DASHSCOPE_API_KEY"):
+    if not os.getenv("DASHSCOPE_API_KEY") and not env.get("DASHSCOPE_API_KEY"):
         print("警告: 请设置 DASHSCOPE_API_KEY 环境变量")
-        print("   export DASHSCOPE_API_KEY=your-api-key")
     
     print("启动文生3D提示词优化服务...")
     uvicorn.run(
-        "main_txt:app",
+        "app.main:app",
         host="0.0.0.0",
         port=8090,
         reload=True,

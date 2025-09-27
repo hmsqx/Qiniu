@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("AugmentService")
 class QwenLLMClient:
     """千问大模型客户端封装类"""
     

@@ -2,8 +2,6 @@
 import cv2
 import numpy as np
 from typing import Dict
-# from skimage import feature, measure, filters
-# from skimage.color import rgb2gray
 
 class ImageQualityAssessor:
     """图像质量评估器"""
