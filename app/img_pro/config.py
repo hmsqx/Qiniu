@@ -10,10 +10,8 @@ class Settings(BaseSettings):
     
     # 图像处理参数
     MAX_IMAGE_SIZE: int = 2048
-    MIN_IMAGE_SIZE: int = 256
+    MIN_IMAGE_SIZE: int = 2048
     
-    # 模型权重路径（如果使用预训练模型）
-    MODEL_WEIGHTS_PATH: str = "./weights"
     
     class Config:
         env_file = ".env"
