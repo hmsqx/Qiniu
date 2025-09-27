@@ -1,5 +1,4 @@
 import { ImageUploader } from "./ImageUploader";
-import type { ImageUploaderHandle } from "./ImageUploader";
 import { GenerationOptions } from "./GenerationOptions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +22,7 @@ export const ImageTo3DTab = ({
   format,
   onFormatChange,
 }: Props) => {
-  const uploaderRef = useRef<ImageUploaderHandle | null>(null);
+  const openFileDialogRef = useRef<null | (() => void)>(null);
   const [imgSize, setImgSize] = useState<{ w: number; h: number } | null>(null);
 
   useEffect(() => {
@@ -53,8 +52,8 @@ export const ImageTo3DTab = ({
   return (
     <div className="space-y-6">
       <ImageUploader
-        ref={uploaderRef}
         onChange={(b) => onChangeImageBase64(b)}
+        onRegisterOpen={(open) => (openFileDialogRef.current = open)}
       />
 
       {imageBase64 ? (
@@ -97,7 +96,7 @@ export const ImageTo3DTab = ({
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => uploaderRef.current?.openFileDialog()}
+                  onClick={() => openFileDialogRef.current?.()}
                 >
                   重新选择
                 </Button>

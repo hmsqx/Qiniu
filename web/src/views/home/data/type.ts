@@ -13,4 +13,5 @@ export interface Inspiration {
   userId?: string;
   version?: string;
   isPrivate?: boolean;
+  isLiked?: boolean; // server-side liked state (islike)
 }

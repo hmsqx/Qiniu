@@ -9,13 +9,6 @@ interface LoadingSkeletonProps {
   className?: string;
 }
 
-/**
- * 通用加载骨架：用于 Suspense fallback。
- * variant:
- *  - page: 较大页面块
- *  - panel: 卡片/面板区域
- *  - compact: 小区域/列表项
- */
 const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   lines,
   variant = "panel",

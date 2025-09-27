@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { queryPublicModels } from "@/api/public";
 import type { QueryPublicModelsResult } from "@/api/public";
 import type { Inspiration } from "../data/type";
+import { buildAssetUrl } from "@/utils/asset";
 
 export interface UseInfinitePublicModelsOptions {
   pageSize?: number;
@@ -25,14 +26,23 @@ export interface UseInfinitePublicModelsResult {
 }
 
 function mapToInspiration(item: any): Inspiration {
-  const image = item.imgUrl || item.previewImages || item.coverUrl || "";
+  const imageRaw = item.imgUrl || item.previewImages || item.coverUrl || "";
+  const image = buildAssetUrl(imageRaw) || imageRaw || "";
+  const id = String(item.modelId || item.jobId || item.id || "");
+  const title = item.prompt || item.modelId || item.jobId || "模型";
+  const author =
+    item.username ||
+    (item.userId ? `User-${String(item.userId).slice(0, 6)}` : "Public");
   return {
-    id: String(item.modelId || item.jobId || item.id || ""),
-    title: item.modelId || item.jobId || "模型",
-    author: item.userId ? `User-${String(item.userId).slice(0, 6)}` : "Public",
+    id,
+    title,
+    author,
     tags: [item.resultFormat || "Model"],
     image,
-    views: Math.floor(2000 + Math.random() * 20000),
+    views:
+      typeof item.viewCount === "number"
+        ? item.viewCount
+        : Math.floor(2000 + Math.random() * 20000),
     status: item.status,
     downloadCount: item.downloadCount,
     like: item.like,
@@ -40,7 +50,8 @@ function mapToInspiration(item: any): Inspiration {
     createTime: item.create_time,
     userId: item.userId,
     version: item.version,
-    isPrivate: item.Isprivate,
+    isPrivate: item.Isprivate ?? item.isPrivate,
+    isLiked: !!item.islike,
   };
 }
 
@@ -75,7 +86,7 @@ export function useInfinitePublicModels(
           pageSize,
         });
         totalRef.current = res.total;
-        const mapped = res.list.map(mapToInspiration);
+        const mapped = res.list.map((i: any) => mapToInspiration(i.raw ?? i));
 
         setItems((prev) => {
           const next = append ? [...prev, ...mapped] : mapped;

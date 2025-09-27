@@ -23,17 +23,42 @@ const AdminUsers: React.FC = () => {
     setRole,
     setPage,
   } = useUsers();
+  const [paging, setPaging] = React.useState(false);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const handleApply = (s: {
     username: string;
     email: string;
     role: string;
   }) => {
+    // 搜索或重置后也属于列表跳转，使用骨架屏
+    setPaging(true);
     setUsername(s.username);
     setEmail(s.email);
     setRole(s.role);
     setKeyword("");
     setPage(1);
+  };
+
+  // 当加载结束后，关闭分页中的骨架屏
+  React.useEffect(() => {
+    if (!loading && paging) setPaging(false);
+  }, [loading, paging]);
+
+  const handlePrev = () => {
+    if (page > 1) {
+      setPaging(true);
+      prevPage();
+    }
+  };
+  const handleNext = () => {
+    if (page < totalPages) {
+      setPaging(true);
+      nextPage();
+    }
+  };
+  const handleJump = (p: number) => {
+    setPaging(true);
+    setPage(p);
   };
 
   return (
@@ -45,16 +70,21 @@ const AdminUsers: React.FC = () => {
         onRefresh={refresh}
       />
 
-      <UsersTable list={list} loading={loading} />
+      <UsersTable
+        list={list}
+        loading={loading}
+        forceSkeleton={paging}
+        baseIndex={(page - 1) * pageSize}
+      />
       <div className="mt-4">
         <Pagination
           total={total}
           pageNum={page}
           totalPages={totalPages}
           loading={loading}
-          onPrev={prevPage}
-          onNext={nextPage}
-          onJump={(p) => setPage(p)}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          onJump={handleJump}
         />
       </div>
     </div>

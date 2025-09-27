@@ -9,7 +9,7 @@ interface InspirationCardProps {
 }
 
 export function InspirationCard({ item }: InspirationCardProps) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(!!item.isLiked);
   const [popping, setPopping] = useState(false);
   const views = useMemo(
     () => item.views ?? Math.floor(3000 + Math.random() * 20000),
@@ -22,15 +22,6 @@ export function InspirationCard({ item }: InspirationCardProps) {
     setPopping(true);
     setTimeout(() => setPopping(false), 180);
   };
-
-  const statusColor =
-    item.status === "SUCCEED"
-      ? "bg-emerald-500"
-      : item.status === "PROCESSING"
-      ? "bg-amber-500"
-      : item.status === "FAILED"
-      ? "bg-rose-500"
-      : "bg-slate-400";
 
   const hasImage = !!item.image;
 
@@ -57,15 +48,7 @@ export function InspirationCard({ item }: InspirationCardProps) {
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-black/0 to-transparent opacity-0 transition group-hover:opacity-100" />
 
-        {item.status && (
-          <div className="absolute left-3 top-3 z-20 flex items-center gap-1">
-            <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white shadow-sm ${statusColor}`}
-            >
-              {item.status}
-            </span>
-          </div>
-        )}
+        {/* status badge removed per request */}
 
         <div className="absolute bottom-3 left-3 z-20 flex translate-y-1 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[11px] text-slate-700 opacity-0 shadow-sm ring-1 ring-slate-200 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 group-hover:backdrop-blur">
           <Eye className="h-4 w-4 text-slate-500" />

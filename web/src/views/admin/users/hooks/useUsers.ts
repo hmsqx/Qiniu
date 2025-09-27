@@ -9,7 +9,7 @@ export function useUsers() {
 
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [keyword, setKeyword] = useState(""); // 兼容旧逻辑（未使用单独字段时）
+  const [keyword, setKeyword] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");

@@ -1,0 +1,277 @@
+import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
+
+export type ThreeViewerOptions = {
+  url: string | null;
+  format: string;
+  isVideo: boolean;
+  isUsd: boolean;
+  showGrid: boolean;
+  autoRotate: boolean;
+  stlColor: string;
+};
+
+export function useThreeViewer(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  opts: ThreeViewerOptions
+) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
+  const gridRef = useRef<THREE.GridHelper | null>(null);
+  const stlMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
+  const initialCamRef = useRef<{
+    pos: THREE.Vector3;
+    target: THREE.Vector3;
+  } | null>(null);
+  const modelRootRef = useRef<THREE.Object3D | null>(null);
+
+  useEffect(() => {
+    const { url, format, isVideo, isUsd, showGrid, autoRotate, stlColor } =
+      opts;
+    if (!containerRef.current || !url || isVideo || isUsd) return;
+
+    const safeUrl = url as string;
+    const container = containerRef.current;
+
+    const manager = new THREE.LoadingManager();
+    const proxyify = (inputUrl: string) => {
+      try {
+        if (/^(data:|blob:)/i.test(inputUrl)) return inputUrl;
+        if (/^(\.\.\/|\.\/|\/)/.test(inputUrl)) return inputUrl;
+        const u = new URL(inputUrl, window.location.origin);
+        if (u.hostname.endsWith("tencentcos.cn")) {
+          return "/model" + u.pathname + (u.search || "");
+        }
+        return inputUrl;
+      } catch {
+        return inputUrl;
+      }
+    };
+    manager.setURLModifier(proxyify);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+    canvasRef.current = renderer.domElement;
+    rendererRef.current = renderer;
+
+    const scene = new THREE.Scene();
+    scene.background = null;
+    sceneRef.current = scene;
+
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      Math.max(1, container.clientWidth) / Math.max(1, container.clientHeight),
+      0.1,
+      1000
+    );
+    camera.position.set(2.5, 2.0, 3.5);
+    cameraRef.current = camera;
+    initialCamRef.current = {
+      pos: camera.position.clone(),
+      target: new THREE.Vector3(0, 0.5, 0),
+    };
+
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
+    hemi.position.set(0, 20, 0);
+    scene.add(hemi);
+
+    const dir = new THREE.DirectionalLight(0xffffff, 1.0);
+    dir.position.set(5, 10, 7.5);
+    dir.castShadow = true;
+    scene.add(dir);
+
+    const grid = new THREE.GridHelper(10, 20, 0x444444, 0x222222);
+    grid.position.y = -0.001;
+    scene.add(grid);
+    gridRef.current = grid;
+    grid.visible = showGrid;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.target.set(0, 0.5, 0);
+    controlsRef.current = controls;
+    controls.autoRotate = autoRotate;
+
+    function centerAndScale(object: THREE.Object3D) {
+      const box = new THREE.Box3().setFromObject(object);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      const scale = 2.0 / maxDim;
+      object.position.sub(center);
+      object.position.multiplyScalar(scale);
+      object.scale.setScalar(scale);
+    }
+
+    async function load() {
+      try {
+        let root: THREE.Object3D | null = null;
+        if (format === "glb" || format === "gltf") {
+          const loader = new GLTFLoader(manager);
+          loader.setCrossOrigin("anonymous");
+          const basePath = new URL(
+            safeUrl,
+            window.location.origin
+          ).href.replace(/[^/]*$/g, "");
+          loader.setResourcePath(basePath);
+          const gltf = await loader.loadAsync(safeUrl);
+          root = gltf.scene;
+        } else if (format === "obj") {
+          try {
+            const urlObj = new URL(safeUrl, window.location.origin);
+            const basePath = urlObj.href.replace(/[^/]*$/g, "");
+            const mtlUrl = urlObj.href.replace(/\.obj(\?.*)?$/i, ".mtl$1");
+            const mtlLoader = new MTLLoader(manager);
+            mtlLoader.setCrossOrigin("anonymous");
+            mtlLoader.setResourcePath(basePath);
+            const materials = await mtlLoader.loadAsync(mtlUrl);
+            materials.preload();
+            const objLoader = new OBJLoader(manager);
+            objLoader.setMaterials(materials);
+            root = await objLoader.loadAsync(safeUrl);
+          } catch (e) {
+            const objLoader = new OBJLoader(manager);
+            root = await objLoader.loadAsync(safeUrl);
+          }
+        } else if (format === "fbx") {
+          const loader = new FBXLoader(manager);
+          const basePath = new URL(
+            safeUrl,
+            window.location.origin
+          ).href.replace(/[^/]*$/g, "");
+          loader.setResourcePath?.(basePath as any);
+          root = await loader.loadAsync(safeUrl);
+        } else if (format === "stl") {
+          const loader = new STLLoader(manager);
+          const geometry = await loader.loadAsync(safeUrl);
+          const material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(stlColor),
+            metalness: 0.1,
+            roughness: 0.8,
+          });
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          root = mesh;
+          stlMaterialRef.current = material;
+        } else if (!format) {
+          throw new Error("未知格式：无法从链接推断");
+        } else {
+          throw new Error(`暂不支持该格式: ${format}`);
+        }
+
+        if (root) {
+          centerAndScale(root);
+          scene.add(root);
+          modelRootRef.current = root;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    load();
+
+    let raf = 0;
+    const onResize = () => {
+      const w = Math.max(1, container.clientWidth);
+      const h = Math.max(1, container.clientHeight);
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+
+    const animate = () => {
+      controls.update();
+      renderer.render(scene, camera);
+      raf = requestAnimationFrame(animate);
+    };
+    animate();
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(raf);
+      controls.dispose();
+      renderer.dispose();
+      scene.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (mesh.isMesh) {
+          mesh.geometry?.dispose?.();
+          const mats = Array.isArray(mesh.material)
+            ? mesh.material
+            : [mesh.material];
+          mats.forEach((m: any) => {
+            if (m && typeof m.dispose === "function") m.dispose();
+          });
+        }
+      });
+      if (renderer.domElement && renderer.domElement.parentElement) {
+        renderer.domElement.parentElement.removeChild(renderer.domElement);
+      }
+    };
+  }, [containerRef, opts.url, opts.format, opts.isVideo, opts.isUsd]);
+
+  // reactive toggles
+  useEffect(() => {
+    if (gridRef.current) gridRef.current.visible = opts.showGrid;
+  }, [opts.showGrid]);
+
+  useEffect(() => {
+    if (controlsRef.current) controlsRef.current.autoRotate = opts.autoRotate;
+  }, [opts.autoRotate]);
+
+  useEffect(() => {
+    if (stlMaterialRef.current) {
+      stlMaterialRef.current.color = new THREE.Color(opts.stlColor);
+      stlMaterialRef.current.needsUpdate = true;
+    }
+  }, [opts.stlColor]);
+
+  const handleResetView = () => {
+    const cam = cameraRef.current;
+    const controls = controlsRef.current;
+    if (!cam || !controls || !initialCamRef.current) return;
+    cam.position.copy(initialCamRef.current.pos);
+    controls.target.copy(initialCamRef.current.target);
+    controls.update();
+  };
+
+  const handleScreenshot = () => {
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+    const url = renderer.domElement.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "screenshot.png";
+    a.click();
+  };
+
+  return {
+    canvasRef,
+    sceneRef,
+    cameraRef,
+    rendererRef,
+    controlsRef,
+    gridRef,
+    stlMaterialRef,
+    initialCamRef,
+    modelRootRef,
+    handleResetView,
+    handleScreenshot,
+  } as const;
+}

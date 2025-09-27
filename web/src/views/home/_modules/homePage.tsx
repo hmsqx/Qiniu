@@ -10,7 +10,7 @@ export interface HomePageProps {
 }
 
 export default function HomePage({ scrollRoot }: HomePageProps) {
-  const { items, loading, loadingMore, hasMore, observerRef } =
+  const { items, loading, loadingMore, hasMore, observerRef, error } =
     useInfinitePublicModels({ pageSize: 24, root: scrollRoot });
 
   return (
@@ -26,11 +26,17 @@ export default function HomePage({ scrollRoot }: HomePageProps) {
             className="hidden h-[260px] md:block md:h-[360px]"
           />
         </div>
-        <section>
+
+        <section className="pt-4">
           <SectionHeader title="灵感广场" />
+          {!!items.length && (
+            <div className="px-1 pb-2 text-xs text-slate-500">
+              共 {items.length} 个模型{loadingMore ? "，加载中…" : ""}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 contain-paint">
             {items.map((item, idx) => (
-              <InspirationCard key={idx} item={item} />
+              <InspirationCard key={`${item.id}-${idx}`} item={item} />
             ))}
             {loading &&
               items.length === 0 &&
@@ -41,7 +47,18 @@ export default function HomePage({ scrollRoot }: HomePageProps) {
                 />
               ))}
           </div>
-          {/* Sentinel for infinite scroll. Add margin to avoid being hidden behind bottom UI */}
+          {!loading && items.length === 0 && (
+            <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl bg-slate-50 py-10 text-sm text-slate-500 dark:bg-slate-800/30">
+              {error ? (
+                <>
+                  <span>加载失败：{error}</span>
+                  <span className="text-xs text-slate-400">请稍后重试</span>
+                </>
+              ) : (
+                <span>暂无数据，去生成一些作品吧～</span>
+              )}
+            </div>
+          )}
           <div ref={observerRef as any} className="h-4 mt-2" />
           {loadingMore && (
             <div className="mt-2 text-center text-xs text-slate-500">
