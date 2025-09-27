@@ -74,6 +74,19 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.606 0.25 292.717);
+  /* Status semantic tokens */
+  --status-success-bg: oklch(0.92 0.05 160); /* soft green bg */
+  --status-success-fg: oklch(0.42 0.15 150);
+  --status-success-border: oklch(0.78 0.04 160);
+  --status-processing-bg: oklch(0.95 0.07 85); /* soft amber */
+  --status-processing-fg: oklch(0.55 0.14 80);
+  --status-processing-border: oklch(0.82 0.06 85);
+  --status-waiting-bg: oklch(0.94 0.01 280);
+  --status-waiting-fg: oklch(0.45 0.01 280);
+  --status-waiting-border: oklch(0.78 0.01 280);
+  --status-error-bg: oklch(0.93 0.08 25);
+  --status-error-fg: oklch(0.5 0.18 25);
+  --status-error-border: oklch(0.78 0.07 25);
 }
 
 .dark {
@@ -88,12 +101,12 @@
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
+  --muted-foreground: oklch(0.74 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --border: oklch(1 0 0 / 14%);
+  --input: oklch(1 0 0 / 18%);
   --ring: oklch(0.541 0.281 293.009);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -108,6 +121,19 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.541 0.281 293.009);
+  /* Dark mode status tokens */
+  --status-success-bg: oklch(0.24 0.07 150);
+  --status-success-fg: oklch(0.82 0.12 150);
+  --status-success-border: oklch(0.42 0.08 150);
+  --status-processing-bg: oklch(0.3 0.08 80);
+  --status-processing-fg: oklch(0.9 0.12 80);
+  --status-processing-border: oklch(0.5 0.09 80);
+  --status-waiting-bg: oklch(0.28 0.01 280);
+  --status-waiting-fg: oklch(0.82 0.01 280);
+  --status-waiting-border: oklch(0.46 0.01 280);
+  --status-error-bg: oklch(0.32 0.13 25);
+  --status-error-fg: oklch(0.9 0.15 25);
+  --status-error-border: oklch(0.54 0.12 25);
 }
 @layer base {
   * {
@@ -143,6 +169,47 @@
   }
 }
 
+/* Status badge utility (token driven) */
+@layer components {
+  .status-badge-base {
+    @apply inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium select-none;
+    line-height: 1.1;
+  }
+  .status-success {
+    background: var(--status-success-bg);
+    color: var(--status-success-fg);
+    border-color: var(--status-success-border);
+  }
+  .status-processing {
+    background: var(--status-processing-bg);
+    color: var(--status-processing-fg);
+    border-color: var(--status-processing-border);
+  }
+  .status-waiting {
+    background: var(--status-waiting-bg);
+    color: var(--status-waiting-fg);
+    border-color: var(--status-waiting-border);
+  }
+  .status-error {
+    background: var(--status-error-bg);
+    color: var(--status-error-fg);
+    border-color: var(--status-error-border);
+  }
+  /* Panel surface (cards / admin blocks) */
+  .panel {
+    @apply relative border border-border/40 bg-gradient-to-b from-card/70 to-card/40 backdrop-blur supports-[backdrop-filter]:bg-card/60 shadow-[0_0_0_1px_hsl(var(--border)/0.25),0_4px_10px_-2px_rgba(0,0,0,0.35),0_2px_4px_rgba(0,0,0,0.4)] transition-colors rounded-xl;
+  }
+  .panel:hover {
+    @apply border-border/60 shadow-[0_0_0_1px_hsl(var(--border)/0.4),0_6px_14px_-3px_rgba(0,0,0,0.45),0_3px_6px_rgba(0,0,0,0.5)];
+  }
+  .dark .panel {
+    @apply shadow-[0_0_0_1px_hsl(var(--border)/0.3),0_4px_12px_-2px_rgba(0,0,0,0.55),0_2px_4px_rgba(0,0,0,0.6)];
+  }
+  .dark .panel:hover {
+    @apply shadow-[0_0_0_1px_hsl(var(--border)/0.4),0_6px_16px_-3px_rgba(0,0,0,0.65),0_3px_8px_rgba(0,0,0,0.7)];
+  }
+}
+
 /* Utility: hide scrollbars but keep scrolling */
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
@@ -150,4 +217,25 @@
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* Performance utilities */
+.contain-paint {
+  contain: content;
+  content-visibility: auto;
+}
+
+/* Do not force global smooth scrolling; rely on default for better wheel perf */
+html {
+  scroll-behavior: auto;
+}
+
+.input-no-spin::-webkit-outer-spin-button,
+.input-no-spin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.input-no-spin[type="number"] {
+  appearance: textfield; /* Standard */
+  -moz-appearance: textfield; /* Firefox */
 }

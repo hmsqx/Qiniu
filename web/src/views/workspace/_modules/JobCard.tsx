@@ -6,25 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { StatusBadge } from "./StatusBadge";
 import { Link } from "react-router-dom";
 import { downloadModelFile } from "@/utils/download";
-
-function getExt(url?: string | null): string | null {
-  if (!url) return null;
-  const m = url
-    .split("?")[0]
-    .split("#")[0]
-    .match(/\.([a-z0-9]+)$/i);
-  return m ? m[1].toLowerCase() : null;
-}
-
-function toProxiedUrl(url?: string | null): string {
-  if (!url) return "";
-  try {
-    const u = new URL(url);
-    return "/model" + u.pathname + (u.search || "");
-  } catch {
-    return url || "";
-  }
-}
+import { getExt, toProxiedUrl } from "@/utils/url";
 
 interface JobCardProps {
   item: JobItem;
@@ -44,7 +26,7 @@ export function JobCard({
   toggling,
 }: JobCardProps) {
   const rawStatus = (item.status || "").toUpperCase();
-  const isDone = rawStatus === "DONE";
+  const isDone = rawStatus === "DONE" || rawStatus === "SUCCEED";
   const isProcessing =
     rawStatus === "RUN" || rawStatus === "WAITING" || rawStatus === "QUEUE";
   const hasPreview = !!item.imgUrl;

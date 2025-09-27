@@ -1,14 +1,19 @@
 // src/layout/index.tsx
 import { Outlet } from "react-router-dom";
 import { Header } from "./Header";
+import ScaledContainer from "./ScaledContainer";
 
 export default function Layout() {
   return (
-    <div className="relative flex min-h-screen flex-col w-screen h-screen overflow-hidden">
-      <Header />
-      <main className="flex-1 mt-4 px-4 overflow-auto">
-        <Outlet />
-      </main>
-    </div>
+    <ScaledContainer>
+      <div className="relative flex h-full flex-col w-full overflow-hidden">
+        <div>
+          <Header />
+        </div>
+        <main className="flex-1 overflow-hidden">
+          <Outlet />
+        </main>
+      </div>
+    </ScaledContainer>
   );
 }

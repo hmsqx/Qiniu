@@ -6,10 +6,8 @@ import { defineConfig, loadEnv } from "vite";
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd());
 
-  const proxyTarget = env.VITE_PROXY_TARGET || "http://localhost:3000";
-  const cosTarget =
-    env.VITE_COS_TARGET ||
-    "https://hunyuan-prod-1258344699.cos.ap-guangzhou.tencentcos.cn";
+  const proxyTarget = "http://47.120.8.25:8080";
+  const proxyTarget2 = env.VITE_PROXY_TARGET2 || "http://47.120.8.25:8090";
 
   return defineConfig({
     plugins: [react(), tailwindcss()],
@@ -25,16 +23,17 @@ export default ({ mode }: { mode: string }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/api/, ""),
         },
-        "/cos": {
-          target: cosTarget,
+        "/models": {
+          target: "http://47.120.8.25",
           changeOrigin: true,
-          secure: true,
-          // Map /cos/<path> -> cosTarget/<path>
-          rewrite: (p) => p.replace(/^\/cos/, ""),
+        },
+        "/llm": {
+          target: proxyTarget2,
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/llm/, ""),
         },
       },
     },
-
     define: {},
   });
 };

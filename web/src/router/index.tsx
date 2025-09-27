@@ -2,13 +2,20 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Layout from "@/layout";
 import Home from "@/views/home";
-import Workspace from "@/views/workspace";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
-import Viewer from "@/views/viewer";
 
-// small Protected wrapper component used in routes
+const AdminLayout = lazy(() => import("@/layout/AdminLayout"));
+const Admin = lazy(() => import("@/views/admin/dashboard"));
+const AdminUsers = lazy(() => import("@/views/admin/users"));
+const AdminModels = lazy(() => import("@/views/admin/models"));
+const Workspace = lazy(() => import("@/views/workspace"));
+const Viewer = lazy(() => import("@/views/viewer"));
+const NotFound = lazy(() => import("@/views/not-found"));
+
 const Protected: React.FC<{ children: React.ReactElement }> = ({
   children,
 }) => {
@@ -21,6 +28,23 @@ const Protected: React.FC<{ children: React.ReactElement }> = ({
   }, [isAuthenticated]);
 
   if (!isAuthenticated) return <Navigate to="/home" replace />;
+
+  return children;
+};
+
+const ProtectedAdmin: React.FC<{ children: React.ReactElement }> = ({
+  children,
+}) => {
+  const { isAuthenticated, openLoginModal, user } = useAuth();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      openLoginModal();
+    }
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) return <Navigate to="/home" replace />;
+  if (user?.role !== "admin") return <Navigate to="/home" replace />;
 
   return children;
 };
@@ -44,14 +68,81 @@ const router = createBrowserRouter([
         path: "workspace",
         element: (
           <Protected>
-            <Workspace />
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingSkeleton variant="page" />}>
+                <Workspace />
+              </Suspense>
+            </ErrorBoundary>
           </Protected>
         ),
       },
       {
         path: "viewer",
-        // 公共预览页，不需要鉴权
-        element: <Viewer />,
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSkeleton variant="page" />}>
+              <Viewer />
+            </Suspense>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: "admin",
+        element: (
+          <ProtectedAdmin>
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingSkeleton variant="panel" />}>
+                <AdminLayout />
+              </Suspense>
+            </ErrorBoundary>
+          </ProtectedAdmin>
+        ),
+        children: [
+          {
+            index: true,
+            element: (
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton variant="panel" />}>
+                  {" "}
+                  <Admin />{" "}
+                </Suspense>
+              </ErrorBoundary>
+            ),
+          },
+          {
+            path: "users",
+            element: (
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton variant="panel" />}>
+                  {" "}
+                  <AdminUsers />{" "}
+                </Suspense>
+              </ErrorBoundary>
+            ),
+          },
+          {
+            path: "models",
+            element: (
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton variant="panel" />}>
+                  {" "}
+                  <AdminModels />{" "}
+                </Suspense>
+              </ErrorBoundary>
+            ),
+          },
+        ],
+      },
+      // Wildcard route for 404s
+      {
+        path: "*",
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSkeleton variant="page" />}>
+              <NotFound />
+            </Suspense>
+          </ErrorBoundary>
+        ),
       },
     ],
   },

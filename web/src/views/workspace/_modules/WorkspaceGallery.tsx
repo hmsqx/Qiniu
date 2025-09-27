@@ -1,14 +1,10 @@
 import { useAuth } from "@/context/AuthContext";
-import { useWorkspaceJobs } from "./workspace-gallery/hooks/useWorkspaceJobs";
-import { Toolbar } from "./workspace-gallery/components/Toolbar";
-import {
-  Grid,
-  EmptyState,
-  ErrorState,
-} from "./workspace-gallery/components/Grid";
-import { SkeletonCard } from "./workspace-gallery/components/SkeletonCard";
-import { JobCard } from "./workspace-gallery/components/JobCard";
-import { Pagination } from "./workspace-gallery/components/Pagination";
+import { useWorkspaceJobs } from "../hooks/useWorkspaceJobs";
+import { Toolbar } from "./Toolbar";
+import { Grid, EmptyState, ErrorState } from "./Grid";
+import { SkeletonCard } from "./SkeletonCard";
+import { JobCard } from "./JobCard";
+import { Pagination } from "./Pagination";
 import React from "react";
 import { toggleJobVisibility, type JobItem } from "@/api/mode3D";
 import { useToast } from "@/components/ui/use-toast";
@@ -28,6 +24,7 @@ export default function WorkspaceGallery() {
     refresh,
     nextPage,
     prevPage,
+    goToPage,
   } = useWorkspaceJobs(userId, { initialPage: 1, pageSize: 10 });
 
   const [selectionMode, setSelectionMode] = React.useState(false);
@@ -35,6 +32,12 @@ export default function WorkspaceGallery() {
   const [bulkLoading, setBulkLoading] = React.useState(false);
   const [togglingIds, setTogglingIds] = React.useState<Set<string>>(new Set());
   const { toast } = useToast();
+
+  // 本地展示数据，避免批量操作后重置到第一页或再次请求接口
+  const [displayList, setDisplayList] = React.useState<JobItem[]>(list);
+  React.useEffect(() => {
+    setDisplayList(list);
+  }, [list]);
 
   React.useEffect(() => {
     if (!selectionMode) setSelectedIds([]);
@@ -50,15 +53,40 @@ export default function WorkspaceGallery() {
 
   async function bulkToggle(target: "public" | "private") {
     if (selectedIds.length === 0) return;
-    const idsToProcess = [...selectedIds];
+
+    // 过滤：设为公开 -> 仅处理当前为私有的；设为私有 -> 仅处理当前为公开的
+    const itemMap = new Map(displayList.map((it) => [it.jobId, it] as const));
+    const allIds = [...selectedIds];
+    const idsToProcess = allIds.filter((id) => {
+      const item = itemMap.get(id);
+      if (!item) return false;
+      return target === "public" ? item.isPrivate : !item.isPrivate;
+    });
+    const skippedCount = allIds.length - idsToProcess.length;
+
+    // 清空选择并退出多选
     setSelectedIds([]);
     setSelectionMode(false);
+
+    // 无需处理则提示并返回
+    if (idsToProcess.length === 0) {
+      toast({
+        title: "无需处理",
+        description:
+          target === "public"
+            ? "所选任务均已是公开状态"
+            : "所选任务均已是私有状态",
+        variant: "success",
+      });
+      return;
+    }
+
     setBulkLoading(true);
     let successCount = 0;
     let failCount = 0;
     const toastId = toast({
       title: target === "public" ? "正在批量设为公开" : "正在批量设为私有",
-      description: `共 ${idsToProcess.length} 个任务...`,
+      description: `需处理 ${idsToProcess.length} 个，已跳过 ${skippedCount} 个...`,
       variant: "loading",
     });
     try {
@@ -67,6 +95,12 @@ export default function WorkspaceGallery() {
           try {
             await toggleJobVisibility(id);
             successCount++;
+            // 本地乐观更新：翻转当前页中对应项的私有状态
+            setDisplayList((prev) =>
+              prev.map((it) =>
+                it.jobId === id ? { ...it, isPrivate: !it.isPrivate } : it
+              )
+            );
           } catch (e) {
             failCount++;
           }
@@ -82,27 +116,26 @@ export default function WorkspaceGallery() {
           }
         })
       );
-      await refresh();
       const totalCount = idsToProcess.length;
       if (failCount === 0) {
         toast({
           id: toastId,
           title: target === "public" ? "批量设为公开完成" : "批量设为私有完成",
-          description: `成功处理 ${successCount} 个任务`,
+          description: `成功处理 ${successCount} 个，跳过 ${skippedCount} 个`,
           variant: "success",
         });
       } else if (successCount === 0) {
         toast({
           id: toastId,
           title: "批量操作失败",
-          description: `全部 ${failCount} 个任务失败`,
+          description: `全部 ${failCount} 个任务失败（跳过 ${skippedCount} 个）`,
           variant: "error",
         });
       } else {
         toast({
           id: toastId,
           title: "部分成功",
-          description: `成功 ${successCount} / 失败 ${failCount} (共 ${totalCount})`,
+          description: `成功 ${successCount} / 失败 ${failCount} / 跳过 ${skippedCount}（需处理 ${totalCount}）`,
           variant: "error",
         });
       }
@@ -124,7 +157,12 @@ export default function WorkspaceGallery() {
     });
     try {
       await toggleJobVisibility(job.jobId);
-      refresh();
+      // 本地乐观更新
+      setDisplayList((prev) =>
+        prev.map((it) =>
+          it.jobId === job.jobId ? { ...it, isPrivate: !it.isPrivate } : it
+        )
+      );
       setSelectedIds((prev) => prev.filter((id) => id !== job.jobId));
       // 更新成成功
       toast({
@@ -150,7 +188,7 @@ export default function WorkspaceGallery() {
     }
   }
 
-  const totalCountCurrentPage = list.length;
+  const totalCountCurrentPage = displayList.length;
 
   function enterSelectionMode() {
     if (!selectionMode) {
@@ -171,7 +209,7 @@ export default function WorkspaceGallery() {
     if (selectedIds.length === totalCountCurrentPage) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(list.map((it) => it.jobId));
+      setSelectedIds(displayList.map((it) => it.jobId));
     }
   }
 
@@ -188,7 +226,7 @@ export default function WorkspaceGallery() {
   }, [selectionMode]);
 
   return (
-    <div className="p-4 sm:p-6  text-white min-h-screen overflow-y-auto no-scrollbar">
+    <div className="p-4 sm:p-6  text-white min-h-full overflow-y-auto no-scrollbar">
       <Toolbar
         loading={loading || bulkLoading}
         onRefresh={refresh}
@@ -216,8 +254,8 @@ export default function WorkspaceGallery() {
             ? Array.from({ length: Math.max(4, Math.min(6, pageSize)) }).map(
                 (_, idx) => <SkeletonCard key={idx} />
               )
-            : list.length > 0
-            ? list.map((it) => (
+            : displayList.length > 0
+            ? displayList.map((it) => (
                 <JobCard
                   key={it.jobId}
                   item={it}
@@ -240,6 +278,7 @@ export default function WorkspaceGallery() {
           loading={loading || bulkLoading}
           onPrev={prevPage}
           onNext={nextPage}
+          onJump={goToPage}
         />
       )}
     </div>
