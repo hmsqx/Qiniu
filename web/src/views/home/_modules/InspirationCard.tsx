@@ -5,6 +5,7 @@ import type { Inspiration } from "../data/type";
 import { formatNumber } from "@/lib/utils";
 import { likeModel } from "@/api/like";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { getExt, toProxiedUrl } from "@/utils/url";
 
@@ -14,6 +15,7 @@ interface InspirationCardProps {
 
 export function InspirationCard({ item }: InspirationCardProps) {
   const { toast } = useToast();
+  const { user, openLoginModal } = useAuth();
 
   const [liked, setLiked] = useState(!!item.islike);
   const [likeSubmitting, setLikeSubmitting] = useState(false);
@@ -21,6 +23,11 @@ export function InspirationCard({ item }: InspirationCardProps) {
 
   const onLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    // 必须登录才允许点赞：无 token 则弹出登录
+    if (!user?.sessionToken) {
+      openLoginModal();
+      return;
+    }
     if (likeSubmitting) return;
     const nextLiked = !liked;
     setLiked(nextLiked);

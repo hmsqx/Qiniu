@@ -114,8 +114,8 @@ export function Pagination({
                   onClick={() => onJump && onJump(num)}
                   className={
                     num === pageNum
-                      ? "bg-white/20 text-white border-white/30"
-                      : "bg-transparent border-white/20 hover:bg-white/10 text-white"
+                      ? "bg-white/20 text-white border-white/30 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
+                      : "bg-transparent border-white/20 hover:bg-white/10 text-white focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
                   }
                 >
                   {num}
@@ -131,7 +131,7 @@ export function Pagination({
             size="sm"
             onClick={onPrev}
             disabled={pageNum <= 1 || loading}
-            className="bg-transparent border-white/20 hover:bg-white/10 text-white"
+            className="bg-transparent border-white/20 hover:bg-white/10 text-white focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
           >
             上一页
           </Button>
@@ -140,7 +140,7 @@ export function Pagination({
             size="sm"
             onClick={onNext}
             disabled={pageNum >= totalPages || loading}
-            className="bg-transparent border-white/20 hover:bg-white/10 text-white"
+            className="bg-transparent border-white/20 hover:bg-white/10 text-white focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
           >
             下一页
           </Button>
@@ -165,7 +165,7 @@ export function Pagination({
                 variant="outline"
                 disabled={loading || !jumpVal || !!jumpError}
                 onClick={triggerJump}
-                className="bg-transparent border-white/20 hover:bg-white/10 text-white"
+                className="bg-transparent border-white/20 hover:bg-white/10 text-white focus-visible:ring-0 focus-visible:ring-offset-0 outline-none"
               >
                 {jumping ? <Loader2 className="w-4 h-4 animate-spin" /> : "GO"}
               </Button>

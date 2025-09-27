@@ -29,9 +29,11 @@ export async function likeModel(
   jobId: string
 ): Promise<ApiEnvelope<OperationResult> | OperationResult> {
   if (!jobId) throw new Error("jobId 不能为空");
-  return post<ApiEnvelope<OperationResult> | OperationResult>("/api/like", {
-    jobId,
-  });
+  // 新接口：/api/like/toggle；鉴权依赖请求头 Session-Token（由 request.ts 自动注入）
+  return post<ApiEnvelope<OperationResult> | OperationResult>(
+    "/api/like/toggle",
+    { jobId }
+  );
 }
 
 // 统计“下载”操作接口。
