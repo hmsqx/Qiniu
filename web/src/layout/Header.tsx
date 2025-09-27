@@ -1,16 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 // 导入 react-router-dom 的钩子
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Hexagon,
-  Mail,
-  Gift,
-  Sparkles,
-  Home,
-  LayoutGrid,
-  Settings,
-  Menu,
-} from "lucide-react";
+import { Hexagon, Sparkles, Home, LayoutGrid, Settings, Menu, Gift } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
+import RechargeModal from "@/components/RechargeModal";
 
 import { MenuBar, type MenuItem } from "./glowMenu";
 
@@ -119,14 +111,7 @@ export const Header = () => {
       {/* 右侧区域: 操作和用户信息 (这部分基本不变) */}
       <div className="flex items-center gap-2 sm:gap-4">
         <div className="hidden lg:flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            联系我们
-          </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            <Gift className="h-4 w-4" />
-            邀请好友
-          </Button>
+          <RechargeEntry />
         </div>
 
         <Separator orientation="vertical" className="h-6 hidden lg:block" />
@@ -153,6 +138,32 @@ export const Header = () => {
         </div>
       </div>
     </header>
+  );
+};
+
+const RechargeEntry: React.FC = () => {
+  const { isAuthenticated, openLoginModal } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  const onClick = () => {
+    if (!isAuthenticated) {
+      openLoginModal();
+      return;
+    }
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <Button
+        size="sm"
+        onClick={onClick}
+        className="bg-gradient-to-r from-purple-500/80 to-fuchsia-500/80 text-white hover:from-purple-500 hover:to-fuchsia-500 shadow-sm"
+      >
+        <Gift className="h-4 w-4 mr-1" /> 充值
+      </Button>
+      <RechargeModal open={open} onOpenChange={setOpen} />
+    </>
   );
 };
 
