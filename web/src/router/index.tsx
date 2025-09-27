@@ -14,6 +14,7 @@ const AdminUsers = lazy(() => import("@/views/admin/users"));
 const AdminModels = lazy(() => import("@/views/admin/models"));
 const Workspace = lazy(() => import("@/views/workspace"));
 const Viewer = lazy(() => import("@/views/viewer"));
+const NotFound = lazy(() => import("@/views/not-found"));
 
 const Protected: React.FC<{ children: React.ReactElement }> = ({
   children,
@@ -131,6 +132,17 @@ const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      // Wildcard route for 404s
+      {
+        path: "*",
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSkeleton variant="page" />}>
+              <NotFound />
+            </Suspense>
+          </ErrorBoundary>
+        ),
       },
     ],
   },
