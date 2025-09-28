@@ -1,35 +1,28 @@
 #pragma once
 
 // ---------------- Tencent Cloud Credentials ----------------
-#ifndef TENCENTCLOUD_SECRET_ID
-#define TENCENTCLOUD_SECRET_ID "AKIDzqUxDF3e2C8qLcfXRCuXzELSOJzXs1xf"
-#endif
-
-#ifndef TENCENTCLOUD_SECRET_KEY
-#define TENCENTCLOUD_SECRET_KEY "XqwotlQr43pPs8OWTDi07jAORHuJVVJv"
-#endif
-
+// IMPORTANT: Do not embed secrets at compile time. Runtime env should provide them.
+// TENCENTCLOUD_SECRET_ID and TENCENTCLOUD_SECRET_KEY are intentionally not given defaults.
+// Region can have a non-secret default.
 #ifndef TENCENTCLOUD_REGION
 #define TENCENTCLOUD_REGION "ap-guangzhou"
 #endif
 
 // ---------------- MySQL Connection ----------------
+// Runtime env should provide DB params; defaults are non-secret and overridable at runtime.
+// Kept here only as legacy fallbacks in some compilation branches.
 #ifndef MYSQL_HOST
-#define MYSQL_HOST "127.0.0.1"
+#define MYSQL_HOST "mysql"
 #endif
-
 #ifndef MYSQL_USER
 #define MYSQL_USER "Qiniu"
 #endif
-
 #ifndef MYSQL_PASSWORD
-#define MYSQL_PASSWORD "Password"
+#define MYSQL_PASSWORD ""
 #endif
-
 #ifndef MYSQL_DATABASE
 #define MYSQL_DATABASE "Tasks"
 #endif
-
 #ifndef MYSQL_PORT
 #define MYSQL_PORT 3306
 #endif
@@ -46,7 +39,7 @@
 
 #ifndef AI3D_POLL_TIMEOUT_SECONDS
 #define AI3D_POLL_TIMEOUT_SECONDS 900 // 15 分钟
-#endif 
+#endif
 
 // ---------------- Model Storage & Serving ----------------
 #ifndef MODEL_FS_BASE_DIR

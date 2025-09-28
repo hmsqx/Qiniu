@@ -1,0 +1,20 @@
+# Git
+
+.git
+.gitignore
+
+# Build artifacts
+
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake*install.cmake
+Makefile
+*.o
+\_.a
+\*.so
+
+# OS
+
+.DS_Store
+Thumbs.db

@@ -8,6 +8,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 查找 jsoncpp 包
 find_package(jsoncpp REQUIRED)
 
+# 为编译阶段补充 SDK 头文件目录（便于找到 tencentcloud/core 与 ai3d 头文件）
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/tencentcloud-sdk-cpp-master/core/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/tencentcloud-sdk-cpp-master/ai3d/include
+)
+
+# 引入腾讯云 C++ SDK（本仓库包含源码）
+add_subdirectory(tencentcloud-sdk-cpp-master)
+
 # 收集源码并添加包含目录
 file(GLOB SERVER_SOURCES
     src/*.cc
@@ -40,10 +49,10 @@ endif()
 # CURL库
 find_package(CURL REQUIRED)
 
-# 链接依赖
-target_link_libraries(tencent_cloud_cpp_sample 
-    tencentcloud-sdk-cpp-ai3d 
-    tencentcloud-sdk-cpp-core 
+# 链接依赖（使用 SDK 定义的目标名：ai3d 与 core）
+target_link_libraries(tencent_cloud_cpp_sample
+    ai3d
+    core
     jsoncpp_lib
     ${MYSQLCLIENT_LIB}
     OpenSSL::Crypto
@@ -51,9 +60,9 @@ target_link_libraries(tencent_cloud_cpp_sample
     CURL::libcurl
 )
 
-#target_link_libraries(tencent_cloud_cpp_sample_simple 
-#    tencentcloud-sdk-cpp-ai3d 
- #   tencentcloud-sdk-cpp-core 
+#target_link_libraries(tencent_cloud_cpp_sample_simple
+#    tencentcloud-sdk-cpp-ai3d
+ #   tencentcloud-sdk-cpp-core
  #   jsoncpp_lib
 #    ${MYSQLCLIENT_LIB}
 #    OpenSSL::Crypto
