@@ -19,11 +19,13 @@ RUN pnpm -s build
 FROM nginx:1.27-alpine
 ARG API_UPSTREAM=http://server:8080
 ARG LLM_UPSTREAM=http://py_server:8090
+ENV API_UPSTREAM=${API_UPSTREAM} \
+	LLM_UPSTREAM=${LLM_UPSTREAM}
 COPY --from=build /app/dist /usr/share/nginx/html
 
 ## 生成安全的 Nginx 配置：仅替换我们定义的两个变量，避免破坏 $host/$uri 等 Nginx 变量
 RUN set -eux; \
-		cat > /tmp/default.conf.template <<'EOF'; \
+		cat > /tmp/default.conf.template <<'EOF'
 server {
 	listen 80;
 	server_name _;
@@ -54,7 +56,9 @@ server {
 	}
 }
 EOF
-		# 仅替换我们需要的变量，保留 Nginx 自身变量不被 envsubst 处理
+
+# 仅替换我们需要的变量，保留 Nginx 自身变量不被 envsubst 处理
+RUN set -eux; \
 		envsubst '${API_UPSTREAM} ${LLM_UPSTREAM}' < /tmp/default.conf.template > /etc/nginx/conf.d/default.conf; \
 		rm -f /tmp/default.conf.template
 
