@@ -1,6 +1,7 @@
 #include "tx_ai3d.h"
 #include "config.h"
 #include "db_utils.h"
+#include "runtime_config.h"
 #include "concurrent_downloader.h"
 
 #include <tencentcloud/ai3d/v20250513/Ai3dClient.h>
@@ -23,8 +24,8 @@ using namespace TencentCloud::Ai3d::V20250513;
 using namespace TencentCloud::Ai3d::V20250513::Model;
 
 // 辅助函数：下载文件并保存到数据库
-static void downloadAndSaveFiles(const std::string& jobId, 
-                                const Json::Value& modelList, 
+static void downloadAndSaveFiles(const std::string& jobId,
+                                const Json::Value& modelList,
                                 const Json::Value& previewList,
                                 Json::Value& taskInfo)
 {
@@ -35,24 +36,24 @@ static void downloadAndSaveFiles(const std::string& jobId,
             // 将本地文件URL保存到数据库
             Json::Value localModels = downloadResult["modelList"];
             Json::Value localPreviews = downloadResult["previewImages"];
-            
+
             // 构建本地文件URL字符串
             std::string localFileUrls;
             std::string localPreviewUrls;
-            
+
             for (const auto& model : localModels) {
                 if (!localFileUrls.empty()) localFileUrls += ",";
                 localFileUrls += model["fileUrl"].asString();
             }
-            
+
             for (const auto& preview : localPreviews) {
                 if (!localPreviewUrls.empty()) localPreviewUrls += ",";
                 localPreviewUrls += preview.asString();
             }
-            
+
             // 更新数据库
             updateAi3dTaskFiles(jobId, localFileUrls, localPreviewUrls);
-            
+
             // 更新返回结果，使用本地URL
             taskInfo["modelList"] = localModels;
             taskInfo["previewImages"] = localPreviews;
@@ -156,7 +157,13 @@ static void ensureLocalFiles(const std::string& jobId,
 
 static Ai3dClient buildClient()
 {
-    Credential cred(TENCENTCLOUD_SECRET_ID, TENCENTCLOUD_SECRET_KEY);
+    // 运行时读取凭证，避免硬编码密钥
+    std::string sid = rc_tc_secret_id();
+    std::string skey = rc_tc_secret_key();
+    if (sid.empty() || skey.empty()) {
+        throw std::runtime_error("TencentCloud credentials not provided. Please set TENCENTCLOUD_SECRET_ID and TENCENTCLOUD_SECRET_KEY.");
+    }
+    Credential cred(sid, skey);
 
     HttpProfile httpProfile;
     httpProfile.SetEndpoint("ai3d.tencentcloudapi.com");
@@ -165,7 +172,7 @@ static Ai3dClient buildClient()
     clientProfile.SetHttpProfile(httpProfile);
 
     Ai3dClient client(cred, "", clientProfile);
-    client.SetRegion(TENCENTCLOUD_REGION);
+    client.SetRegion(rc_tc_region());
     return client;
 }
 
@@ -254,7 +261,7 @@ Json::Value submitHunyuanTo3DJobRapid(const std::string &prompt,
     }
     // 根据 SDK，布尔可选项应通过 Set 方法设置，这里仅示例不默认开启
     req.SetEnablePBR(true);
-    
+
 
     auto outcome = client.SubmitHunyuanTo3DRapidJob(req);
     if (!outcome.IsSuccess())
@@ -325,7 +332,7 @@ Json::Value queryTaskStatusFromTx(const std::string &jobId)
         taskInfo["errorMsg"] = e.what();
     }
     return taskInfo;
-} 
+}
 
 Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
 {
@@ -347,7 +354,7 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
         QueryHunyuanTo3DProJobResponse resp = outcome.GetResult();
         taskInfo["requestId"] = resp.GetRequestId();
         taskInfo["status"] = resp.GetStatus();
-        std::cout << "ProJob: " << resp.GetStatus() <<std::endl; 
+        std::cout << "ProJob: " << resp.GetStatus() <<std::endl;
         if (resp.GetStatus() == "DONE")
         {
             auto fileList = resp.GetResultFile3Ds();
@@ -355,7 +362,7 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
             Json::Value previewList;
             for (const auto &file : fileList)
             {
-                
+
                 Json::Value modelItem;
                 modelItem["fileUrl"] = file.GetUrl();
                 modelItem["fileFormat"] = file.GetType();
@@ -366,7 +373,7 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
             }
             taskInfo["modelList"] = modelList;
             taskInfo["previewImages"] = previewList;
-            
+
             // 检查数据库中是否已经存在本地文件URL
             Json::Value existingFiles = getTaskFileInfo(jobId);
             ensureLocalFiles(jobId, modelList, previewList, taskInfo);
@@ -389,7 +396,7 @@ Json::Value queryTaskStatusFromTxPro(const std::string &jobId)
         taskInfo["errorMsg"] = e.what();
     }
     return taskInfo;
-} 
+}
 
 Json::Value queryTaskStatusFromTxRapid(const std::string &jobId)
 {
@@ -411,7 +418,7 @@ Json::Value queryTaskStatusFromTxRapid(const std::string &jobId)
         QueryHunyuanTo3DRapidJobResponse resp = outcome.GetResult();
         taskInfo["requestId"] = resp.GetRequestId();
         taskInfo["status"] = resp.GetStatus();
-        //std::cout << "rapidJob: " << resp.GetStatus() <<std::endl; 
+        //std::cout << "rapidJob: " << resp.GetStatus() <<std::endl;
         if (resp.GetStatus() == "DONE")
         {
             auto fileList = resp.GetResultFile3Ds();
@@ -446,4 +453,4 @@ Json::Value queryTaskStatusFromTxRapid(const std::string &jobId)
         taskInfo["errorMsg"] = e.what();
     }
     return taskInfo;
-} 
+}
