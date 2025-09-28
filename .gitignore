@@ -1,0 +1,30 @@
+# Local, env and secrets
+.env
+py-server/.env
+
+# python
+__pycache__/
+*.py[cod]
+
+# Node
+web/node_modules
+web/dist/
+
+# Build artifacts
+server/build/
+server/a.a
+server/a.out
+server/a.pdb
+server/a.ilk
+server/a.lib
+server/a.dll
+server/a.so
+
+# Docker
+.log
+
+.vscode/
+
+# Editor: IntelliJ IDEA
+.idea/
+*.iml

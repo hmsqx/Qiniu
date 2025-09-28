@@ -1,0 +1,22 @@
+# 默认排除所有内容过于激进；列出常见忽略项以保持构建精简
+
+.git
+.gitignore
+**/**pycache**/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.DS_Store
+node_modules
+web/node_modules
+py-server/uv.lock
+py-server/.venv
+py-server/.env
+.env
+\*.log
+
+# 排除数据卷和运行时产物
+
+models-data
+mysql-data
+
+# 如果仅使用运行时挂载的 seed-models，可以忽略或移除 models/
