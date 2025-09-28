@@ -135,7 +135,6 @@ export function useThreeViewer(
           // Prefer compressed assets when available
           try {
             const draco = new DRACOLoader(manager);
-            // Use Google-hosted decoders to avoid bundling decoder files; replace with local /draco/ if desired
             draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
             loader.setDRACOLoader(draco);
           } catch {}
@@ -160,22 +159,8 @@ export function useThreeViewer(
           const gltf = await loader.loadAsync(safeUrl);
           root = gltf.scene;
         } else if (format === "obj") {
-          try {
-            const urlObj = new URL(safeUrl, window.location.origin);
-            const basePath = urlObj.href.replace(/[^/]*$/g, "");
-            const mtlUrl = urlObj.href.replace(/\.obj(\?.*)?$/i, ".mtl$1");
-            const mtlLoader = new MTLLoader(manager);
-            mtlLoader.setCrossOrigin("anonymous");
-            mtlLoader.setResourcePath(basePath);
-            const materials = await mtlLoader.loadAsync(mtlUrl);
-            materials.preload();
-            const objLoader = new OBJLoader(manager);
-            objLoader.setMaterials(materials);
-            root = await objLoader.loadAsync(safeUrl);
-          } catch (e) {
-            const objLoader = new OBJLoader(manager);
-            root = await objLoader.loadAsync(safeUrl);
-          }
+          const objLoader = new OBJLoader(manager);
+          root = await objLoader.loadAsync(safeUrl);
         } else if (format === "fbx") {
           const loader = new FBXLoader(manager);
           const basePath = new URL(

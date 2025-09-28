@@ -64,7 +64,6 @@ export const GenerationOptions = ({
             <SelectItem value="STL">STL</SelectItem>
             <SelectItem value="USDZ">USDZ</SelectItem>
             <SelectItem value="FBX">FBX</SelectItem>
-            <SelectItem value="MP4">MP4</SelectItem>
           </SelectContent>
         </Select>
       </div>
