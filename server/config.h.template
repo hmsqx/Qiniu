@@ -1,0 +1,103 @@
+#pragma once
+
+// AI3D服务器配置文件模板
+// 复制此文件为 config.h 并修改相应的配置值
+
+// ---------------- 腾讯云配置 ----------------
+#ifndef TENCENTCLOUD_SECRET_ID
+#define TENCENTCLOUD_SECRET_ID "your_secret_id_here"
+#endif
+
+#ifndef TENCENTCLOUD_SECRET_KEY
+#define TENCENTCLOUD_SECRET_KEY "your_secret_key_here"
+#endif
+
+#ifndef TENCENTCLOUD_REGION
+#define TENCENTCLOUD_REGION "ap-guangzhou"
+#endif
+
+// ---------------- 数据库配置 ----------------
+#ifndef MYSQL_HOST
+#define MYSQL_HOST "localhost"
+#endif
+
+#ifndef MYSQL_USER
+#define MYSQL_USER "ai3d_user"
+#endif
+
+#ifndef MYSQL_PASSWORD
+#define MYSQL_PASSWORD "your_mysql_password_here"
+#endif
+
+#ifndef MYSQL_DATABASE
+#define MYSQL_DATABASE "Tasks"
+#endif
+
+#ifndef MYSQL_PORT
+#define MYSQL_PORT 3306
+#endif
+
+// ---------------- 服务器配置 ----------------
+#ifndef SERVER_PORT
+#define SERVER_PORT 8080
+#endif
+
+#ifndef SERVER_HOST
+#define SERVER_HOST "0.0.0.0"
+#endif
+
+// ---------------- 会话管理 ----------------
+#ifndef SESSION_TTL_SECONDS
+#define SESSION_TTL_SECONDS 2592000  // 30天
+#endif
+
+// ---------------- AI3D轮询配置 ----------------
+#ifndef AI3D_POLL_INTERVAL_SECONDS
+#define AI3D_POLL_INTERVAL_SECONDS 5
+#endif
+
+#ifndef AI3D_POLL_TIMEOUT_SECONDS
+#define AI3D_POLL_TIMEOUT_SECONDS 900  // 15分钟
+#endif
+
+// ---------------- 模型存储配置 ----------------
+#ifndef MODEL_FS_BASE_DIR
+#define MODEL_FS_BASE_DIR "/var/www/models"
+#endif
+
+#ifndef MODEL_URL_BASE_PATH
+#define MODEL_URL_BASE_PATH "/models"
+#endif
+
+#ifndef MAX_CONCURRENT_MODEL_DOWNLOADS
+#define MAX_CONCURRENT_MODEL_DOWNLOADS 4
+#endif
+
+#ifndef MODEL_DOWNLOAD_TIMEOUT_SECONDS
+#define MODEL_DOWNLOAD_TIMEOUT_SECONDS 300
+#endif
+
+// ---------------- API安全配置 ----------------
+#ifndef MAX_REQUESTS_PER_MINUTE
+#define MAX_REQUESTS_PER_MINUTE 60
+#endif
+
+#ifndef MAX_REQUESTS_PER_HOUR
+#define MAX_REQUESTS_PER_HOUR 1000
+#endif
+
+#ifndef MAX_REQUESTS_PER_DAY
+#define MAX_REQUESTS_PER_DAY 10000
+#endif
+
+#ifndef BURST_LIMIT
+#define BURST_LIMIT 10
+#endif
+
+#ifndef RATE_LIMIT_WINDOW_SECONDS
+#define RATE_LIMIT_WINDOW_SECONDS 60
+#endif
+
+#ifndef MAX_REQUEST_SIZE_BYTES
+#define MAX_REQUEST_SIZE_BYTES (1024 * 1024)  // 1MB
+#endif
