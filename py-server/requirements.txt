@@ -1,0 +1,22 @@
+# Web框架
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# AI和机器学习
+openai==1.50.2
+dashscope==1.19.2
+
+# 数据验证和配置
+pydantic==2.9.2
+pydantic-settings==2.5.2
+
+# 图像处理
+pillow==10.4.0
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
+
+# HTTP请求
+requests==2.32.3
+
+# 可选包（如果使用百度千帆的话）
+# qianfan==0.3.5
