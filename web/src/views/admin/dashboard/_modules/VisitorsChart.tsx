@@ -18,7 +18,7 @@ interface VisitorsChartProps {
 
 const chartConfig = {
   visitors: {
-    label: "访问量",
+    label: "每日使用次数",
     color: "var(--color-chart-1)",
   },
 } as const;

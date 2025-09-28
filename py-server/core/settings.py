@@ -34,10 +34,20 @@ class Settings(BaseSettings):
     # Dashscope API base
     DASHSCOPE_BASE_HTTP_API_URL: str = "https://dashscope.aliyuncs.com/api/v1"
 
-    # Resolve env file: prefer APP_ENV_FILE, else default to app/api.env
+    # Resolve env file loading order (no CWD dependency):
+    # 1) APP_ENV_FILE (explicit override)
+    # 2) <package-root>/.env (common local default)
+    # 3) <package-root>/api.env (legacy default)
     _pkg_root = Path(__file__).resolve().parent.parent
-    _default_env = _pkg_root / "api.env"
-    _env_file = os.environ.get("APP_ENV_FILE", str(_default_env))
+    _legacy_env = _pkg_root / "api.env"
+    _dot_env = _pkg_root / ".env"
+
+    _env_file = os.environ.get("APP_ENV_FILE")
+    if not _env_file:
+        if _dot_env.exists():
+            _env_file = str(_dot_env)
+        else:
+            _env_file = str(_legacy_env)
 
     model_config = SettingsConfigDict(
         env_file=_env_file,

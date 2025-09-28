@@ -14,7 +14,7 @@ const Dashboard: React.FC = () => {
           <div className="ml-8">
             <CardTitle className="text-base">总使用量</CardTitle>
             <p className="text-xs text-muted-foreground">
-              最近 {range === "14d" ? "14 天" : "7 天"}
+              最近 {range === "7d" ? "7 天" : "14 天"}
             </p>
           </div>
           <Tabs value={range} onValueChange={setRange} className="w-auto">

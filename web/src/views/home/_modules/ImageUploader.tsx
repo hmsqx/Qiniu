@@ -7,9 +7,14 @@ type Props = {
   onChange?: (base64: string | null) => void;
   /** 注册打开文件选择框的方法 */
   onRegisterOpen?: (open: () => void) => void;
+  disabled?: boolean; // 禁用交互（润色/优化进行中）
 };
 
-export const ImageUploader = ({ onChange, onRegisterOpen }: Props) => {
+export const ImageUploader = ({
+  onChange,
+  onRegisterOpen,
+  disabled,
+}: Props) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,6 +86,7 @@ export const ImageUploader = ({ onChange, onRegisterOpen }: Props) => {
     onDragEnter: () => setIsDragOver(true),
     onDragLeave: () => setIsDragOver(false),
     multiple: false,
+    disabled: !!disabled,
   });
 
   useEffect(() => {
@@ -97,6 +103,7 @@ export const ImageUploader = ({ onChange, onRegisterOpen }: Props) => {
           "bg-muted/60 hover:bg-muted/70 transition-colors duration-200",
           "shadow-sm hover:shadow-md ring-1 ring-border/50",
           "transform transition-transform group",
+          disabled && "opacity-60 cursor-not-allowed pointer-events-none",
           isDragActive || isDragOver
             ? "border-primary/60 bg-primary/[0.08] ring-primary/40"
             : "border-border/70 hover:border-input"

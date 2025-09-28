@@ -8,11 +8,22 @@ type Props = {
   base64: string; // 无 data: 前缀
   count?: number; // 默认 3
   onSelect?: (b64: string) => void;
+  onBusyChange?: (busy: boolean) => void;
 };
 
-const VipPolishPanel: React.FC<Props> = ({ base64, count = 2, onSelect }) => {
+const VipPolishPanel: React.FC<Props> = ({
+  base64,
+  count = 2,
+  onSelect,
+  onBusyChange,
+}) => {
   const [busy, setBusy] = useState(false);
   const [variants, setVariants] = useState<string[]>([]);
+
+  // 通知父组件当前忙碌状态（用于锁定删除/重新上传）
+  React.useEffect(() => {
+    onBusyChange?.(busy);
+  }, [busy, onBusyChange]);
 
   const run = async () => {
     if (busy) return;

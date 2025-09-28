@@ -16,6 +16,7 @@ type Props = {
   onReselect?: () => void;
   onOptimize?: () => void;
   optimizing?: boolean;
+  actionsLocked?: boolean; // 锁定删除/重新选择（润色进行中）
 };
 
 export const ImagePreviewCard: React.FC<Props> = ({
@@ -24,6 +25,7 @@ export const ImagePreviewCard: React.FC<Props> = ({
   onReselect,
   onOptimize,
   optimizing,
+  actionsLocked,
 }) => {
   const { dataUrl, dimensions, readableSize } = useImageBase64Info(base64);
 
@@ -52,13 +54,19 @@ export const ImagePreviewCard: React.FC<Props> = ({
                     size="icon"
                     variant="ghost"
                     className="h-7 w-7 rounded-full bg-background/70 backdrop-blur border border-white/10 hover:bg-background"
-                    onClick={onRemove}
+                    onClick={() => {
+                      if (actionsLocked) return;
+                      onRemove();
+                    }}
+                    disabled={actionsLocked}
                     aria-label="移除图片"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>移除图片</TooltipContent>
+                <TooltipContent>
+                  {actionsLocked ? "润色进行中，暂不可操作" : "移除图片"}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -75,7 +83,15 @@ export const ImagePreviewCard: React.FC<Props> = ({
           </div>
           <div className="mt-3 flex flex-wrap gap-2 items-center">
             {onReselect && (
-              <Button size="sm" variant="outline" onClick={onReselect}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  if (actionsLocked) return;
+                  onReselect();
+                }}
+                disabled={actionsLocked}
+              >
                 重新选择
               </Button>
             )}

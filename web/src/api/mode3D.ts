@@ -38,19 +38,41 @@ function normalize(resp: any): QueryJobsResult {
 
   const list: JobItem[] = data.taskList.map((t: any) => {
     const raw = (t.status || "").toString().toUpperCase();
-    const status = raw as RawJobStatus;
+
+    // Normalize a few success variants that backend may return
+    const successAliases = new Set(["DONE", "SUCCEED", "SUCCESS", "COMPLETED"]);
+    const normalizedStatus: RawJobStatus = successAliases.has(raw)
+      ? "DONE"
+      : (raw as RawJobStatus);
+
+    // Prefer previewImages string; if array provided, take first
+    const preview = Array.isArray(t.previewImages)
+      ? t.previewImages[0]
+      : t.previewImages;
+
+    // Extract model URL from various possible shapes
+    let modelUrl: string | undefined;
+    if (Array.isArray(t.modelList) && t.modelList.length > 0) {
+      const m0 = t.modelList[0] || {};
+      modelUrl = m0.fileUrl || m0.fileurl || m0.url || m0.link;
+    }
+    // Fallbacks on root level keys commonly seen in other endpoints
+    modelUrl =
+      modelUrl ||
+      t.fileUrl ||
+      t.fileurl ||
+      t.modelUrl ||
+      t.modelurl ||
+      undefined;
+
     return {
-      jobId: String(t.jobId || t.jobId),
-      status: raw === "DONE" || raw === "SUCCEED" ? "DONE" : status,
-      imgUrl: t.previewImages,
-      modelUrl: buildAssetUrl(
-        Array.isArray(t.modelList) && t.modelList.length > 0
-          ? t.modelList[0].fileUrl || t.modelList[0].fileUrl
-          : undefined
-      ),
-      isPrivate: t.Isprivate,
+      jobId: String(t.jobId || t.JobId || t.id || t.ID || ""),
+      status: normalizedStatus,
+      imgUrl: preview,
+      modelUrl: buildAssetUrl(modelUrl),
+      isPrivate: typeof t.Isprivate === "boolean" ? t.Isprivate : t.isPrivate,
       errorMsg: typeof t.errorMsg === "string" ? t.errorMsg : undefined,
-    };
+    } as JobItem;
   });
 
   const total =

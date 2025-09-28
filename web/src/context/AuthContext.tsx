@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { setAuthToken } from "@/utils/request";
 import { loginApi, registerApi, meApi, logoutApi } from "@/api/auth";
 
@@ -40,18 +46,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const raw = localStorage.getItem(AUTH_STORAGE);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        if (parsed.token_count && !parsed.tokenCount) {
-          const num =
-            typeof parsed.token_count === "number"
-              ? parsed.token_count
-              : parseInt(parsed.token_count, 10);
-          parsed.tokenCount = isNaN(num) ? undefined : num;
-        }
-        parsed.id = parsed.id || parsed.userId || parsed.username;
-        return parsed as User;
-      }
-      return null;
+      if (!parsed || typeof parsed !== "object") return null;
+
+      parsed.id = parsed.id || parsed.userId || parsed.username;
+      return parsed as User;
     } catch (e) {
       return null;
     }
@@ -77,48 +75,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       throw new Error(e?.response?.data?.message || e?.message || "登录失败");
     });
 
-    const ok =
-      (resp as any)?.status === "success" || (resp as any)?.code === 200;
-    const data = (resp as any)?.data || resp;
-
-    if (ok || data?.sessionToken) {
-      const baseUser: User = {
-        id: data?.userId || usernameOrEmail,
-        username: data?.username || usernameOrEmail,
-        email: data?.email || null,
-        sessionToken: data?.sessionToken || null,
-        avatar: data?.avatar || null,
-      };
-
-      setAuthToken(baseUser.sessionToken || undefined);
-      setUser(baseUser);
-
-      try {
-        const meResp = await meApi();
-        const me = (meResp as any)?.data || meResp;
-        if (me) {
-          const enriched: User = {
-            id: me.userId || me.id || baseUser.id,
-            username: me.username || baseUser.username,
-            role: me.role ?? null,
-            tokenCount:
-              typeof me.token_count === "number"
-                ? me.token_count
-                : parseInt(me.token_count, 10) || undefined,
-            email: me.email ?? baseUser.email ?? null,
-            sessionToken: baseUser.sessionToken,
-            avatar: baseUser.avatar || me.avatar || null,
-          };
-          setUser(enriched);
-          return enriched;
-        }
-      } catch (e) {
-        console.warn("获取当前用户信息失败 (/auth/me)", e);
-      }
-      return baseUser;
+    const { data, status, code, message } = resp as any;
+    const ok = status === "success" || code === 200;
+    if (!ok || !data?.sessionToken) {
+      throw new Error(message || "登录失败");
     }
 
-    throw new Error((resp as any)?.message || "登录失败");
+    const baseUser: User = {
+      id: data.userId || usernameOrEmail,
+      username: data.username || usernameOrEmail,
+      email: data.email ?? null,
+      sessionToken: data.sessionToken ?? null,
+      avatar: data.avatar ?? null,
+    };
+
+    setAuthToken(baseUser.sessionToken || undefined);
+    setUser(baseUser);
+
+    try {
+      const meResp = await meApi();
+      const me = (meResp as any)?.data;
+      if (me) {
+        const enriched: User = {
+          id: me.userId || baseUser.id,
+          username: me.username || baseUser.username,
+          role: me.role ?? null,
+          tokenCount: Number(me.token_count),
+          email: me.email ?? baseUser.email ?? null,
+          sessionToken: baseUser.sessionToken,
+          avatar: me.avatar ?? baseUser.avatar ?? null,
+        };
+        setUser(enriched);
+        return enriched;
+      }
+    } catch (e) {
+      console.warn("获取当前用户信息失败 (/auth/me)", e);
+    }
+    return baseUser;
   };
 
   const register = async (
@@ -130,15 +123,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const resp = await registerApi(body).catch((e) => {
       throw new Error(e?.response?.data?.message || e?.message || "注册失败");
     });
-
-    const ok =
-      (resp as any)?.status === "success" || (resp as any)?.code === 200;
-    if (ok) {
-      const u = await login(username, password);
-      return u;
-    }
-
-    throw new Error((resp as any)?.message || "注册失败");
+    const { status, code, message } = resp as any;
+    const ok = status === "success" || code === 200;
+    if (!ok) throw new Error(message || "注册失败");
+    return await login(username, password);
   };
 
   const logout = async () => {
@@ -147,18 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (sessionToken) {
       try {
-        const resp = await logoutApi(sessionToken);
-        const ok =
-          (resp as any)?.status === "success" ||
-          (resp as any)?.code === 200 ||
-          (resp as any)?.code === 0 ||
-          typeof (resp as any)?.code === "undefined";
-
-        if (!ok) {
-          logoutError = new Error(
-            (resp as any)?.message || "退出登录失败，请稍后重试"
-          );
-        }
+        await logoutApi(sessionToken);
       } catch (error: any) {
         console.warn("logout 调用失败", error);
         logoutError = new Error(
@@ -184,33 +161,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.sessionToken) return null;
     try {
       const meResp = await meApi();
-      const me = (meResp as any)?.data || meResp;
+      const me = (meResp as any)?.data;
       if (!me) return user;
       const merged: User = {
-        id: me.userId || me.id || user.id,
+        id: me.userId || user.id,
         username: me.username || user.username,
         role: me.role ?? user.role ?? null,
-        tokenCount:
-          typeof me.token_count === "number"
-            ? me.token_count
-            : parseInt(me.token_count, 10) || user.tokenCount,
+        tokenCount: Number(me.token_count ?? user.tokenCount),
         email: me.email ?? user.email ?? null,
         sessionToken: user.sessionToken,
-        avatar: user.avatar || me.avatar || null,
+        avatar: me.avatar ?? user.avatar ?? null,
       };
       setUser(merged);
       return merged;
     } catch (e) {
+      // 如果 session 已无效，清理本地登录状态
+      const status = (e as any)?.response?.status;
+      if (status === 401 || status === 403) {
+        setUser(null);
+        setAuthToken(undefined);
+        try {
+          localStorage.removeItem(AUTH_STORAGE);
+        } catch {}
+        return null;
+      }
       console.warn("refreshUser 调用失败", e);
       return user;
     }
   };
 
+  const didInitRef = useRef(false);
   useEffect(() => {
-    if (
-      user?.sessionToken &&
-      (user?.tokenCount === undefined || user?.role === undefined)
-    ) {
+    // 页面首次打开时，如果存在会话，则强制拉取一次最新用户信息
+    // 防止 React 18 严格模式下开发环境触发两次
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+    if (user?.sessionToken) {
       refreshUser();
     }
   }, []);
