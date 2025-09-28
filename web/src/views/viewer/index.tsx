@@ -38,9 +38,10 @@ const Viewer: React.FC = () => {
   const isVideo = format === "mp4";
   const isUsd = format === "usdz" || format === "usd";
 
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid, setShowGrid] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
   const [stlColor, setStlColor] = useState<string>("#aaaaaa");
+  const [backgroundColor, setBackgroundColor] = useState<string>("#000000");
   const [downloading, setDownloading] = useState(false);
 
   function handleDownload(e: React.MouseEvent) {
@@ -63,6 +64,7 @@ const Viewer: React.FC = () => {
     showGrid,
     autoRotate,
     stlColor,
+    backgroundColor,
   });
 
   if (!urlParam) {
@@ -114,6 +116,8 @@ const Viewer: React.FC = () => {
         onReset={handleResetView}
         stlColor={stlColor}
         onStlColor={setStlColor}
+        backgroundColor={backgroundColor}
+        onBackgroundColor={setBackgroundColor}
       />
     </div>
   );

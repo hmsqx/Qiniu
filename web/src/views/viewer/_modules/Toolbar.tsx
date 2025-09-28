@@ -13,6 +13,8 @@ type Props = {
   onReset: () => void;
   stlColor: string;
   onStlColor: (color: string) => void;
+  backgroundColor: string;
+  onBackgroundColor: (color: string) => void;
 };
 
 const Toolbar: React.FC<Props> = ({
@@ -27,6 +29,8 @@ const Toolbar: React.FC<Props> = ({
   onReset,
   stlColor,
   onStlColor,
+  backgroundColor,
+  onBackgroundColor,
 }) => {
   return (
     <div className="absolute right-4 top-2 text-slate-400 text-xs font-mono flex items-center gap-3">
@@ -77,6 +81,18 @@ const Toolbar: React.FC<Props> = ({
         >
           重置
         </button>
+        <label
+          className="flex items-center gap-1 text-slate-300"
+          title="背景颜色"
+        >
+          背景
+          <input
+            type="color"
+            value={backgroundColor}
+            onChange={(e) => onBackgroundColor(e.target.value)}
+            className="w-5 h-5 p-0 bg-transparent border-0"
+          />
+        </label>
         {format === "stl" && (
           <label
             className="flex items-center gap-1 text-slate-300"

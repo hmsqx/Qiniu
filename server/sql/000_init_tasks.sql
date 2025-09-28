@@ -166,3 +166,29 @@ INSERT INTO `user_sessions` VALUES (1,'ac65735e-983f-11f0-8927-00163e103396','c5
 UNLOCK TABLES;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+-- 1) Create user_model_downloads table (idempotent)
+CREATE TABLE IF NOT EXISTS `user_model_downloads` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(64) NOT NULL COMMENT '用户ID',
+  `job_id` varchar(64) NOT NULL COMMENT '任务/模型ID',
+  `download_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '下载时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_user_job` (`user_id`,`job_id`) COMMENT '确保每个用户对每个模型只能下载一次',
+  KEY `idx_user` (`user_id`) COMMENT '用户索引',
+  KEY `idx_job` (`job_id`) COMMENT '任务索引',
+  KEY `idx_download_time` (`download_time`) COMMENT '下载时间索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户模型下载记录表';
+
+-- 2) Backfill last 14 days of records into daily_model_views (idempotent)
+INSERT IGNORE INTO `daily_model_views` (`view_date`, `total_views`)
+SELECT
+  DATE(DATE_SUB(CURDATE(), INTERVAL n DAY)) AS view_date,
+  0 AS total_views
+FROM (
+  SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION
+  SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION
+  SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 13
+) numbers
+WHERE DATE(DATE_SUB(CURDATE(), INTERVAL n DAY)) >= DATE_SUB(CURDATE(), INTERVAL 13 DAY);

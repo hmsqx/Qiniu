@@ -15,6 +15,7 @@ export type ThreeViewerOptions = {
   showGrid: boolean;
   autoRotate: boolean;
   stlColor: string;
+  backgroundColor: string;
 };
 
 export function useThreeViewer(
@@ -62,12 +63,21 @@ export function useThreeViewer(
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    // Set initial background color
+    try {
+      const bg = new THREE.Color(opts.backgroundColor || "#000000");
+      renderer.setClearColor(bg, 1);
+    } catch {}
     container.appendChild(renderer.domElement);
     canvasRef.current = renderer.domElement;
     rendererRef.current = renderer;
 
     const scene = new THREE.Scene();
-    scene.background = null;
+    try {
+      scene.background = new THREE.Color(opts.backgroundColor || "#000000");
+    } catch {
+      scene.background = null;
+    }
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(
@@ -241,6 +251,18 @@ export function useThreeViewer(
       stlMaterialRef.current.needsUpdate = true;
     }
   }, [opts.stlColor]);
+
+  // reactive background color
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current as THREE.Scene | null;
+    if (!renderer || !scene) return;
+    try {
+      const bg = new THREE.Color(opts.backgroundColor || "#000000");
+      renderer.setClearColor(bg, 1);
+      scene.background = bg;
+    } catch {}
+  }, [opts.backgroundColor]);
 
   const handleResetView = () => {
     const cam = cameraRef.current;
