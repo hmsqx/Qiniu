@@ -5,7 +5,7 @@ const VITE_API_BASE = "/llm";
 
 const instance: AxiosInstance = axios.create({
   baseURL: VITE_API_BASE,
-  timeout: 180000,
+  timeout: 360000,
   headers: {
     "Content-Type": "application/json",
   },
