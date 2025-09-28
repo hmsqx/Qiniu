@@ -12,10 +12,8 @@ export type ThreeViewerOptions = {
   format: string;
   isVideo: boolean;
   isUsd: boolean;
-  showGrid: boolean;
   autoRotate: boolean;
   stlColor: string;
-  backgroundColor: string;
 };
 
 export function useThreeViewer(
@@ -27,7 +25,6 @@ export function useThreeViewer(
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const controlsRef = useRef<OrbitControls | null>(null);
-  const gridRef = useRef<THREE.GridHelper | null>(null);
   const stlMaterialRef = useRef<THREE.MeshStandardMaterial | null>(null);
   const initialCamRef = useRef<{
     pos: THREE.Vector3;
@@ -36,8 +33,7 @@ export function useThreeViewer(
   const modelRootRef = useRef<THREE.Object3D | null>(null);
 
   useEffect(() => {
-    const { url, format, isVideo, isUsd, showGrid, autoRotate, stlColor } =
-      opts;
+    const { url, format, isVideo, isUsd, autoRotate, stlColor } = opts;
     if (!containerRef.current || !url || isVideo || isUsd) return;
 
     const safeUrl = url as string;
@@ -63,21 +59,13 @@ export function useThreeViewer(
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    // Set initial background color
-    try {
-      const bg = new THREE.Color(opts.backgroundColor || "#000000");
-      renderer.setClearColor(bg, 1);
-    } catch {}
     container.appendChild(renderer.domElement);
     canvasRef.current = renderer.domElement;
     rendererRef.current = renderer;
 
     const scene = new THREE.Scene();
-    try {
-      scene.background = new THREE.Color(opts.backgroundColor || "#000000");
-    } catch {
-      scene.background = null;
-    }
+    // No background color logic; keep transparent to show page background
+    scene.background = null;
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(
@@ -102,11 +90,7 @@ export function useThreeViewer(
     dir.castShadow = true;
     scene.add(dir);
 
-    const grid = new THREE.GridHelper(10, 20, 0x444444, 0x222222);
-    grid.position.y = -0.001;
-    scene.add(grid);
-    gridRef.current = grid;
-    grid.visible = showGrid;
+    // Removed grid helper to eliminate grid rendering
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -236,11 +220,6 @@ export function useThreeViewer(
     };
   }, [containerRef, opts.url, opts.format, opts.isVideo, opts.isUsd]);
 
-  // reactive toggles
-  useEffect(() => {
-    if (gridRef.current) gridRef.current.visible = opts.showGrid;
-  }, [opts.showGrid]);
-
   useEffect(() => {
     if (controlsRef.current) controlsRef.current.autoRotate = opts.autoRotate;
   }, [opts.autoRotate]);
@@ -251,18 +230,6 @@ export function useThreeViewer(
       stlMaterialRef.current.needsUpdate = true;
     }
   }, [opts.stlColor]);
-
-  // reactive background color
-  useEffect(() => {
-    const renderer = rendererRef.current;
-    const scene = sceneRef.current as THREE.Scene | null;
-    if (!renderer || !scene) return;
-    try {
-      const bg = new THREE.Color(opts.backgroundColor || "#000000");
-      renderer.setClearColor(bg, 1);
-      scene.background = bg;
-    } catch {}
-  }, [opts.backgroundColor]);
 
   const handleResetView = () => {
     const cam = cameraRef.current;
@@ -289,7 +256,6 @@ export function useThreeViewer(
     cameraRef,
     rendererRef,
     controlsRef,
-    gridRef,
     stlMaterialRef,
     initialCamRef,
     modelRootRef,

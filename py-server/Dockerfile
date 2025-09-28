@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source
 COPY . .
 
-"#" Simple entrypoint to inject DASHSCOPE_API_KEY into api.env if present
+
 COPY docker-entrypoint.sh /usr/local/bin/entry.sh
 RUN chmod +x /usr/local/bin/entry.sh
 
