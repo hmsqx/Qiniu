@@ -8,7 +8,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 
-const AdminLayout = lazy(() => import("@/layout/AdminLayout"));
+const AdminLayout = lazy(() => import("@/layout/admin"));
 const Admin = lazy(() => import("@/views/admin/dashboard"));
 const AdminUsers = lazy(() => import("@/views/admin/users"));
 const AdminModels = lazy(() => import("@/views/admin/models"));
