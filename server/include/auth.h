@@ -10,4 +10,7 @@ Json::Value registerUser(const std::string &username,
 
 // 登录：传入用户名或邮箱、明文密码，返回 Json（包含 sessionToken 与过期时间等）
 Json::Value loginUser(const std::string &usernameOrEmail,
-                      const std::string &plainPassword); 
+                      const std::string &plainPassword);
+
+// 登出：撤销用户会话token
+Json::Value logoutUser(const std::string &sessionToken); 

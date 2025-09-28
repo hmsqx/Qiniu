@@ -155,12 +155,12 @@ Json::Value loginUser(const std::string &usernameOrEmail,
         return resp;
     }
 
-    // 优先复用未过期且未撤销的会话
+    // 优先复用未过期的会话
     std::string tokenHex;
     {
         std::ostringstream q;
         q << "SELECT session_token FROM user_sessions WHERE user_id='" << userId
-          << "' AND revoked=0 AND expire_time > NOW() ORDER BY create_time DESC LIMIT 1";
+          << "' AND expire_time > NOW() ORDER BY create_time DESC LIMIT 1";
         
         auto sres = conn.executeQuery(q.str());
         if (sres) {
@@ -202,6 +202,43 @@ Json::Value loginUser(const std::string &usernameOrEmail,
     resp["data"]["userId"] = userId;
     resp["data"]["sessionToken"] = tokenHex;
     resp["data"]["expireInSeconds"] = SESSION_TTL_SECONDS;
+    return resp;
+}
+
+Json::Value logoutUser(const std::string &sessionToken)
+{
+    Json::Value resp;
+    ScopedConnection conn;
+    if (!conn.isValid()) {
+        resp["status"] = "error";
+        resp["code"] = 500;
+        resp["message"] = "数据库连接失败";
+        return resp;
+    }
+
+    if (sessionToken.empty()) {
+        resp["status"] = "error";
+        resp["code"] = 400;
+        resp["message"] = "会话token不能为空";
+        return resp;
+    }
+
+    std::string eToken = conn.escapeString(sessionToken);
+    
+    // 删除会话token（登出后完全清除会话）
+    std::ostringstream deleteSql;
+    deleteSql << "DELETE FROM user_sessions WHERE session_token='" << eToken << "'";
+    
+    if (!conn.executeUpdate(deleteSql.str())) {
+        resp["status"] = "error";
+        resp["code"] = 500;
+        resp["message"] = "登出失败";
+        return resp;
+    }
+    
+    resp["status"] = "success";
+    resp["code"] = 200;
+    resp["message"] = "登出成功";
     return resp;
 }
 

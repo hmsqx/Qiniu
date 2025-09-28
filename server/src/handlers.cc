@@ -374,6 +374,11 @@ void handleQueryJobsByPageAsync(const httplib::Request &req, httplib::Response &
                     Json::Value dbInfo = getTaskCompleteInfo(job.first);
                     Json::Value taskInfo;
                     std::cout <<"UserId: "<< userId<<" jobId: "<<job.first<<" job version:" <<job.second <<std::endl;
+                    if(dbInfo["status"] == "SUCCEED" || dbInfo["status"] == "DONE"){
+                        taskInfo = dbInfo;
+                        currentPageData.append(taskInfo);
+                        continue;
+                    }
                     if(job.second == "rapid")
                     taskInfo = queryTaskStatusFromTxRapid(job.first);
                     else if(job.second == "pro")
@@ -389,6 +394,10 @@ void handleQueryJobsByPageAsync(const httplib::Request &req, httplib::Response &
                         taskInfo["downloadCount"] = dbInfo["downloadCount"];
                         taskInfo["like"] = dbInfo["like"];
                         taskInfo["createTime"] = dbInfo["createTime"];
+                        taskInfo["status"] = dbInfo["status"];
+                        if(taskInfo["status"] == "SUCCEED"){
+                            taskInfo["errorMsg"] = "";
+                        }
                     }
 
                     currentPageData.append(taskInfo);
@@ -660,6 +669,41 @@ void handleLogin(const httplib::Request &req, httplib::Response &res)
     res.set_content(Json::writeString(writer, result), "application/json");
 }
 
+void handleLogout(const httplib::Request &req, httplib::Response &res)
+{
+    // 从请求头获取Session-Token
+    std::string sessionToken;
+    if (req.has_header("Session-Token"))
+    {
+        sessionToken = req.get_header_value("Session-Token");
+    }
+    
+    if (sessionToken.empty())
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 400;
+        errorResponse["message"] = "缺少Session-Token";
+        Json::StreamWriterBuilder writer;
+        res.status = 400;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+
+    Json::Value result = logoutUser(sessionToken);
+    Json::StreamWriterBuilder writer;
+    if (result.get("status", "error").asString() == "success")
+    {
+        res.status = 200;
+    }
+    else
+    {
+        int code = result.get("code", 500).asInt();
+        res.status = (code >= 400 && code < 600) ? code : 500;
+    }
+    res.set_content(Json::writeString(writer, result), "application/json");
+}
+
 void handleMe(const httplib::Request &req, httplib::Response &res)
 {
     std::string sessionToken;
@@ -722,6 +766,7 @@ void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
+    
     std::string jobId = root.get("jobId", "").asString();
     if (jobId.empty())
     {
@@ -734,23 +779,52 @@ void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
-    auto fut = getThreadPool().enqueue([jobId]()
-                                       { return incrementModelDownloadCount(jobId); });
+    
+    // 获取当前用户信息
+    std::string sessionToken;
+    if (req.has_header("Session-Token"))
+    {
+        sessionToken = req.get_header_value("Session-Token");
+    }
+    
+    Json::Value userInfo;
+    if (!sessionToken.empty())
+    {
+        userInfo = getUserInfoBySessionToken(sessionToken);
+    }
+    
+    std::string currentUserId = userInfo.get("userId", "").asString();
+    if (currentUserId.empty())
+    {
+        Json::Value errorResponse;
+        errorResponse["status"] = "error";
+        errorResponse["code"] = 401;
+        errorResponse["message"] = "未登录或会话已过期";
+        Json::StreamWriterBuilder writer;
+        res.status = 401;
+        res.set_content(Json::writeString(writer, errorResponse), "application/json");
+        return;
+    }
+    
+    // 使用新的下载记录函数（确保每个用户对每个模型只能计数一次）
+    auto fut = getThreadPool().enqueue([currentUserId, jobId]()
+                                       { return recordUserDownloadAndIncrementCount(currentUserId, jobId); });
     if (!fut.get())
     {
         Json::Value errorResponse;
         errorResponse["status"] = "error";
         errorResponse["code"] = 500;
-        errorResponse["message"] = "下载计数更新失败";
+        errorResponse["message"] = "下载记录更新失败";
         Json::StreamWriterBuilder writer;
         res.status = 500;
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
+    
     Json::Value ok;
     ok["status"] = "success";
     ok["code"] = 200;
-    ok["message"] = "下载计数+1";
+    ok["message"] = "下载记录已更新";
     Json::StreamWriterBuilder writer;
     res.status = 200;
     res.set_content(Json::writeString(writer, ok), "application/json");
@@ -1114,26 +1188,27 @@ void handleGetTaskFiles(const httplib::Request &req, httplib::Response &res)
     res.set_content(Json::writeString(writer, result), "application/json");
 }
 
-void handleViewModel(const httplib::Request &req, httplib::Response &res)
-{
+void handleIncrementViewAndGetRates(const httplib::Request& req, httplib::Response& res) {
+    // 1. 解析请求JSON
     Json::Value root;
     Json::CharReaderBuilder reader;
     std::string errors;
     std::istringstream ss(req.body);
-    if (!Json::parseFromStream(reader, ss, &root, &errors))
-    {
+
+    if (!Json::parseFromStream(reader, ss, &root, &errors)) {
         Json::Value e;
         e["status"] = "error";
         e["code"] = 400;
-        e["message"] = std::string("无效的JSON格式: ") + errors;
+        e["message"] = "无效的JSON格式: " + errors;
         Json::StreamWriterBuilder w;
         res.status = 400;
         res.set_content(Json::writeString(w, e), "application/json");
         return;
     }
+
+    // 2. 校验jobId参数
     std::string jobId = root.get("jobId", "").asString();
-    if (jobId.empty())
-    {
+    if (jobId.empty()) {
         Json::Value e;
         e["status"] = "error";
         e["code"] = 400;
@@ -1143,29 +1218,48 @@ void handleViewModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(w, e), "application/json");
         return;
     }
-    auto fut = getThreadPool().enqueue([jobId]()
-                                       { return incrementModelViewCount(jobId); });
-    bool ok = fut.get();
-    if (!ok)
-    {
+
+    // 3. 异步执行：递增viewCount并获取统计（使用线程池）
+    auto fut = getThreadPool().enqueue([jobId]() {
+        Json::Value stats;
+        bool success = incrementModelViewAndGetStats(jobId, stats);
+        return std::make_pair(success, stats);
+    });
+
+    auto [success, stats] = fut.get();
+
+    // 4. 处理结果并返回
+    if (!success) {
         Json::Value e;
         e["status"] = "error";
         e["code"] = 500;
-        e["message"] = "浏览计数更新失败";
+        e["message"] = "浏览计数更新或查询失败";
         Json::StreamWriterBuilder w;
         res.status = 500;
         res.set_content(Json::writeString(w, e), "application/json");
         return;
     }
+
+    // 5. 构建包含下载率、收藏率和prompt的响应
+    double viewCnt = stats["viewCount"].asDouble();
+    double likeRate = (viewCnt <= 0) ? 0.0 : static_cast<double>(stats["likeCount"].asInt()) / viewCnt;
+    double downloadRate = (viewCnt <= 0) ? 0.0 : static_cast<double>(stats["downloadCount"].asInt()) / viewCnt;
+
     Json::Value resp;
     resp["status"] = "success";
     resp["code"] = 200;
-    resp["message"] = "浏览计数+1";
+    resp["data"]["jobId"] = jobId;
+    resp["data"]["viewCount"] = stats["iewCount"].asInt();
+    resp["data"]["likeCount"] = stats["likeCount"].asInt();
+    resp["data"]["downloadCount"] = stats["downloadCount"].asInt();
+    resp["data"]["likeRate"] = likeRate;       // 收藏率
+    resp["data"]["downloadRate"] = downloadRate; // 下载率
+    resp["data"]["prompt"] = stats["prompt"].asString();     // 新增prompt字段
+
     Json::StreamWriterBuilder w;
     res.status = 200;
     res.set_content(Json::writeString(w, resp), "application/json");
 }
-
 static Json::Value buildRateResponse(const std::string &jobId, const std::string &rateName, int likeCnt, int downloadCnt, int viewCnt)
 {
     double denom = static_cast<double>(viewCnt);
@@ -1186,6 +1280,7 @@ static Json::Value buildRateResponse(const std::string &jobId, const std::string
     return resp;
 }
 
+//deprecated
 void handleGetLikeRate(const httplib::Request &req, httplib::Response &res)
 {
     Json::Value root;
@@ -1234,7 +1329,7 @@ void handleGetLikeRate(const httplib::Request &req, httplib::Response &res)
     res.status = 200;
     res.set_content(Json::writeString(w, ok), "application/json");
 }
-
+//deprecated
 void handleGetDownloadRate(const httplib::Request &req, httplib::Response &res)
 {
     Json::Value root;
@@ -1283,7 +1378,7 @@ void handleGetDownloadRate(const httplib::Request &req, httplib::Response &res)
     res.status = 200;
     res.set_content(Json::writeString(w, ok), "application/json");
 }
-
+//deprecated
 void handleGetUserGrowth(const httplib::Request &req, httplib::Response &res)
 {
     // 支持 query 参数或 body 传参：start, end（ISO时间如 2025-09-01 00:00:00）

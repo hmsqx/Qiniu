@@ -57,3 +57,47 @@
 #ifndef MODEL_DOWNLOAD_TIMEOUT_SECONDS
 #define MODEL_DOWNLOAD_TIMEOUT_SECONDS 300 // 单个文件下载超时（秒）
 #endif
+
+// ---------------- API Security & Rate Limiting ----------------
+#ifndef MAX_REQUESTS_PER_MINUTE
+#define MAX_REQUESTS_PER_MINUTE 60 // 每分钟最大请求数
+#endif
+
+#ifndef MAX_REQUESTS_PER_HOUR
+#define MAX_REQUESTS_PER_HOUR 1000 // 每小时最大请求数
+#endif
+
+#ifndef MAX_REQUESTS_PER_DAY
+#define MAX_REQUESTS_PER_DAY 10000 // 每天最大请求数
+#endif
+
+#ifndef BURST_LIMIT
+#define BURST_LIMIT 10 // 突发请求限制
+#endif
+
+#ifndef RATE_LIMIT_WINDOW_SECONDS
+#define RATE_LIMIT_WINDOW_SECONDS 60 // 限流时间窗口大小（秒）
+#endif
+
+#ifndef MAX_REQUEST_SIZE_BYTES
+#define MAX_REQUEST_SIZE_BYTES (1024 * 1024) // 最大请求体大小（1MB）
+#endif
+
+// ---------------- Server Configuration ----------------
+#ifndef SERVER_PORT
+#define SERVER_PORT 8080 // 服务器监听端口
+#endif
+
+#ifndef SERVER_HOST
+#define SERVER_HOST "0.0.0.0" // 服务器监听地址
+#endif
+
+
+// ---------------- AI3D轮询配置 ----------------
+#ifndef AI3D_POLL_INTERVAL_SECONDS
+#define AI3D_POLL_INTERVAL_SECONDS 5
+#endif
+
+#ifndef AI3D_POLL_TIMEOUT_SECONDS
+#define AI3D_POLL_TIMEOUT_SECONDS 900  // 15分钟
+#endif

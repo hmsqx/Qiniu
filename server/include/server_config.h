@@ -5,6 +5,7 @@
 #include "thread_pool.h"
 #include "concurrent_downloader.h"
 #include "performance_monitor.h"
+#include "deallock_detector.h"
 #include <iostream>
 
 // 服务器配置结构

@@ -121,18 +121,18 @@ ScopedTransaction<Func> createTransaction(Func&& func, IsolationLevel level = Is
     return ScopedTransaction<Func>(std::forward<Func>(func), level);
 }
 
-// 死锁检测和重试机制
-class DeadlockDetector {
-public:
-    static bool isDeadlockError(const std::string& error);
-    static bool shouldRetry(const std::string& error);
-    static int getMaxRetries() { return 3; }
-    static int getRetryDelayMs() { return 100; } // 毫秒
-};
+// // 死锁检测和重试机制
+// class DeadlockDetector {
+// public:
+//     static bool isDeadlockError(const std::string& error);
+//     static bool shouldRetry(const std::string& error);
+//     static int getMaxRetries() { return 3; }
+//     static int getRetryDelayMs() { return 100; } // 毫秒
+// };
 
 // 带重试的事务执行
 template<typename Func>
-bool executeWithRetry(Func&& func, int maxRetries = DeadlockDetector::getMaxRetries()) {
+bool executeWithRetry(Func&& func, int maxRetries = 3) {
     for (int i = 0; i < maxRetries; ++i) {
         try {
             if (func()) {
@@ -140,15 +140,15 @@ bool executeWithRetry(Func&& func, int maxRetries = DeadlockDetector::getMaxRetr
             }
             
             // 检查是否需要重试
-            if (i < maxRetries - 1 && DeadlockDetector::shouldRetry("")) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(DeadlockDetector::getRetryDelayMs() * (i + 1)));
+            if (i < maxRetries - 1 ) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100 * (i + 1)));
                 continue;
             }
             
             return false;
         } catch (const std::exception& e) {
-            if (i < maxRetries - 1 && DeadlockDetector::shouldRetry(e.what())) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(DeadlockDetector::getRetryDelayMs() * (i + 1)));
+            if (i < maxRetries - 1 ) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100 * (i + 1)));
                 continue;
             }
             throw;

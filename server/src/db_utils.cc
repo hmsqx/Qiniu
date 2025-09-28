@@ -260,6 +260,88 @@ bool incrementModelDownloadCount(const std::string &jobId)
     return conn.executeUpdate(sql.str());
 }
 
+// 新增：检查用户是否已下载过该模型
+bool hasUserDownloadedModel(const std::string& userId, const std::string& jobId)
+{
+    ScopedConnection conn;
+    if (!conn.isValid()) {
+        return false;
+    }
+    
+    std::string eUserId = conn.escapeString(userId);
+    std::string eJobId = conn.escapeString(jobId);
+    
+    std::ostringstream sql;
+    sql << "SELECT 1 FROM user_model_downloads WHERE user_id='" << eUserId << "' AND job_id='" << eJobId << "' LIMIT 1";
+    
+    auto res = conn.executeQuery(sql.str());
+    if (res) {
+        MYSQL_ROW row = mysql_fetch_row(res.get());
+        return (row != nullptr);
+    }
+    return false;
+}
+
+// 新增：记录用户下载并增加模型下载计数（事务安全）
+bool recordUserDownloadAndIncrementCount(const std::string& userId, const std::string& jobId)
+{
+    return executeWithRetry([&]() -> bool {
+        ScopedConnection baseConn;
+        if (!baseConn.isValid()) {
+            return false;
+        }
+        
+        TransactionManager transaction(std::move(baseConn));
+        if (!transaction.begin(IsolationLevel::REPEATABLE_READ)) {
+            return false;
+        }
+        
+        try {
+            std::string eUserId = transaction.escapeString(userId);
+            std::string eJobId = transaction.escapeString(jobId);
+            
+            // 检查是否已经下载过
+            std::ostringstream checkSql;
+            checkSql << "SELECT 1 FROM user_model_downloads WHERE user_id='" << eUserId 
+                     << "' AND job_id='" << eJobId << "' FOR UPDATE";
+            
+            auto checkRes = transaction.executeQuery(checkSql.str());
+            if (checkRes) {
+                MYSQL_ROW row = mysql_fetch_row(checkRes.get());
+                if (row) {
+                    // 已经下载过，不重复计数
+                    return transaction.commit();
+                }
+            }
+            
+            // 插入下载记录
+            std::ostringstream insertSql;
+            insertSql << "INSERT INTO user_model_downloads (user_id, job_id, download_time) VALUES ('"
+                      << eUserId << "', '" << eJobId << "', NOW())";
+            
+            if (!transaction.executeUpdate(insertSql.str())) {
+                transaction.rollback();
+                return false;
+            }
+            
+            // 增加模型下载计数
+            std::ostringstream updateSql;
+            updateSql << "UPDATE ai3d_tasks SET downloadCount = COALESCE(downloadCount,0) + 1, update_time=NOW() WHERE tx_job_id='" << eJobId << "'";
+            
+            if (!transaction.executeUpdate(updateSql.str())) {
+                transaction.rollback();
+                return false;
+            }
+            
+            return transaction.commit();
+        } catch (const std::exception& e) {
+            std::cerr << "记录用户下载异常: " << e.what() << std::endl;
+            transaction.rollback();
+            return false;
+        }
+    });
+}
+
 bool incrementModelLikeCount(const std::string &jobId)
 {
     ScopedConnection conn;
@@ -275,18 +357,99 @@ bool incrementModelLikeCount(const std::string &jobId)
     return conn.executeUpdate(sql.str());
 }
 
-bool incrementModelViewCount(const std::string &jobId)
-{
-    ScopedConnection conn;
-    if (!conn.isValid()) {
+/**
+ * 事务内执行：递增viewCount并查询最新统计信息
+ * @param conn 数据库连接（事务内）
+ * @param jobId 任务ID
+ * @param outStats 输出的统计信息（包含prompt）
+ * @return 操作是否成功
+ */
+bool incrementViewAndGetStats(TransactionManager& transaction, const std::string& jobId, Json::Value& outStats) {
+    try {
+        std::string eJobId = transaction.escapeString(jobId);
+
+        // 1. 递增viewCount（加行锁，确保并发安全）
+        std::ostringstream updateSql;
+        updateSql << "UPDATE ai3d_tasks "
+                  << "SET viewCount = COALESCE(viewCount, 0) + 1, update_time = NOW() "
+                  << "WHERE tx_job_id = '" << eJobId << "'"; // 行锁防止并发更新
+
+        if (!transaction.executeUpdate(updateSql.str())) {
+            return false;
+        }
+
+        // 2. 更新每日浏览量记录
+        std::ostringstream dailyViewSql;
+        dailyViewSql << "INSERT INTO daily_model_views (view_date, total_views) "
+                     << "VALUES (CURDATE(), 1) "
+                     << "ON DUPLICATE KEY UPDATE total_views = total_views + 1";
+
+        if (!transaction.executeUpdate(dailyViewSql.str())) {
+            return false;
+        }
+
+        // 3. 查询更新后的统计信息（包含prompt）
+        std::ostringstream querySql;
+        querySql << "SELECT "
+                 << "COALESCE(`like`, 0), "
+                 << "COALESCE(downloadCount, 0), "
+                 << "COALESCE(viewCount, 0), "
+                 << "prompt " // 新增查询prompt字段
+                 << "FROM ai3d_tasks "
+                 << "WHERE tx_job_id = '" << eJobId << "' LIMIT 1";
+
+        auto res = transaction.executeQuery(querySql.str());
+        if (!res) {
+            return false;
+        }
+
+        MYSQL_ROW row = mysql_fetch_row(res.get());
+        if (!row) {
+            return false; // 任务不存在
+        }
+
+        // 解析结果到结构体
+        outStats["likeCount"] = row[0] ? atoi(row[0]) : 0;
+        outStats["downloadCount"] = row[1] ? atoi(row[1]) : 0;
+        outStats["viewCount"] = row[2] ? atoi(row[2]) : 0;
+        outStats["prompt"] = row[3] ? row[3] : ""; // 处理prompt
+
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "事务内操作失败: " << e.what() << std::endl;
         return false;
     }
-    std::string eJobId = conn.escapeString(jobId);
-    std::ostringstream sql;
-    sql << "UPDATE ai3d_tasks SET viewCount = COALESCE(viewCount,0) + 1, update_time=NOW() WHERE tx_job_id='" << eJobId << "'";
-    return conn.executeUpdate(sql.str());
 }
 
+/**
+ * 对外接口：递增viewCount并获取最新统计（含事务与重试）
+ * @param jobId 任务ID
+ * @param outStats 输出的统计信息
+ * @return 操作是否成功
+ */
+bool incrementModelViewAndGetStats(const std::string& jobId, Json::Value& outStats) {
+    return executeWithRetry([&]() -> bool {
+        ScopedConnection conn;
+        if (!conn.isValid()) {
+            return false;
+        }
+
+        // 开启事务（可重复读隔离级别）
+        TransactionManager transaction(std::move(conn));
+        if (!transaction.begin(IsolationLevel::REPEATABLE_READ)) {
+            return false;
+        }
+
+        // 执行核心逻辑
+        bool success = incrementViewAndGetStats(transaction, jobId, outStats);
+        if (success) {
+            return transaction.commit(); // 提交事务
+        } else {
+            transaction.rollback(); // 失败回滚
+            return false;
+        }
+    });
+}
 bool getTaskStatsInternal(ScopedConnection &conn, const std::string &jobId, int &outLike, int &outDownload, int &outView)
 {
     std::string eJobId = conn.escapeString(jobId);
@@ -374,6 +537,26 @@ Json::Value getAdminOverviewStats()
         out["yesterdayNewUsers"] = yesterdayNew;
         out["dayBeforeNewUsers"] = dayBeforeNew;
         out["userGrowthRate"] = growthRate;
+
+        // 查询近14天每一天所有模型的浏览量
+        auto q7 = conn.executeQuery(
+            "SELECT view_date, total_views FROM daily_model_views "
+            "WHERE view_date >= DATE_SUB(CURDATE(), INTERVAL 13 DAY) "
+            "ORDER BY view_date ASC"
+        );
+        
+        Json::Value dailyViews(Json::arrayValue);
+        if (q7) {
+            MYSQL_ROW row;
+            while ((row = mysql_fetch_row(q7.get())) != nullptr) {
+                Json::Value dayData;
+                dayData["date"] = row[0] ? row[0] : "";
+                dayData["views"] = row[1] ? atoi(row[1]) : 0;
+                dailyViews.append(dayData);
+            }
+        }
+        out["dailyViews"] = dailyViews;
+
     } catch (...) { out["ok"] = false; }
     return out;
 }
@@ -441,12 +624,12 @@ std::pair<int, Json::Value> adminQueryModels(const std::string &minLike,
         auto cr = conn.executeQuery(countSql.str()); if (cr) { MYSQL_ROW row = mysql_fetch_row(cr.get()); if (row) total = atoi(row[0]); }
 
         int startIdx = (pageNum - 1) * pageSize;
-        std::ostringstream pageSql; pageSql << "SELECT tx_job_id, user_id, COALESCE(`like`,0), COALESCE(downloadCount,0), COALESCE(Isprivate,0), status, result_format, version, create_time, prompt" << base.str();
+        std::ostringstream pageSql; pageSql << "SELECT tx_job_id, user_id, COALESCE(`like`,0), COALESCE(downloadCount,0), COALESCE(Isprivate,0), status, result_format, version, create_time, prompt, viewCount, fileurl, previewImages" << base.str();
         pageSql << " ORDER BY create_time DESC LIMIT " << startIdx << ", " << pageSize;
         auto pr = conn.executeQuery(pageSql.str());
         if (pr) {
             MYSQL_ROW row; while ((row = mysql_fetch_row(pr.get())) != nullptr) {
-                Json::Value item; item["jobId"] = row[0] ? row[0] : ""; item["userId"] = row[1] ? row[1] : ""; item["like"] = row[2] ? atoi(row[2]) : 0; item["downloadCount"] = row[3] ? atoi(row[3]) : 0; item["Isprivate"] = (row[4] && atoi(row[4]) != 0); item["status"] = row[5] ? row[5] : ""; item["resultFormat"] = row[6] ? row[6] : ""; item["version"] = row[7] ? row[7] : ""; item["create_time"] = row[8] ? row[8] : ""; item["prompt"] = row[9] ? row[9] : ""; list.append(item);
+                Json::Value item; item["jobId"] = row[0] ? row[0] : ""; item["userId"] = row[1] ? row[1] : ""; item["like"] = row[2] ? atoi(row[2]) : 0; item["downloadCount"] = row[3] ? atoi(row[3]) : 0; item["Isprivate"] = (row[4] && atoi(row[4]) != 0); item["status"] = row[5] ? row[5] : ""; item["resultFormat"] = row[6] ? row[6] : ""; item["version"] = row[7] ? row[7] : ""; item["create_time"] = row[8] ? row[8] : ""; item["prompt"] = row[9] ? row[9] : ""; item["viewCount"] = row[10] ? atoi(row[10]) : 0; item["fileurl"] = row[11] ? row[11] : ""; item["previewImages"] = row[12] ? row[12] : ""; list.append(item);
             }
         }
     } catch (...) { total = 0; list = Json::Value(Json::arrayValue); }
@@ -479,7 +662,7 @@ std::pair<int, Json::Value> queryModelsByPrivacy(bool isPrivate,
     int startIdx = (pageNum - 1) * pageSize;
     std::ostringstream pageSql;
     pageSql << "SELECT t.tx_job_id, t.user_id, t.status, t.result_format, t.version, "
-        << "COALESCE(t.downloadCount,0), COALESCE(t.Isprivate,0), COALESCE(t.`like`,0), t.create_time, u.username, t.prompt, t.fileurl, t.previewImages "  // 最后添加u.username
+        << "COALESCE(t.downloadCount,0), COALESCE(t.Isprivate,0), COALESCE(t.`like`,0), t.create_time, u.username, t.prompt, t.fileurl, t.previewImages ,t.viewCount "  // 最后添加u.username
         << "FROM ai3d_tasks t "
         << "LEFT JOIN users u ON t.user_id = u.user_id "  // 连表关联条件
         << "WHERE COALESCE(t.Isprivate, 0) = " << (isPrivate ? 1 : 0)
@@ -503,6 +686,7 @@ std::pair<int, Json::Value> queryModelsByPrivacy(bool isPrivate,
             item["prompt"] = row[10] ? row[10] : "";
             item["fileurl"] = row[11] ? row[11] : "";
             item["previewImages"] = row[12] ? row[12] : "";
+            item["viewCount"] = row[13] ? atoi(row[13]) : 0;
             list.append(item);
         }
     }
@@ -656,7 +840,7 @@ bool toggleUserLikeForJob(const std::string& userId, const std::string& jobId, b
             bool exists = false;
             if (res) {
                 MYSQL_ROW row = mysql_fetch_row(res.get());
-                if (row) exists = true;
+                if (row) exists = row[0];
             }
 
             bool ok = false;
@@ -675,6 +859,9 @@ bool toggleUserLikeForJob(const std::string& userId, const std::string& jobId, b
                 i << "INSERT INTO user_model_likes (user_id, job_id, create_time) VALUES ('"
                   << eUser << "','" << eJob << "', NOW())";
                 ok = tx.executeUpdate(i.str());
+                std::ostringstream u;
+                u << "UPDATE ai3d_tasks SET `like` = COALESCE(`like`,0) + 1, update_time=NOW() WHERE tx_job_id='" << eJob << "'";
+                ok = tx.executeUpdate(u.str());
                 outNewStatus = true;
             }
             if (!ok) { tx.rollback(); return false; }

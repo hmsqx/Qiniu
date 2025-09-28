@@ -9,6 +9,7 @@ void handleQueryJobsByPageAsync(const httplib::Request &req, httplib::Response &
 
 void handleRegister(const httplib::Request &req, httplib::Response &res);
 void handleLogin(const httplib::Request &req, httplib::Response &res);
+void handleLogout(const httplib::Request &req, httplib::Response &res);
 
 // 获取当前用户信息（通过请求头 Session-Token）
 void handleMe(const httplib::Request &req, httplib::Response &res);
@@ -29,7 +30,7 @@ void handleGetUserLike(const httplib::Request &req, httplib::Response &res);
 void handleToggleUserLike(const httplib::Request &req, httplib::Response &res);
 
 // 浏览与比率、用户增长
-void handleViewModel(const httplib::Request &req, httplib::Response &res);
+void handleIncrementViewAndGetRates(const httplib::Request &req, httplib::Response &res);
 void handleGetLikeRate(const httplib::Request &req, httplib::Response &res);
 void handleGetDownloadRate(const httplib::Request &req, httplib::Response &res);
 void handleGetUserGrowth(const httplib::Request &req, httplib::Response &res);

@@ -1,4 +1,5 @@
 #include "transaction_manager.h"
+#include "deallock_detector.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -194,18 +195,4 @@ my_ulonglong TransactionManager::getAffectedRows() const {
 
 std::string TransactionManager::escapeString(const std::string& input) {
     return conn_.escapeString(input);
-}
-
-// DeadlockDetector 实现
-bool DeadlockDetector::isDeadlockError(const std::string& error) {
-    return error.find("Deadlock found") != std::string::npos ||
-           error.find("Lock wait timeout") != std::string::npos ||
-           error.find("1213") != std::string::npos || // Deadlock error code
-           error.find("1205") != std::string::npos;   // Lock wait timeout error code
-}
-
-bool DeadlockDetector::shouldRetry(const std::string& error) {
-    return isDeadlockError(error) ||
-           error.find("Connection lost") != std::string::npos ||
-           error.find("Lost connection") != std::string::npos;
 }

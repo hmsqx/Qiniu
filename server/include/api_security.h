@@ -6,14 +6,15 @@
 #include <chrono>
 #include <mutex>
 #include <atomic>
+#include "config.h"
 
 // 限流配置
 struct RateLimitConfig {
-    int maxRequestsPerMinute = 60;     // 每分钟最大请求数
-    int maxRequestsPerHour = 1000;     // 每小时最大请求数
-    int maxRequestsPerDay = 10000;     // 每天最大请求数
-    int burstLimit = 10;               // 突发请求限制
-    int windowSizeSeconds = 60;        // 时间窗口大小（秒）
+    int maxRequestsPerMinute = MAX_REQUESTS_PER_MINUTE;     // 每分钟最大请求数
+    int maxRequestsPerHour = MAX_REQUESTS_PER_HOUR;         // 每小时最大请求数
+    int maxRequestsPerDay = MAX_REQUESTS_PER_DAY;           // 每天最大请求数
+    int burstLimit = BURST_LIMIT;                           // 突发请求限制
+    int windowSizeSeconds = RATE_LIMIT_WINDOW_SECONDS;      // 时间窗口大小（秒）
 };
 
 // 请求计数器
@@ -98,7 +99,7 @@ private:
 class RequestValidator {
 public:
     // 验证JSON请求
-    static bool validateJSONRequest(const std::string& body, size_t maxSize = 1024 * 1024);
+    static bool validateJSONRequest(const std::string& body, size_t maxSize = MAX_REQUEST_SIZE_BYTES);
     
     // 验证参数
     static bool validateParameter(const std::string& param, const std::string& type);

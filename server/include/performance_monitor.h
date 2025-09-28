@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <chrono>
 #include <atomic>
 #include <mutex>
@@ -9,6 +10,7 @@
 #include <vector>
 #include <thread>
 #include <limits>
+
 
 // 性能指标类型
 enum class MetricType {
@@ -102,58 +104,60 @@ private:
 
 // 死锁检测器
 class DeadlockDetector {
-public:
-    static DeadlockDetector& getInstance();
+    public:
+        static DeadlockDetector& getInstance();
+        static bool shouldRetry(const std::string& error);
+        static bool isDeadlockError(const std::string& error);
+        // 初始化检测器
+        void initialize();
+        
+        // 记录锁获取
+        void recordLockAcquisition(const std::string& lockName, const std::string& threadId);
+        
+        // 记录锁释放
+        void recordLockRelease(const std::string& lockName, const std::string& threadId);
+        
+        // 检测死锁
+        bool detectDeadlock();
+        
+        // 获取死锁报告
+        struct DeadlockReport {
+            bool hasDeadlock;
+            std::vector<std::string> involvedLocks;
+            std::vector<std::string> involvedThreads;
+            std::string cycleDescription;
+            std::chrono::steady_clock::time_point detectionTime;
+        };
+        DeadlockReport getDeadlockReport();
+        
+        // 预防死锁建议
+        std::vector<std::string> getPreventionSuggestions();
+        
+        // 清理数据
+        void cleanup();
     
-    // 初始化检测器
-    void initialize();
-    
-    // 记录锁获取
-    void recordLockAcquisition(const std::string& lockName, const std::string& threadId);
-    
-    // 记录锁释放
-    void recordLockRelease(const std::string& lockName, const std::string& threadId);
-    
-    // 检测死锁
-    bool detectDeadlock();
-    
-    // 获取死锁报告
-    struct DeadlockReport {
-        bool hasDeadlock;
-        std::vector<std::string> involvedLocks;
-        std::vector<std::string> involvedThreads;
-        std::string cycleDescription;
-        std::chrono::steady_clock::time_point detectionTime;
+    private:
+        DeadlockDetector() = default;
+        
+        struct LockInfo {
+            std::string lockName;
+            std::string ownerThreadId;
+            std::chrono::steady_clock::time_point acquisitionTime;
+            std::vector<std::string> waitingThreads;
+        };
+        
+        mutable std::mutex detectorMutex_;
+        std::unordered_map<std::string, LockInfo> locks_;
+        std::unordered_map<std::string, std::vector<std::string>> threadLocks_;
+        
+        // 死锁检测算法
+        bool hasCycle(const std::string& startThread, std::unordered_set<std::string>& visited, 
+                      std::unordered_set<std::string>& recursionStack);
+        
+        // 获取线程ID
+        std::string getCurrentThreadId();
     };
-    DeadlockReport getDeadlockReport();
     
-    // 预防死锁建议
-    std::vector<std::string> getPreventionSuggestions();
-    
-    // 清理数据
-    void cleanup();
-
-private:
-    DeadlockDetector() = default;
-    
-    struct LockInfo {
-        std::string lockName;
-        std::string ownerThreadId;
-        std::chrono::steady_clock::time_point acquisitionTime;
-        std::vector<std::string> waitingThreads;
-    };
-    
-    mutable std::mutex detectorMutex_;
-    std::unordered_map<std::string, LockInfo> locks_;
-    std::unordered_map<std::string, std::vector<std::string>> threadLocks_;
-    
-    // 死锁检测算法
-    bool hasCycle(const std::string& startThread, std::unordered_set<std::string>& visited, 
-                  std::unordered_set<std::string>& recursionStack);
-    
-    // 获取线程ID
-    std::string getCurrentThreadId();
-};
 
 // 系统资源监控
 class SystemResourceMonitor {

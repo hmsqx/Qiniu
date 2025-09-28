@@ -45,6 +45,12 @@ Json::Value getUserInfoBySessionToken(const std::string &sessionToken);
 // 模型下载量 +1（按任务 tx_job_id 计数）
 bool incrementModelDownloadCount(const std::string &jobId);
 
+// 新增：检查用户是否已下载过该模型
+bool hasUserDownloadedModel(const std::string& userId, const std::string& jobId);
+
+// 新增：记录用户下载并增加模型下载计数（事务安全，每个用户对每个模型只能计数一次）
+bool recordUserDownloadAndIncrementCount(const std::string& userId, const std::string& jobId);
+
 // 模型收藏量 +1（按任务 tx_job_id 计数）
 bool incrementModelLikeCount(const std::string &jobId);
 
@@ -74,6 +80,7 @@ bool toggleUserLikeForJob(const std::string& userId, const std::string& jobId, b
 
 // 浏览量相关
 bool incrementModelViewCount(const std::string &jobId);
+bool incrementModelViewAndGetStats(const std::string& jobId, Json::Value& outStats);
 // 读取某任务的 like、download、view 统计
 bool getTaskStats(const std::string &jobId, int &outLike, int &outDownload, int &outView);
 // 用户增长：给定时间窗口返回新用户数量

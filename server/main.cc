@@ -56,6 +56,7 @@ int main()
     SECURE_GET(server, "/api/query", handleQueryJobsByPageAsync);
     SECURE_POST(server, "/api/register", handleRegister);
     SECURE_POST(server, "/api/login", handleLogin);
+    SECURE_POST(server, "/api/logout", handleLogout);
     SECURE_GET(server, "/api/auth/me", handleMe);
     SECURE_POST(server, "/api/downloadModel", handleDownloadModel);
     SECURE_POST(server, "/api/like", handleLikeModel);
@@ -66,10 +67,10 @@ int main()
     SECURE_POST(server, "/api/getTaskFiles", handleGetTaskFiles);
     SECURE_POST(server, "/api/like/get", handleGetUserLike);
     SECURE_POST(server, "/api/like/toggle", handleToggleUserLike);
-    SECURE_POST(server, "/api/view", handleViewModel);
-    SECURE_POST(server, "/api/likeRate", handleGetLikeRate);
-    SECURE_POST(server, "/api/downloadRate", handleGetDownloadRate);
-    SECURE_GET(server, "/api/userGrowth", handleGetUserGrowth);
+    SECURE_POST(server, "/api/view", handleIncrementViewAndGetRates);
+    //SECURE_POST(server, "/api/likeRate", handleGetLikeRate);
+    //SECURE_POST(server, "/api/downloadRate", handleGetDownloadRate);
+    //SECURE_GET(server, "/api/userGrowth", handleGetUserGrowth);
     // 管理员端
     SECURE_GET(server, "/api/admin/overview", handleAdminOverview);
     SECURE_GET(server, "/api/admin/users", handleAdminQueryUsers);
@@ -191,8 +192,8 @@ int main()
         }
     });
 
-    std::cout << "启动HTTP服务器，监听端口8080..." << std::endl;
-    std::cout << "模型文件服务已启用，可通过 /model/ 路径访问下载的文件" << std::endl;
-    server.listen("0.0.0.0", 8080);
-    return 0;
+     std::cout << "启动HTTP服务器，监听端口" << SERVER_PORT << "..." << std::endl;
+     std::cout << "模型文件服务已启用，可通过 /model/ 路径访问下载的文件" << std::endl;
+     server.listen(SERVER_HOST, SERVER_PORT);
+     return 0;
 }
