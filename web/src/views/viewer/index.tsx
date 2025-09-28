@@ -90,7 +90,7 @@ const Viewer: React.FC = () => {
           target="_blank"
           rel="noreferrer"
         >
-          在系统中打开或下载
+          下载到本地查看
         </a>
       </div>
     );
