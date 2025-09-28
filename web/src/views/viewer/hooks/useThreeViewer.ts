@@ -8,7 +8,6 @@ import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.j
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 
 export type ThreeViewerOptions = {
   url: string | null;
