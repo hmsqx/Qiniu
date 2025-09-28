@@ -16,7 +16,7 @@ export const GeneratorTabs = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [action, setAction] = useState<string>("SubmitHunyuanTo3DJob");
-  const [format, setFormat] = useState<string>("OBJ");
+  const [format, setFormat] = useState<string>("STL");
   const { isAuthenticated, openLoginModal, user } = useAuth();
   const { show } = useMessage();
   const [activeTab, setActiveTab] = useState<"text-to-3d" | "image-to-3d">(

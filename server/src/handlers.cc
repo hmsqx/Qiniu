@@ -368,39 +368,48 @@ void handleQueryJobsByPageAsync(const httplib::Request &req, httplib::Response &
                 int finalPageNum = pageNum;
                 if (finalPageNum > totalPage && totalPage > 0) finalPageNum = totalPage;
 
-                Json::Value currentPageData;
-                for (const auto &job : taskIdList)
-                {
-                    Json::Value dbInfo = getTaskCompleteInfo(job.first);
-                    Json::Value taskInfo;
-                    std::cout <<"UserId: "<< userId<<" jobId: "<<job.first<<" job version:" <<job.second <<std::endl;
-                    if(dbInfo["status"] == "SUCCEED" || dbInfo["status"] == "DONE"){
-                        taskInfo = dbInfo;
-                        currentPageData.append(taskInfo);
-                        continue;
-                    }
-                    if(job.second == "rapid")
-                    taskInfo = queryTaskStatusFromTxRapid(job.first);
-                    else if(job.second == "pro")
-                    taskInfo = queryTaskStatusFromTxPro(job.first);
-                    else
-                    taskInfo = queryTaskStatusFromTx(job.first);
+                // 并发查询每个任务的状态与DB合并，提升列表吞吐
+                std::vector<std::future<Json::Value>> futures;
+                futures.reserve(taskIdList.size());
+                for (const auto &job : taskIdList) {
+                    futures.emplace_back(getThreadPool().enqueue([job]() {
+                        Json::Value merged;
+                        try {
+                            // 读取数据库信息
+                            Json::Value dbInfo = getTaskCompleteInfo(job.first);
+                            // 如果已完成，直接返回DB信息（避免外部重复查询）
+                            if (dbInfo["status"].asString() == "SUCCEED" || dbInfo["status"].asString() == "DONE") {
+                                return dbInfo;
+                            }
+                            // 远端状态查询
+                            Json::Value taskInfo;
+                            if (job.second == "rapid") taskInfo = queryTaskStatusFromTxRapid(job.first);
+                            else if (job.second == "pro") taskInfo = queryTaskStatusFromTxPro(job.first);
+                            else taskInfo = queryTaskStatusFromTx(job.first);
 
-                    if (dbInfo.get("found", false).asBool()) {
-                        taskInfo["fileurl"] = dbInfo["fileurl"];
-                        if(!dbInfo["previewImages"].empty())
-                        taskInfo["previewImages"] = dbInfo["previewImages"];
-                        taskInfo["Isprivate"] = dbInfo["Isprivate"];
-                        taskInfo["downloadCount"] = dbInfo["downloadCount"];
-                        taskInfo["like"] = dbInfo["like"];
-                        taskInfo["createTime"] = dbInfo["createTime"];
-                        taskInfo["status"] = dbInfo["status"];
-                        if(taskInfo["status"] == "SUCCEED"){
-                            taskInfo["errorMsg"] = "";
+                            // 合并DB信息
+                            if (dbInfo.get("found", false).asBool()) {
+                                taskInfo["fileurl"] = dbInfo["fileurl"];
+                                if (!dbInfo["previewImages"].empty()) taskInfo["previewImages"] = dbInfo["previewImages"];
+                                taskInfo["Isprivate"] = dbInfo["Isprivate"];
+                                taskInfo["downloadCount"] = dbInfo["downloadCount"];
+                                taskInfo["like"] = dbInfo["like"];
+                                taskInfo["createTime"] = dbInfo["createTime"];
+                                if (!dbInfo["status"].asString().empty()) taskInfo["status"] = dbInfo["status"];
+                                if (taskInfo["status"].asString() == "SUCCEED") taskInfo["errorMsg"] = "";
+                            }
+                            merged = taskInfo;
+                        } catch (const std::exception &ex) {
+                            merged["status"] = "error";
+                            merged["message"] = std::string("任务查询异常: ") + ex.what();
                         }
-                    }
+                        return merged;
+                    }));
+                }
 
-                    currentPageData.append(taskInfo);
+                Json::Value currentPageData(Json::arrayValue);
+                for (auto &f : futures) {
+                    currentPageData.append(f.get());
                 }
 
                 out["status"] = "success";
@@ -1249,7 +1258,7 @@ void handleIncrementViewAndGetRates(const httplib::Request& req, httplib::Respon
     resp["status"] = "success";
     resp["code"] = 200;
     resp["data"]["jobId"] = jobId;
-    resp["data"]["viewCount"] = stats["iewCount"].asInt();
+    resp["data"]["viewCount"] = stats["viewCount"].asInt();
     resp["data"]["likeCount"] = stats["likeCount"].asInt();
     resp["data"]["downloadCount"] = stats["downloadCount"].asInt();
     resp["data"]["likeRate"] = likeRate;       // 收藏率

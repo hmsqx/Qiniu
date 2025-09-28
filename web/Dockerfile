@@ -21,7 +21,41 @@ ARG API_UPSTREAM=http://server:8080
 ARG LLM_UPSTREAM=http://py_server:8090
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Nginx 配置，反向代理到后端服务
-RUN printf "server {\n  listen 80;\n  server_name _;\n  root /usr/share/nginx/html;\n  index index.html;\n\n  location / {\n    try_files \\$uri \\$uri/ /index.html;\n  }\n\n  location /api/ {\n    proxy_pass %s/;\n    proxy_set_header Host \\$host;\n    proxy_set_header X-Real-IP \\$remote_addr;\n    proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;\n  }\n  location /llm/ {\n    proxy_pass %s/;\n    proxy_set_header Host \\$host;\n    proxy_set_header X-Real-IP \\$remote_addr;\n    proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;\n  }\n  location /models/ {\n    proxy_pass %s/models/;\n  }\n}\n" "$API_UPSTREAM" "$LLM_UPSTREAM" "$API_UPSTREAM" > /etc/nginx/conf.d/default.conf
+## 生成安全的 Nginx 配置：仅替换我们定义的两个变量，避免破坏 $host/$uri 等 Nginx 变量
+RUN set -eux; \
+		cat > /tmp/default.conf.template <<'EOF'; \
+server {
+	listen 80;
+	server_name _;
+	root /usr/share/nginx/html;
+	index index.html;
+
+	location / {
+		try_files $uri $uri/ /index.html;
+	}
+
+	location /api/ {
+		proxy_pass ${API_UPSTREAM}/;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+
+	location /llm/ {
+		proxy_pass ${LLM_UPSTREAM}/;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+
+	# 静态模型文件从 C++ 服务透传
+	location /models/ {
+		proxy_pass ${API_UPSTREAM}/models/;
+	}
+}
+EOF
+		# 仅替换我们需要的变量，保留 Nginx 自身变量不被 envsubst 处理
+		envsubst '${API_UPSTREAM} ${LLM_UPSTREAM}' < /tmp/default.conf.template > /etc/nginx/conf.d/default.conf; \
+		rm -f /tmp/default.conf.template
 
 EXPOSE 80

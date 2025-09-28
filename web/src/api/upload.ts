@@ -3,11 +3,11 @@ import { post } from "@/utils/request";
 const UPLOAD_ENDPOINT = "/api/get_model";
 
 export type GenerationResultFormat =
-  | "OBJ"
   | "GLB"
   | "GLTF"
   | "FBX"
   | "USDZ"
+  | "STL"
   | string;
 
 type BasePayload = {

@@ -60,7 +60,6 @@ export const GenerationOptions = ({
             <SelectValue placeholder="选择模型格式" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="OBJ">OBJ</SelectItem>
             <SelectItem value="GLB">GLB</SelectItem>
             <SelectItem value="STL">STL</SelectItem>
             <SelectItem value="USDZ">USDZ</SelectItem>
