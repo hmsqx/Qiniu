@@ -11,10 +11,10 @@
 #include "tx_ai3d.h"
 
 // 优化的数据库查询函数，使用连接池
-Json::Value getTaskCompleteInfoOptimized(const std::string& jobId) 
+Json::Value getTaskCompleteInfoOptimized(const std::string& jobId)
 {
     Json::Value result;
-    
+
     try {
         // 使用连接池获取连接
         ScopedConnection conn;
@@ -58,39 +58,39 @@ Json::Value getTaskCompleteInfoOptimized(const std::string& jobId)
         std::cerr << "查询任务信息异常: " << e.what() << std::endl;
         result["found"] = false;
     }
-    
+
     return result;
 }
 
 // 使用事务的原子操作
-bool updateTaskFilesWithTransaction(const std::string& jobId, 
-                                   const std::string& fileUrl, 
+bool updateTaskFilesWithTransaction(const std::string& jobId,
+                                   const std::string& fileUrl,
                                    const std::string& previewImages) {
     return executeWithRetry([&]() -> bool {
         ScopedConnection conn;
         if (!conn.isValid()) {
             return false;
         }
-        
+
         TransactionManager transaction(std::move(conn));
         if (!transaction.begin(IsolationLevel::REPEATABLE_READ)) {
             return false;
         }
-        
+
         try {
             std::string eJobId = transaction.escapeString(jobId);
             std::string eFileUrl = transaction.escapeString(fileUrl);
             std::string ePreviewImages = transaction.escapeString(previewImages);
-            
-            std::string sql = "UPDATE ai3d_tasks SET fileurl='" + eFileUrl + 
-                            "', previewImages='" + ePreviewImages + 
+
+            std::string sql = "UPDATE ai3d_tasks SET fileurl='" + eFileUrl +
+                            "', previewImages='" + ePreviewImages +
                             "', update_time=NOW() WHERE tx_job_id='" + eJobId + "'";
-            
+
             if (!transaction.executeUpdate(sql)) {
                 transaction.rollback();
                 return false;
             }
-            
+
             return transaction.commit();
         } catch (const std::exception& e) {
             std::cerr << "更新任务文件异常: " << e.what() << std::endl;
@@ -106,7 +106,7 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //     std::string userId = req.get_param_value("UserId");
 //     std::string pageNumStr = req.get_param_value("PageNum");
 //     std::string pageSizeStr = req.get_param_value("PageSize");
-    
+
 //     if (userId.empty() || pageNumStr.empty() || pageSizeStr.empty()) {
 //         Json::Value errorResponse;
 //         errorResponse["status"] = "error";
@@ -117,7 +117,7 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //         res.set_content(Json::writeString(writer, errorResponse), "application/json");
 //         return;
 //     }
-    
+
 //     int pageNum, pageSize;
 //     try {
 //         pageNum = std::stoi(pageNumStr);
@@ -132,7 +132,7 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //         res.set_content(Json::writeString(writer, errorResponse), "application/json");
 //         return;
 //     }
-    
+
 //     // 使用线程池异步处理
 //     auto future = getThreadPool().enqueue([=]() -> Json::Value {
 //         try {
@@ -149,12 +149,12 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //                 result["data"]["tasks"] = Json::Value(Json::arrayValue);
 //                 return result;
 //             }
-            
+
 //             Json::Value currentPageData;
 //             for (const auto &job : taskIds.second) {
 //                 // 使用优化的查询函数
 //                 Json::Value dbInfo = getTaskCompleteInfoOptimized(job.first);
-                
+
 //                 // 获取腾讯云状态
 //                 Json::Value taskInfo;
 //                 if (job.second == "rapid") {
@@ -164,7 +164,7 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //                 } else {
 //                     taskInfo = queryTaskStatusFromTx(job.first);
 //                 }
-                
+
 //                 // 合并信息
 //                 if (dbInfo.get("found", false).asBool()) {
 //                     taskInfo["fileurl"] = dbInfo["fileurl"];
@@ -176,10 +176,10 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //                     taskInfo["like"] = dbInfo["like"];
 //                     taskInfo["createTime"] = dbInfo["createTime"];
 //                 }
-                
+
 //                 currentPageData.append(taskInfo);
 //             }
-            
+
 //             Json::Value result;
 //             result["status"] = "success";
 //             result["code"] = 200;
@@ -188,7 +188,7 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //             result["data"]["pageNum"] = pageNum;
 //             result["data"]["pageSize"] = pageSize;
 //             result["data"]["tasks"] = currentPageData;
-            
+
 //             return result;
 //         } catch (const std::exception& e) {
 //             Json::Value errorResult;
@@ -198,13 +198,13 @@ bool updateTaskFilesWithTransaction(const std::string& jobId,
 //             return errorResult;
 //         }
 //     });
-    
+
 //     // 等待结果
 //     try {
 //         Json::Value result = future.get();
 //         Json::StreamWriterBuilder writer;
 //         res.set_content(Json::writeString(writer, result), "application/json");
-        
+
 //         if (result["status"].asString() == "error") {
 //             res.status = result["code"].asInt();
 //         } else {
@@ -230,23 +230,23 @@ bool incrementDownloadCountSafely(const std::string& jobId) {
         if (!conn.isValid()) {
             return false;
         }
-        
+
         TransactionManager transaction(std::move(conn));
         if (!transaction.begin(IsolationLevel::REPEATABLE_READ)) {
             return false;
         }
-        
+
         try {
             std::string eJobId = transaction.escapeString(jobId);
-            
+
             // 使用原子操作更新计数
             std::string sql = "UPDATE ai3d_tasks SET downloadCount=COALESCE(downloadCount,0)+1 WHERE tx_job_id='" + eJobId + "'";
-            
+
             if (!transaction.executeUpdate(sql)) {
                 transaction.rollback();
                 return false;
             }
-            
+
             return transaction.commit();
         } catch (const std::exception& e) {
             std::cerr << "增加下载计数异常: " << e.what() << std::endl;

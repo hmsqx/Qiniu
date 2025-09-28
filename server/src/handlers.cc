@@ -120,7 +120,7 @@ void handleGetModel(const httplib::Request &req, httplib::Response &res)
             auto start = steady_clock::now();
             while (duration_cast<seconds>(steady_clock::now() - start).count() < AI3D_POLL_TIMEOUT_SECONDS)
             {
-                
+
                 Json::Value taskInfo;
                 if(version == "comm")
                 taskInfo = queryTaskStatusFromTx(jobId);
@@ -128,7 +128,7 @@ void handleGetModel(const httplib::Request &req, httplib::Response &res)
                 taskInfo = queryTaskStatusFromTxPro(jobId);
                 else if(version == "rapid")
                 taskInfo = queryTaskStatusFromTxRapid(jobId);
-                std::cout << "定时器任务执行中jobId: " << jobId <<" status:" <<taskInfo.get("status","")<< std::endl;  
+                std::cout << "定时器任务执行中jobId: " << jobId <<" status:" <<taskInfo.get("status","")<< std::endl;
                 std::string status = taskInfo.get("status", "").asString();
                 if (status == "DONE")
                 {
@@ -677,7 +677,7 @@ void handleLogout(const httplib::Request &req, httplib::Response &res)
     {
         sessionToken = req.get_header_value("Session-Token");
     }
-    
+
     if (sessionToken.empty())
     {
         Json::Value errorResponse;
@@ -766,7 +766,7 @@ void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
-    
+
     std::string jobId = root.get("jobId", "").asString();
     if (jobId.empty())
     {
@@ -779,20 +779,20 @@ void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
-    
+
     // 获取当前用户信息
     std::string sessionToken;
     if (req.has_header("Session-Token"))
     {
         sessionToken = req.get_header_value("Session-Token");
     }
-    
+
     Json::Value userInfo;
     if (!sessionToken.empty())
     {
         userInfo = getUserInfoBySessionToken(sessionToken);
     }
-    
+
     std::string currentUserId = userInfo.get("userId", "").asString();
     if (currentUserId.empty())
     {
@@ -805,7 +805,7 @@ void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
-    
+
     // 使用新的下载记录函数（确保每个用户对每个模型只能计数一次）
     auto fut = getThreadPool().enqueue([currentUserId, jobId]()
                                        { return recordUserDownloadAndIncrementCount(currentUserId, jobId); });
@@ -820,7 +820,7 @@ void handleDownloadModel(const httplib::Request &req, httplib::Response &res)
         res.set_content(Json::writeString(writer, errorResponse), "application/json");
         return;
     }
-    
+
     Json::Value ok;
     ok["status"] = "success";
     ok["code"] = 200;
