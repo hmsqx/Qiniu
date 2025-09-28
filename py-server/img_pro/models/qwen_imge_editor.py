@@ -64,7 +64,8 @@ class Qwen3DOptimizer:
     async def download_image_to_base64(self, image_url: str) -> str:
         """异步下载图像并转换为base64"""
         try:
-            response = requests.get(image_url, timeout=30)
+            timeout = get_settings().IMAGE_DOWNLOAD_TIMEOUT
+            response = requests.get(image_url, timeout=timeout)
             if response.status_code == 200:
                 return base64.b64encode(response.content).decode('utf-8')
             else:

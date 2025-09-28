@@ -79,11 +79,13 @@ const router = createBrowserRouter([
       {
         path: "viewer",
         element: (
-          <ErrorBoundary>
-            <Suspense fallback={<LoadingSkeleton variant="page" />}>
-              <Viewer />
-            </Suspense>
-          </ErrorBoundary>
+          <Protected>
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingSkeleton variant="page" />}>
+                <Viewer />
+              </Suspense>
+            </ErrorBoundary>
+          </Protected>
         ),
       },
       {

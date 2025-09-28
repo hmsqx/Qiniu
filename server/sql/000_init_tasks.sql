@@ -45,7 +45,7 @@ CREATE TABLE `ai3d_tasks` (
   UNIQUE KEY `uk_tx_job_id` (`tx_job_id`),
   KEY `idx_user_ctime` (`user_id`,`create_time`),
   KEY `idx_ai3d_tasks_viewcount` (`viewCount`)
-) ENGINE=InnoDB AUTO_INCREMENT=428 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='AI3D 任务表';
+) ENGINE=InnoDB AUTO_INCREMENT=428 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='AI3D 任务表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `user_model_likes` (
   UNIQUE KEY `uniq_user_job` (`user_id`,`job_id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_job` (`job_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,12 +102,12 @@ CREATE TABLE `user_sessions` (
   `expire_time` datetime NOT NULL COMMENT '过期时间',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `revoked` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否吊销',
-  `update_time` varchar(45) NOT NULL,
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_session_token` (`session_token`),
   KEY `idx_user_expire` (`user_id`,`expire_time`),
   CONSTRAINT `fk_user_sessions_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户会话表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户会话表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -116,7 +116,7 @@ CREATE TABLE `user_sessions` (
 
 LOCK TABLES `user_sessions` WRITE;
 /*!40000 ALTER TABLE `user_sessions` DISABLE KEYS */;
-INSERT INTO `user_sessions` VALUES (1,'ac65735e-983f-11f0-8927-00163e103396','c5f0133d3a5ae87cfb3770a499b6c7745b0ce5d7a36333fdcf62242814ba3be6','2025-10-23 13:39:29','2025-09-23 13:39:29',0,''),(2,'ac65735e-983f-11f0-8927-00163e103396','cfa65c22f35ffab55f9f15f529bb1ba669070d55cdc5a18da9e3f264562b3b0c','2025-10-23 14:59:19','2025-09-23 14:59:19',0,''),(3,'ac65735e-983f-11f0-8927-00163e103396','f88b3657ea7b47e30b281ffc6df4787a4c0425cdcef481e617fcc727579aa8ea','2025-10-23 18:21:40','2025-09-23 18:21:40',0,''),(4,'aff32f7c-9905-11f0-8927-00163e103396','aa2c5763429b50eb815b697d21efdc505c932d1a59c4d6d358bea063181db996','2025-10-24 13:16:57','2025-09-24 13:16:57',0,'');
+INSERT INTO `user_sessions` (`id`,`user_id`,`session_token`,`expire_time`,`create_time`,`revoked`) VALUES (1,'ac65735e-983f-11f0-8927-00163e103396','c5f0133d3a5ae87cfb3770a499b6c7745b0ce5d7a36333fdcf62242814ba3be6','2025-10-23 13:39:29','2025-09-23 13:39:29',0),(2,'ac65735e-983f-11f0-8927-00163e103396','cfa65c22f35ffab55f9f15f529bb1ba669070d55cdc5a18da9e3f264562b3b0c','2025-10-23 14:59:19','2025-09-23 14:59:19',0),(3,'ac65735e-983f-11f0-8927-00163e103396','f88b3657ea7b47e30b281ffc6df4787a4c0425cdcef481e617fcc727579aa8ea','2025-10-23 18:21:40','2025-09-23 18:21:40',0),(4,'aff32f7c-9905-11f0-8927-00163e103396','aa2c5763429b50eb815b697d21efdc505c932d1a59c4d6d358bea063181db996','2025-10-24 13:16:57','2025-09-24 13:16:57',0);
 /*!40000 ALTER TABLE `user_sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,7 +143,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `uk_user_id` (`user_id`),
   UNIQUE KEY `uk_username` (`username`),
   UNIQUE KEY `uk_email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,6 +168,14 @@ UNLOCK TABLES;
 -- Dump completed on 2025-09-28 20:44:51
 
 
+
+-- Table structure for table `daily_model_views`
+-- Ensures existence before backfilling data
+CREATE TABLE IF NOT EXISTS `daily_model_views` (
+  `view_date` date NOT NULL COMMENT '日期',
+  `total_views` int NOT NULL DEFAULT 0 COMMENT '当天总浏览量',
+  PRIMARY KEY (`view_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='每日模型浏览总计';
 
 -- 1) Create user_model_downloads table (idempotent)
 CREATE TABLE IF NOT EXISTS `user_model_downloads` (

@@ -14,7 +14,7 @@ import { Search, RotateCcw, Eraser, Loader2 } from "lucide-react";
 export interface FiltersState {
   username: string;
   email: string;
-  role: string; // empty string means all
+  role: string;
 }
 
 interface FiltersProps {

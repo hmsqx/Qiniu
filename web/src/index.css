@@ -150,29 +150,6 @@
     @apply bg-background text-foreground;
   }
 
-  /* Normalize form control text color and autofill across themes */
-  input,
-  textarea,
-  select {
-    color: var(--color-foreground);
-  }
-
-  /* Chrome/Safari autofill fix: ensure text color stays readable and bg matches input */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  textarea:-webkit-autofill,
-  textarea:-webkit-autofill:hover,
-  textarea:-webkit-autofill:focus,
-  select:-webkit-autofill,
-  select:-webkit-autofill:hover,
-  select:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--color-foreground);
-    transition: background-color 9999s ease-in-out 0s; /* avoid yellow flash */
-    box-shadow: 0 0 0px 1000px
-      color-mix(in oklch, var(--color-input), transparent 0%) inset;
-  }
-
   /* --- WebKit Scrollbar Styles (Chrome, Safari, Edge) --- */
   /* 这些样式同样会自动适应你的主题，因为它们使用了映射到 CSS 变量的 utility classes */
   ::-webkit-scrollbar {

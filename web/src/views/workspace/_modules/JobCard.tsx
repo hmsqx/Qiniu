@@ -80,7 +80,11 @@ export function JobCard({
           <div className="flex flex-col items-center justify-center text-slate-400">
             <ImageOff className="w-10 h-10 mb-2" />
             <div className="text-sm">
-              {isProcessing ? "任务处理中" : isDone ? "已完成（暂无预览图）" : "暂无预览图"}
+              {isProcessing
+                ? "任务处理中"
+                : isDone
+                ? "已完成（暂无预览图）"
+                : "暂无预览图"}
             </div>
           </div>
         )}

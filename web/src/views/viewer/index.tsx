@@ -55,14 +55,17 @@ const Viewer: React.FC = () => {
       onError: () => setDownloading(false),
     });
   }
-  const { handleResetView, handleScreenshot } = useThreeViewer(containerRef, {
-    url: urlParam,
-    format,
-    isVideo,
-    isUsd,
-    autoRotate,
-    stlColor,
-  });
+  const { handleResetView, handleScreenshot, loadingProgress } = useThreeViewer(
+    containerRef,
+    {
+      url: urlParam,
+      format,
+      isVideo,
+      isUsd,
+      autoRotate,
+      stlColor,
+    }
+  );
 
   const handleResetAll = () => {
     handleResetView();
@@ -103,6 +106,13 @@ const Viewer: React.FC = () => {
 
   return (
     <div ref={containerRef} className="w-full h-[calc(100%-64px)] relative">
+      {loadingProgress > 0 && loadingProgress < 100 && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10">
+          <div className="text-slate-200 text-sm bg-black/60 px-3 py-2 rounded">
+            正在加载模型… {loadingProgress}%
+          </div>
+        </div>
+      )}
       <div className="absolute left-4 top-2 text-slate-300 text-sm bg-black/30 px-2 py-1 rounded">
         旋转: 拖拽 缩放: 滚轮 平移: 右键
       </div>

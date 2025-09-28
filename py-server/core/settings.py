@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     MAX_ENHANCEMENT_ITERATIONS: int = 3
     MAX_IMAGE_SIZE: int = 2048
     MIN_IMAGE_SIZE: int = 2048
+    # Network/HTTP
+    IMAGE_DOWNLOAD_TIMEOUT: int = 120  # seconds
 
     # OpenAI-compatible base for Qwen text
     QWEN_COMPATIBLE_BASE_URL: str = (
@@ -34,10 +36,6 @@ class Settings(BaseSettings):
     # Dashscope API base
     DASHSCOPE_BASE_HTTP_API_URL: str = "https://dashscope.aliyuncs.com/api/v1"
 
-    # Resolve env file loading order (no CWD dependency):
-    # 1) APP_ENV_FILE (explicit override)
-    # 2) <package-root>/.env (common local default)
-    # 3) <package-root>/api.env (legacy default)
     _pkg_root = Path(__file__).resolve().parent.parent
     _legacy_env = _pkg_root / "api.env"
     _dot_env = _pkg_root / ".env"

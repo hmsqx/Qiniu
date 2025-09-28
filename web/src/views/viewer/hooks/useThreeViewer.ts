@@ -1,7 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
@@ -31,6 +34,7 @@ export function useThreeViewer(
     target: THREE.Vector3;
   } | null>(null);
   const modelRootRef = useRef<THREE.Object3D | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
 
   useEffect(() => {
     const { url, format, isVideo, isUsd, autoRotate, stlColor } = opts;
@@ -46,7 +50,8 @@ export function useThreeViewer(
         if (/^(\.\.\/|\.\/|\/)/.test(inputUrl)) return inputUrl;
         const u = new URL(inputUrl, window.location.origin);
         if (u.hostname.endsWith("tencentcos.cn")) {
-          return u.pathname + (u.search || "");
+          // Ensure assets referenced inside GLTF/MTL also go through our proxy
+          return "/model" + u.pathname + (u.search || "");
         }
         return inputUrl;
       } catch {
@@ -54,9 +59,20 @@ export function useThreeViewer(
       }
     };
     manager.setURLModifier(proxyify);
+    manager.onProgress = (_url, itemsLoaded, itemsTotal) => {
+      if (itemsTotal > 0) {
+        setLoadingProgress(Math.round((itemsLoaded / itemsTotal) * 100));
+      }
+    };
+    manager.onLoad = () => setLoadingProgress(100);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
+    // Cap DPR to reduce GPU load on high-DPI displays
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
@@ -116,12 +132,31 @@ export function useThreeViewer(
         let root: THREE.Object3D | null = null;
         if (format === "glb" || format === "gltf") {
           const loader = new GLTFLoader(manager);
+          // Prefer compressed assets when available
+          try {
+            const draco = new DRACOLoader(manager);
+            // Use Google-hosted decoders to avoid bundling decoder files; replace with local /draco/ if desired
+            draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
+            loader.setDRACOLoader(draco);
+          } catch {}
+          try {
+            loader.setMeshoptDecoder(MeshoptDecoder as any);
+          } catch {}
           loader.setCrossOrigin("anonymous");
           const basePath = new URL(
             safeUrl,
             window.location.origin
           ).href.replace(/[^/]*$/g, "");
           loader.setResourcePath(basePath);
+          try {
+            const ktx2 = new KTX2Loader(manager)
+              .setTranscoderPath(
+                // Note: you can host these under /basis/ for offline usage
+                "https://unpkg.com/three@0.160.0/examples/jsm/libs/basis/"
+              )
+              .detectSupport(renderer);
+            loader.setKTX2Loader(ktx2);
+          } catch {}
           const gltf = await loader.loadAsync(safeUrl);
           root = gltf.scene;
         } else if (format === "obj") {
@@ -259,6 +294,7 @@ export function useThreeViewer(
     stlMaterialRef,
     initialCamRef,
     modelRootRef,
+    loadingProgress,
     handleResetView,
     handleScreenshot,
   } as const;

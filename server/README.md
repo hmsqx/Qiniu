@@ -1,37 +1,44 @@
-
 # AI3D C++ 后端服务器
+
 # 1. 克隆项目
+
 git clone <repository-url>
 cd Qiniu/server
 
 # 2. 一键部署
+
 sudo ./deploy.sh
 
 # 3. 配置数据库和密钥
+
 nano include/config.h
 
 # 4. 启动服务
+
 systemctl start ai3d-server
 
 # 5. 健康检查
+
 ./health_check.sh
-基于C++和httplib构建的高性能AI3D模型生成服务后端，提供完整的用户管理、模型管理、文件服务等功能。
+基于 C++和 httplib 构建的高性能 AI3D 模型生成服务后端，提供完整的用户管理、模型管理、文件服务等功能。
 
 ## 🚀 服务器特性
 
 ### 核心功能
-- **AI3D模型生成**：集成腾讯云AI3D SDK，支持文本到3D模型转换
+
+- **AI3D 模型生成**：集成腾讯云 AI3D SDK，支持文本到 3D 模型转换
 - **用户系统**：完整的注册、登录、会话管理
 - **模型管理**：模型上传、下载、预览、收藏、统计
-- **文件服务**：静态文件托管，支持多种3D格式
+- **文件服务**：静态文件托管，支持多种 3D 格式
 - **权限控制**：基于角色的访问控制，支持私有/公开模型
-- **API限流**：IP限流、请求频率控制
-- **安全防护**：SQL注入防护、XSS防护、会话安全
+- **API 限流**：IP 限流、请求频率控制
+- **安全防护**：SQL 注入防护、XSS 防护、会话安全
 
 ### 技术架构
-- **Web框架**：httplib (轻量级HTTP服务器)
+
+- **Web 框架**：httplib (轻量级 HTTP 服务器)
 - **数据库**：MySQL 8.0+ (连接池管理)
-- **AI服务**：腾讯云AI3D SDK
+- **AI 服务**：腾讯云 AI3D SDK
 - **并发处理**：线程池 + 异步任务
 - **安全机制**：多层安全中间件
 - **配置管理**：编译时宏配置
@@ -63,13 +70,15 @@ server/
 ## 🛠️ 环境要求
 
 ### 系统要求
+
 - **操作系统**：Linux (Ubuntu 18.04+ 推荐)
 - **内存**：至少 2GB RAM
 - **存储**：至少 10GB 可用空间
-- **CPU**：2核心以上
+- **CPU**：2 核心以上
 
 ### 依赖软件
-- **编译器**：GCC 7.0+ (支持C++17)
+
+- **编译器**：GCC 7.0+ (支持 C++17)
 - **构建工具**：CMake 3.1+
 - **数据库**：MySQL 5.7+ 或 MariaDB 10.3+
 - **系统库**：
@@ -83,12 +92,14 @@ server/
 ### 1. 安装依赖
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install -y build-essential cmake libmysqlclient-dev libcurl4-openssl-dev libssl-dev libjsoncpp-dev
 ```
 
 **CentOS/RHEL:**
+
 ```bash
 sudo yum install -y gcc-c++ cmake mysql-devel libcurl-devel openssl-devel jsoncpp-devel
 ```
@@ -242,12 +253,14 @@ sudo chown -R www-data:www-data /var/log/ai3d
 ## 🚀 启动服务
 
 ### 开发模式
+
 ```bash
 cd server/build
 ./tencent_cloud_cpp_sample
 ```
 
 ### 生产模式
+
 ```bash
 # 后台运行
 cd server/build
@@ -258,6 +271,7 @@ tail -f /var/log/ai3d/server.log
 ```
 
 ### 系统服务
+
 ```bash
 # 创建systemd服务文件
 sudo tee /etc/systemd/system/ai3d-server.service > /dev/null <<EOF
@@ -288,48 +302,56 @@ sudo systemctl start ai3d-server
 sudo systemctl status ai3d-server
 ```
 
-## 📊 API接口
+## 📊 API 接口
 
 ### 用户认证
+
 - `POST /api/register` - 用户注册
 - `POST /api/login` - 用户登录
 - `POST /api/logout` - 用户登出
 - `GET /api/auth/me` - 获取当前用户信息
 
 ### 模型管理
-- `POST /api/get_model` - 生成3D模型
+
+- `POST /api/get_model` - 生成 3D 模型
 - `GET /api/query` - 查询模型列表（分页）
 - `POST /api/downloadModel` - 下载模型（计数）
 - `POST /api/like` - 点赞/取消点赞
 - `GET /api/showModel` - 查看模型详情
 
 ### 文件服务
+
 - `GET /models/*` - 模型文件下载
 - `GET /download/*` - 文件下载
 
 ### 管理员接口
+
 - `GET /api/admin/overview` - 系统概览统计
 - `GET /api/admin/users` - 用户管理
 - `GET /api/admin/models` - 模型管理
 
 ### 健康检查
+
 - `GET /health` - 服务健康检查
 
 ## 🔒 安全特性
 
 ### 认证和授权
-- **会话管理**：基于token的会话机制
+
+- **会话管理**：基于 token 的会话机制
 - **密码安全**：SHA256+盐值哈希存储
 - **会话过期**：自动清理过期会话
 - **权限控制**：基于角色的访问控制
 
-### API安全
-- **IP限流**：防止恶意请求
-- **请求验证**：JSON格式验证
-- **SQL注入防护**：参数转义和预处理
-- **XSS防护**：输入过滤和输出编码
+### API 安全
+
+- **IP 限流**：防止恶意请求
+- **请求验证**：JSON 格式验证
+- **SQL 注入防护**：参数转义和预处理
+- **XSS 防护**：输入过滤和输出编码
 
 ### 数据安全
+
 - **连接池**：数据库连接复用
 - **事务安全**：关键操作事务保护
 - **并发控制**：线程安全的数据访问
@@ -338,25 +360,29 @@ sudo systemctl status ai3d-server
 
 ### 配置调优
 
-**小型部署（<1000用户）：**
+**小型部署（<1000 用户）：**
+
 ```cpp
 #define MAX_CONCURRENT_MODEL_DOWNLOADS 4
 #define MAX_REQUESTS_PER_MINUTE 60
 ```
 
-**中型部署（1000-10000用户）：**
+**中型部署（1000-10000 用户）：**
+
 ```cpp
 #define MAX_CONCURRENT_MODEL_DOWNLOADS 8
 #define MAX_REQUESTS_PER_MINUTE 100
 ```
 
-**大型部署（>10000用户）：**
+**大型部署（>10000 用户）：**
+
 ```cpp
 #define MAX_CONCURRENT_MODEL_DOWNLOADS 16
 #define MAX_REQUESTS_PER_MINUTE 200
 ```
 
 ### 数据库优化
+
 ```sql
 -- 添加索引
 CREATE INDEX idx_ai3d_tasks_user_id ON ai3d_tasks(user_id);
@@ -367,6 +393,7 @@ CREATE INDEX idx_user_sessions_expire ON user_sessions(expire_time);
 ```
 
 ### 系统优化
+
 ```bash
 # 增加文件描述符限制
 echo "* soft nofile 65535" >> /etc/security/limits.conf
@@ -381,6 +408,7 @@ sysctl -p
 ## 📈 监控和日志
 
 ### 日志配置
+
 ```bash
 # 查看服务日志
 journalctl -u ai3d-server -f
@@ -390,6 +418,7 @@ tail -f /var/log/ai3d/server.log
 ```
 
 ### 性能监控
+
 ```bash
 # 检查服务状态
 curl http://localhost:8080/health
@@ -402,6 +431,7 @@ top -p $(pgrep tencent_cloud_cpp_sample)
 ```
 
 ### 健康检查脚本
+
 ```bash
 #!/bin/bash
 # health_check.sh
@@ -410,7 +440,7 @@ if ! curl -f http://localhost:8080/health > /dev/null 2>&1; then
     echo "Service is down, restarting..."
     sudo systemctl restart ai3d-server
     sleep 10
-    
+
     if ! curl -f http://localhost:8080/health > /dev/null 2>&1; then
         echo "Service restart failed, sending alert..."
         # 发送告警
@@ -421,6 +451,7 @@ fi
 ## 🔄 维护和更新
 
 ### 备份策略
+
 ```bash
 # 数据库备份
 mysqldump -u ai3d_user -p Tasks > backup_$(date +%Y%m%d).sql
@@ -433,6 +464,7 @@ tar -czf models_backup_$(date +%Y%m%d).tar.gz /var/www/models/
 ```
 
 ### 更新流程
+
 ```bash
 # 1. 备份当前版本
 cp build/tencent_cloud_cpp_sample build/tencent_cloud_cpp_sample.backup
@@ -451,6 +483,7 @@ curl http://localhost:8080/health
 ```
 
 ### 定期维护
+
 ```bash
 # 创建维护脚本
 cat > /root/maintenance.sh << 'EOF'
@@ -479,6 +512,7 @@ echo "0 2 * * 0 /root/maintenance.sh" | crontab -
 ### 常见问题
 
 **1. 服务无法启动**
+
 ```bash
 # 检查端口占用
 netstat -tulpn | grep :8080
@@ -491,6 +525,7 @@ journalctl -u ai3d-server -n 50
 ```
 
 **2. 数据库连接失败**
+
 ```bash
 # 测试数据库连接
 mysql -h localhost -u ai3d_user -p Tasks
@@ -500,6 +535,7 @@ sudo systemctl status mysql
 ```
 
 **3. 编译失败**
+
 ```bash
 # 清理构建目录
 rm -rf build/*
@@ -509,16 +545,19 @@ cd build && cmake .. && make -j$(nproc)
 ### 性能问题
 
 **1. 响应慢**
+
 - 检查数据库查询性能
 - 优化索引
 - 增加连接池大小
 
 **2. 内存不足**
+
 - 调整线程池大小
 - 优化内存使用
 - 增加服务器内存
 
 **3. 磁盘空间不足**
+
 - 清理日志文件
 - 清理临时文件
 - 扩展存储空间
@@ -526,6 +565,7 @@ cd build && cmake .. && make -j$(nproc)
 ## 📋 部署检查清单
 
 ### 部署前检查
+
 - [ ] 系统环境满足要求
 - [ ] 依赖软件已安装
 - [ ] 数据库已配置并测试
@@ -534,14 +574,16 @@ cd build && cmake .. && make -j$(nproc)
 - [ ] 防火墙规则已配置
 
 ### 部署后验证
+
 - [ ] 服务器成功启动
 - [ ] 健康检查端点响应正常
-- [ ] API接口功能正常
+- [ ] API 接口功能正常
 - [ ] 数据库连接正常
 - [ ] 文件服务正常
 - [ ] 日志记录正常
 
 ### 生产环境检查
+
 - [ ] 系统服务已配置
 - [ ] 监控告警已设置
 - [ ] 日志轮转已配置
@@ -550,12 +592,11 @@ cd build && cmake .. && make -j$(nproc)
 
 ## 🎯 总结
 
-本服务器提供了完整的AI3D模型生成服务后端，具有以下特点：
+本服务器提供了完整的 AI3D 模型生成服务后端，具有以下特点：
 
-✅ **高性能** - 基于C++和httplib的高性能HTTP服务  
-✅ **高可靠** - 完善的错误处理和事务保护  
-✅ **高安全** - 多层安全防护机制  
-✅ **易部署** - 简单的编译和配置流程  
-✅ **易维护** - 完善的日志和监控系统  
-✅ **易扩展** - 模块化设计，支持功能扩展  
-
+✅ **高性能** - 基于 C++和 httplib 的高性能 HTTP 服务
+✅ **高可靠** - 完善的错误处理和事务保护
+✅ **高安全** - 多层安全防护机制
+✅ **易部署** - 简单的编译和配置流程
+✅ **易维护** - 完善的日志和监控系统
+✅ **易扩展** - 模块化设计，支持功能扩展

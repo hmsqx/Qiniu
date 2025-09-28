@@ -48,9 +48,9 @@ export function useWorkspaceJobs(
   );
 
   const refresh = useCallback(() => {
-    setPageNum(1);
-    fetchPage(1);
-  }, [fetchPage]);
+    // 刷新保持当前页
+    fetchPage(pageNum);
+  }, [fetchPage, pageNum]);
 
   const nextPage = useCallback(() => {
     setPageNum((prev) => {
@@ -79,11 +79,24 @@ export function useWorkspaceJobs(
 
   useEffect(() => {
     if (!userId) return;
-    setPageNum(1);
-    fetchPage(1);
-  }, [userId, pageSize, fetchPage]);
+    // 初始加载使用当前的 pageNum（由 initialPage 决定）
+    fetchPage(pageNum);
+    // 仅在 userId 或 pageSize 变化时重新拉取当前页
+  }, [userId, pageSize]);
 
   const isEmpty = !loading && !error && list.length === 0;
+
+  // 如果总页数变化导致当前页越界，回退到最后一页
+  useEffect(() => {
+    if (pageNum > totalPages) {
+      const target = totalPages;
+      setPageNum(target);
+      if (!loading) {
+        fetchPage(target);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalPages]);
 
   return {
     list,

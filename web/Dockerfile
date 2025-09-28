@@ -22,6 +22,6 @@ ARG LLM_UPSTREAM=http://py_server:8090
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Nginx 配置，反向代理到后端服务
-RUN printf "server {\n  listen 80;\n  server_name _;\n  root /usr/share/nginx/html;\n  index index.html;\n\n  location / {\n    try_files $$uri $$uri/ /index.html;\n  }\n\n  location /api/ {\n    proxy_pass %s/;\n    proxy_set_header Host $$host;\n    proxy_set_header X-Real-IP $$remote_addr;\n    proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;\n  }\n  location /llm/ {\n    proxy_pass %s/;\n    proxy_set_header Host $$host;\n    proxy_set_header X-Real-IP $$remote_addr;\n    proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;\n  }\n  location /models/ {\n    proxy_pass %s/models/;\n  }\n}\n" "$API_UPSTREAM" "$LLM_UPSTREAM" "$API_UPSTREAM" > /etc/nginx/conf.d/default.conf
+RUN printf "server {\n  listen 80;\n  server_name _;\n  root /usr/share/nginx/html;\n  index index.html;\n\n  location / {\n    try_files \\$uri \\$uri/ /index.html;\n  }\n\n  location /api/ {\n    proxy_pass %s/;\n    proxy_set_header Host \\$host;\n    proxy_set_header X-Real-IP \\$remote_addr;\n    proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;\n  }\n  location /llm/ {\n    proxy_pass %s/;\n    proxy_set_header Host \\$host;\n    proxy_set_header X-Real-IP \\$remote_addr;\n    proxy_set_header X-Forwarded-For \\$proxy_add_x_forwarded_for;\n  }\n  location /models/ {\n    proxy_pass %s/models/;\n  }\n}\n" "$API_UPSTREAM" "$LLM_UPSTREAM" "$API_UPSTREAM" > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

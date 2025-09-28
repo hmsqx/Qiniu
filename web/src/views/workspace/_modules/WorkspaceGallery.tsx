@@ -6,12 +6,18 @@ import { SkeletonCard } from "./SkeletonCard";
 import { JobCard } from "./JobCard";
 import { Pagination } from "./Pagination";
 import React from "react";
+import { useSearchParams } from "react-router-dom";
 import { toggleJobVisibility, type JobItem } from "@/api/mode3D";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function WorkspaceGallery() {
   const { user } = useAuth();
   const userId = user?.id || "";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialPageParam = Number(searchParams.get("page") || "1");
+  const initialPage = Number.isFinite(initialPageParam)
+    ? Math.max(1, Math.floor(initialPageParam))
+    : 1;
 
   const {
     list,
@@ -25,7 +31,15 @@ export default function WorkspaceGallery() {
     nextPage,
     prevPage,
     goToPage,
-  } = useWorkspaceJobs(userId, { initialPage: 1, pageSize: 10 });
+  } = useWorkspaceJobs(userId, { initialPage, pageSize: 10 });
+
+  // 将当前页写入 URL，刷新后仍停留在当前页
+  React.useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(pageNum));
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageNum]);
 
   const [selectionMode, setSelectionMode] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
