@@ -1,6 +1,6 @@
 // src/layout/index.tsx
 import { Outlet } from "react-router-dom";
-import { Header } from "./Header";
+import { Header } from "./header";
 import ScaledContainer from "./ScaledContainer";
 
 export default function Layout() {

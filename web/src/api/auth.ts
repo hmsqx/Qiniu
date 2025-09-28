@@ -44,3 +44,13 @@ export async function registerApi(
 export async function meApi(): Promise<ApiEnvelope<AuthSuccess> | AuthSuccess> {
   return await get<ApiEnvelope<AuthSuccess> | AuthSuccess>("/api/auth/me");
 }
+
+export async function logoutApi(
+  sessionToken?: string | null
+): Promise<ApiEnvelope> {
+  const config = sessionToken
+    ? { headers: { "Session-Token": sessionToken } }
+    : undefined;
+
+  return await post<ApiEnvelope>("/api/logout", undefined, config);
+}

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { setAuthToken } from "@/utils/request";
-import { loginApi, registerApi, meApi } from "@/api/auth";
+import { loginApi, registerApi, meApi, logoutApi } from "@/api/auth";
 
 type User = {
   id: string;
@@ -21,7 +21,7 @@ type AuthContextType = {
     email: string,
     password: string
   ) => Promise<User>;
-  logout: () => void;
+  logout: () => Promise<void>;
   openLoginModal: () => void;
   closeLoginModal: () => void;
   loginModalOpen: boolean;
@@ -141,9 +141,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     throw new Error((resp as any)?.message || "注册失败");
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const sessionToken = user?.sessionToken;
+    let logoutError: Error | null = null;
+
+    if (sessionToken) {
+      try {
+        const resp = await logoutApi(sessionToken);
+        const ok =
+          (resp as any)?.status === "success" ||
+          (resp as any)?.code === 200 ||
+          (resp as any)?.code === 0 ||
+          typeof (resp as any)?.code === "undefined";
+
+        if (!ok) {
+          logoutError = new Error(
+            (resp as any)?.message || "退出登录失败，请稍后重试"
+          );
+        }
+      } catch (error: any) {
+        console.warn("logout 调用失败", error);
+        logoutError = new Error(
+          error?.response?.data?.message ||
+            error?.message ||
+            "退出登录失败，请稍后重试"
+        );
+      }
+    }
+
     setUser(null);
     setAuthToken(undefined);
+
+    if (logoutError) {
+      throw logoutError;
+    }
   };
 
   const openLoginModal = () => setLoginModalOpen(true);
